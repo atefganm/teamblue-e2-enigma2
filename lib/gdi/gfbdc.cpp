@@ -4,27 +4,23 @@
 #include <lib/base/init_num.h>
 
 #include <lib/gdi/accel.h>
-#ifdef CONFIG_ION
-#include <lib/gdi/grc.h>
-#endif
+
 #include <time.h>
 
-#if defined(CONFIG_HISILICON_FB)
+#if defined(CONFIG_ION) || defined(CONFIG_HISILICON_FB)
 #include <lib/gdi/grc.h>
 
-#ifdef CONFIG_ION
 extern void bcm_accel_blit(
 		int src_addr, int src_width, int src_height, int src_stride, int src_format,
 		int dst_addr, int dst_width, int dst_height, int dst_stride,
 		int src_x, int src_y, int width, int height,
 		int dst_x, int dst_y, int dwidth, int dheight,
-int pal_addr, int flags);
+		int pal_addr, int flags);
 #endif
 
 gFBDC::gFBDC()
 {
 	fb=new fbClass;
-
 #ifndef CONFIG_ION
 	if (!fb->Available())
 		eFatal("[gFBDC] no framebuffer available");
@@ -128,9 +124,7 @@ void gFBDC::exec(const gOpcode *o)
 			gUnmanagedSurface s(surface);
 			surface = surface_back;
 			surface_back = s;
-#ifdef CONFIG_ION
-			fb->waitVSync();
-#endif
+
 			if (surface.data_phys > surface_back.data_phys)
 				fb->setOffset(surface_back.y);
 			else
@@ -169,6 +163,8 @@ void gFBDC::exec(const gOpcode *o)
 			gUnmanagedSurface s(surface);
 			surface = surface_back;
 			surface_back = s;
+
+			fb->waitVSync();
 			if (surface.data_phys > surface_back.data_phys)
 			{
 				fb->setOffset(0);
