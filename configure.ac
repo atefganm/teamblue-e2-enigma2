@@ -49,8 +49,8 @@ AC_CHECK_LIB([ungif], [DGifOpen], [LIBGIF_LIBS="-lungif"], [AC_CHECK_LIB([gif], 
 AC_SUBST(LIBGIF_LIBS)
 
 AC_ARG_WITH(boxtype,
-	[  --with-boxtype=NAME box type [[none,gb7356,gb7358...]]],
-	[BOXTYPE="$withval"],[BOXTYPE="gb7358"])
+	[  --with-boxtype=NAME box type [[none,dm800...]]],
+	[BOXTYPE="$withval"],[BOXTYPE="dm800"])
 AC_SUBST(BOXTYPE)
 AC_DEFINE_UNQUOTED(BOXTYPE,"$BOXTYPE",[box type])
 
@@ -96,15 +96,66 @@ AC_ARG_WITH(driverdate,
 AC_SUBST(DRIVERDATE)
 AC_DEFINE_UNQUOTED(DRIVERDATE,"$DRIVERDATE",[driver date])
 
+AM_CONDITIONAL(DREAMBOX, test `echo "$BOXTYPE" | cut -b 1-2` == "dm" -o `echo "$BOXTYPE" | cut -b 1-5` == "dream")
+AM_CONDITIONAL(DREAMONE, test "$BOXTYPE" == dreamone)
+AM_CONDITIONAL(DREAMTWO, test "$BOXTYPE" == dreamtwo)
+AM_CONDITIONAL(DM900, test "$BOXTYPE" == dm900)
+AM_CONDITIONAL(DM920, test "$BOXTYPE" == dm920)
+AM_CONDITIONAL(DM8000, test "$BOXTYPE" == dm8000)
+AM_CONDITIONAL(DM7080, test "$BOXTYPE" == dm7080)
+AM_CONDITIONAL(DM820, test "$BOXTYPE" == dm820)
+AM_CONDITIONAL(DM520, test "$BOXTYPE" == dm520)
+AM_CONDITIONAL(DM7020HD, test "$BOXTYPE" == dm7020hd)
+AM_CONDITIONAL(DM7020HDV2, test "$BOXTYPE" == dm7020hdv2)
+AM_CONDITIONAL(DM800, test "$BOXTYPE" == dm800)
+AM_CONDITIONAL(DM800SE, test "$BOXTYPE" == dm800se)
+AM_CONDITIONAL(DM800SEV2, test "$BOXTYPE" == dm800sev2)
+AM_CONDITIONAL(DM500HD, test "$BOXTYPE" == dm500hd)
+AM_CONDITIONAL(DM500HDV2, test "$BOXTYPE" == dm500hdv2)
+
+AM_CONDITIONAL(HAVE_COLORLCD3, test "$BOXTYPE" == dm7080)
+AM_CONDITIONAL(HAVE_COLORLCD2, test "$BOXTYPE" == dm800se -o "$BOXTYPE" == dm800sev2 -o "$BOXTYPE" == dm820)
+AM_CONDITIONAL(HAVE_COLORLCD1, test "$BOXTYPE" == dm8000 -o "$BOXTYPE" == dm800 -o "$BOXTYPE" == dm7020hd -o "$BOXTYPE" == dm7020hdv2)
+AM_CONDITIONAL(HAVE_GRAUTEC8000, test "$BOXTYPE" == dm8000)
+AM_CONDITIONAL(HAVE_GRAUTEC70X0, test "$BOXTYPE" == dm7020hd -o "$BOXTYPE" == dm7020hdv2 -o "$BOXTYPE" == dm7080)
+
+AM_CONDITIONAL(DMAMLOGIC, test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo")
 AM_CONDITIONAL(DREAMBOX, test `echo "$BOXTYPE" | cut -b 1-2` == "dm")
 AM_CONDITIONAL(HAVE_TEMPFANCONTROL, test "$BOXTYPE" == dm8000 -o "$BOXTYPE" == dm800se -o "$BOXTYPE" == dm500hd)
-AM_CONDITIONAL(GIGABLUE, test `echo "$BOXTYPE" | cut -b 1-2` == "gb")
-AM_CONDITIONAL(GBIPBOX, test "$MACHINEBUILD" == gbipbox)
-
 if test `echo "$BOXTYPE" | cut -b 1-2` == "dm"; then
 	AC_DEFINE(DREAMBOX, 1, [Dreambox hardware])
 	AC_DEFINE(KEY_PLAY_ACTUALLY_IS_KEY_PLAYPAUSE, 1,[define when rc sends a KEY_PLAY event for its KEY_PLAYPAUSE key])
 fi
+
+if test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
+	AC_DEFINE(DMAMLOGIC, 1, [Dreambox Amlogic hardware])
+fi
+
+if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm820" -o "$BOXTYPE" == "dm800se" -o "$BOXTYPE" == "dm800sev2" -o "$BOXTYPE" == "dm7020hd" -o "$BOXTYPE" == "dm7020hdv2" -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920" -o "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
+	AC_DEFINE(DREAMBOX_DUAL_TUNER, 1,[define dreambox dual tuner])
+fi
+
+if test "$BOXTYPE" == "dm7080" -o "$BOXTYPE" == "dm520" -o "$BOXTYPE" == "dm820"  -o "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
+	AC_DEFINE(CONFIG_ION, 1,[define BOX use ION Allocator])
+fi
+
+if test "$BOXTYPE" == "dm900" -o "$BOXTYPE" == "dm920"; then
+	AC_DEFINE(DREAMBOX_MOVE_LCD, 1,[define when we need to move lcd text a bit to the right])
+fi
+
+if test "$BOXTYPE" == "dreamone" -o "$BOXTYPE" == "dreamtwo"; then
+	AC_DEFINE(HAVE_AMLOGIC, 1,[define when we need to use amlogic])
+fi
+
+AC_ARG_WITH(nolcd,
+	AC_HELP_STRING([--with-nolcd], [disable ascii based lcd, yes or no]),
+	[[withnolcd=$withval]],
+	[[withnolcd=no]]
+)
+if test x"$withnolcd" != xno ; then
+	AC_DEFINE(NO_LCD, 1,[Define when disable an ascii based lcd device])
+fi
+AM_CONDITIONAL(NO_LCD, test x"$withnolcd" != xno)
 
 AC_ARG_WITH(textlcd,
 	AC_HELP_STRING([--with-textlcd], [use ascii based lcd, yes or no]),
@@ -157,6 +208,7 @@ AM_CONDITIONAL(HAVE_BWLCD255, test x"$withbwlcd255" != xno)
 
 if test `echo "$BOXTYPE" | cut -b 1-2` == "vu"; then
 	AC_DEFINE(FORCE_NO_BLENDING_ACCELERATION, 1,[define when the framebuffer acceleration does not have alphablending support, though the autodetection might indicate that it does])
+	AC_DEFINE(FORCE_NO_FILL_ACCELERATION, 1,[define when the framebuffer acceleration does not have fill support])
 	AC_DEFINE(FORCE_ADVANCED_REMOTE, 1,[define to fixup the input device identification when the remote control is actually an 'advanced' remote (with play/forward/rewind keys)])
 fi
 
