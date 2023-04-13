@@ -1,4 +1,4 @@
-from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager
+from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, getBoxType
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_SKIN, fileCheck, fileExists, fileHas, pathExists, resolveFilename, isPluginInstalled
 from Tools.HardwareInfo import HardwareInfo
 from boxbranding import getBoxType, getMachineBuild, getBrandOEM, getMachineMtdRoot
@@ -8,6 +8,7 @@ SystemInfo["HasRootSubdir"] = False	# This needs to be here so it can be reset b
 SystemInfo["RecoveryMode"] = False or fileCheck("/proc/stb/fp/boot_mode")	# This needs to be here so it can be reset by getMultibootslots!
 from Tools.Multiboot import getMBbootdevice, getMultibootslots  # This import needs to be here to avoid a SystemInfo load loop!
 
+boxtype = getBoxType()
 
 def getNumVideoDecoders():
 	number_of_video_decoders = 0
@@ -102,7 +103,7 @@ SystemInfo["Has2160p"] = fileHas("/proc/stb/video/videomode_preferred", "2160p50
 SystemInfo["HasHDMIpreemphasis"] = fileCheck("/proc/stb/hdmi/preemphasis")
 SystemInfo["HasColorimetry"] = fileCheck("/proc/stb/video/hdmi_colorimetry")
 SystemInfo["HasHDMI-CEC"] = HardwareInfo().has_hdmi() and isPluginInstalled("HdmiCEC") and (fileExists("/dev/cec0") or fileExists("/dev/hdmi_cec") or fileExists("/dev/misc/hdmi_cec0"))
-SystemInfo["HDMIin"] = getMachineBuild() in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo')
+SystemInfo["HDMIin"] = boxtype in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo')
 SystemInfo["HasHdrType"] = fileCheck("/proc/stb/video/hdmi_hdrtype")
 SystemInfo["HasYPbPr"] = getMachineBuild() in ('gb7356', 'gb7325') or model in ('gbultraue', 'gbultraueh', 'gb800ueplus', 'gb800seplus')
 SystemInfo["HasScart"] = getMachineBuild() in ('gb7325', )
