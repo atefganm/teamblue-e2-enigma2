@@ -359,7 +359,18 @@ void eDBoxLCD::update()
 			else
 			{
 #endif
-				write(lcdfd, _buffer, _stride * res.height());
+		{
+			unsigned char gb_buffer[_stride * res.height()];
+			for (int offset = 0; offset < ((_stride * res.height())>>2); offset ++)
+			{
+				unsigned int src = 0;
+				if (offset%(_stride>>2) >= 4) // 4 is offset for dm9x0
+					src = ((unsigned int*)_buffer)[offset - 4];  
+			//                                             blue                         red                  green low                     green high
+			((unsigned int*)gb_buffer)[offset] = ((src >> 3) & 0x001F001F) | ((src << 3) & 0xF800F800) | ((src >> 8) & 0x00E000E0) | ((src << 8) & 0x07000700);
+			}
+			write(lcdfd, gb_buffer, _stride * res.height());
+		}
 #ifdef LCD_COLOR_BITORDER_RGB565
 			}
 #endif
