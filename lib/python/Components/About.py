@@ -255,6 +255,13 @@ def getIfTransferredData(ifname):
 			return rx_bytes, tx_bytes
 
 
+def getChipSetString():
+	chipset = fileReadLine("/proc/stb/info/chipset", source=MODULE_NAME)
+	if chipset is None:
+		return _("Undefined")
+	return chipset.lower()
+
+
 def getDriverInstalledDate():
 	try:
 		from glob import glob
