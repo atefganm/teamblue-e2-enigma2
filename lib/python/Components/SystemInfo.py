@@ -1,4 +1,4 @@
-from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, getBoxType
+from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl, getBoxType
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_SKIN, fileCheck, fileExists, fileHas, pathExists, resolveFilename, isPluginInstalled
 from Tools.HardwareInfo import HardwareInfo
 from boxbranding import getBoxType, getMachineBuild, getBrandOEM, getMachineMtdRoot
@@ -34,6 +34,7 @@ def getHasTuners():
 
 
 model = getBoxType()
+SystemInfo["InDebugMode"] = eGetEnigmaDebugLvl() >= 4
 SystemInfo["CommonInterface"] = eDVBCIInterfaces.getInstance().getNumOfSlots()
 SystemInfo["CommonInterfaceCIDelay"] = fileCheck("/proc/stb/tsmux/rmx_delay")
 for cislot in list(range(0, SystemInfo["CommonInterface"])):
