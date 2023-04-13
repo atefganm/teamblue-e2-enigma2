@@ -10,6 +10,9 @@ from builtins import round
 
 from boxbranding import getBoxType, getMachineBuild, getImageType, getImageVersion
 from sys import maxsize, modules, version_info
+from Tools.Directories import fileReadLine
+
+MODULE_NAME = __name__.split(".")[-1]
 
 
 def getVersionString():
