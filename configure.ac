@@ -528,7 +528,7 @@ data/display/display128/Makefile
 data/display/display128dm/Makefile
 data/display/lcd_skin220/Makefile
 data/display/display390/Makefile
-data/display/lcd_skin400/Makefile
+data/display/display400/Makefile
 data/display/display480/Makefile
 data/display/vfd255/Makefile
 data/skin_default/Makefile
