@@ -3,7 +3,10 @@ from os.path import exists as fileAccess, isdir, isfile, join as pathjoin
 from re import findall
 from subprocess import PIPE, Popen
 from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
-from Tools.Directories import SCOPE_PLUGINS, SCOPE_SKIN, fileCheck, fileContains, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists, isPluginInstalled
+
+from Components.About import getChipSetString
+from Components.RcModel import rc_model
+from Tools.Directories import SCOPE_PLUGINS, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists, isPluginInstalled
 from Tools.HardwareInfo import HardwareInfo
 from boxbranding import getBoxType, getMachineBuild, getBrandOEM, getMachineMtdRoot
 
@@ -146,6 +149,36 @@ class BoxInformation:  # To maintain data integrity class variables should not b
 
 BoxInfo = BoxInformation()
 
+
+ARCHITECTURE = BoxInfo.getItem("architecture")
+BRAND = BoxInfo.getItem("brand")
+MODEL = BoxInfo.getItem("model")
+SOC_FAMILY = BoxInfo.getItem("socfamily")
+DISPLAYTYPE = BoxInfo.getItem("displaytype")
+MTDROOTFS = BoxInfo.getItem("mtdrootfs")
+DISPLAYMODEL = BoxInfo.getItem("displaymodel")
+DISPLAYBRAND = BoxInfo.getItem("displaybrand")
+MACHINEBUILD = BoxInfo.getItem("machinebuild")
+
+def getBoxDisplayName():  # This function returns a tuple like ("BRANDNAME", "BOXNAME")
+	return (DISPLAYBRAND, DISPLAYMODEL)
+
+def getRCFile(ext):
+	filename = resolveFilename(SCOPE_SKIN, pathjoin("hardware", "%s.%s" % (BoxInfo.getItem("rcname"), ext)))
+	if not isfile(filename):
+		filename = resolveFilename(SCOPE_SKIN, pathjoin("hardware", "dmm1.%s" % ext))
+	return filename
+
+def setRCFile(source):
+	if source == "hardware":
+		SystemInfo["RCImage"] = getRCFile("png")
+		SystemInfo["RCMapping"] = getRCFile("xml")
+	else:
+		SystemInfo["RCImage"] = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", SystemInfo["rc_model"], "rc.png"))
+		SystemInfo["RCMapping"] = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", SystemInfo["rc_model"], "rcpositions.xml"))
+	if not (isfile(SystemInfo["RCImage"]) and isfile(SystemInfo["RCMapping"])):
+		SystemInfo["rc_default"] = True
+
 SystemInfo["HasRootSubdir"] = False	# This needs to be here so it can be reset by getMultibootslots!
 SystemInfo["RecoveryMode"] = False or fileCheck("/proc/stb/fp/boot_mode")	# This needs to be here so it can be reset by getMultibootslots!
 from Tools.Multiboot import getMBbootdevice, getMultibootslots  # This import needs to be here to avoid a SystemInfo load loop!
@@ -179,10 +212,25 @@ def getHasTuners():
 	return False
 
 
+def getModuleLayout():
+	modulePath = BoxInfo.getItem("enigmamodule")
+	if modulePath:
+		process = Popen(("/sbin/modprobe", "--dump-modversions", modulePath), stdout=PIPE, stderr=PIPE, universal_newlines=True)
+		stdout, stderr = process.communicate()
+		if process.returncode == 0:
+			for detail in stdout.split("\n"):
+				if "module_layout" in detail:
+					return detail.split("\t")[0]
+	return None
+
+
+BoxInfo.setItem("DebugLevel", eGetEnigmaDebugLvl())
+BoxInfo.setItem("InDebugMode", eGetEnigmaDebugLvl() >= 4)
+BoxInfo.setItem("ModuleLayout", getModuleLayout(), immutable=True)
+
+
 model = HardwareInfo().get_device_model()
 
-BoxInfo.setItem("RCImage", getRCFile("png"))
-BoxInfo.setItem("RCMapping", getRCFile("xml"))
 SystemInfo["InDebugMode"] = eGetEnigmaDebugLvl() >= 4
 SystemInfo["CommonInterface"] = eDVBCIInterfaces.getInstance().getNumOfSlots()
 SystemInfo["CommonInterfaceCIDelay"] = fileCheck("/proc/stb/tsmux/rmx_delay")
