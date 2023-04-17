@@ -252,6 +252,14 @@ SystemInfo["LCDsymbol_hdd"] = model in ("hd51", "vs1500") and fileCheck("/proc/s
 SystemInfo["DeepstandbySupport"] = model != "dm800"
 SystemInfo["OledDisplay"] = fileExists(resolveFilename(SCOPE_SKIN, 'display/lcd_skin/skin_lcd_default.xml'))
 SystemInfo["GBWOL"] = fileExists("/usr/bin/gigablue_wol")
+SystemInfo["CanBTAudio"] = fileCheck("/proc/stb/audio/btaudio")
+SystemInfo["CanBTAudioDelay"] = fileCheck("/proc/stb/audio/btaudio_delay")
+SystemInfo["CanAC3plusTranscode"] = fileExists("/proc/stb/audio/ac3plus_choices")
+SystemInfo["CanDTSHD"] = fileExists("/proc/stb/audio/dtshd_choices")
+SystemInfo["CanWMAPRO"] = fileExists("/proc/stb/audio/wmapro")
+SystemInfo["CanDownmixAACPlus"] = fileExists("/proc/stb/audio/aacplus_choices")
+SystemInfo["CanAACTranscode"] = fileExists("/proc/stb/audio/aac_transcode_choices")
+SystemInfo["CanSyncMode"] = fileExists("/proc/stb/video/sync_mode_choices"
 SystemInfo["Fan"] = fileCheck("/proc/stb/fp/fan")
 SystemInfo["FanPWM"] = SystemInfo["Fan"] and fileCheck("/proc/stb/fp/fan_pwm")
 SystemInfo["PowerLED"] = fileCheck("/proc/stb/power/powerled") or model in ("gbue4k", "gbquad4k") and fileCheck("/proc/stb/fp/led1_pattern")
