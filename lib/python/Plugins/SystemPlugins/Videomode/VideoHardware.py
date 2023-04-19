@@ -405,32 +405,32 @@ class VideoHardware:
                         wss = "auto"
 
                 print("[VideoHardware] -> setting aspect, policy, policy2, wss", aspect, policy, policy2, wss)
-                if chipsetstring.startswith("meson-6") and HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
-                        arw = "0"
-                        if config.av.policy_43.value == "bestfit":
-                                arw = "10"
-                        if config.av.policy_43.value == "panscan":
-                                arw = "11"
-                        if config.av.policy_43.value == "letterbox":
-                                arw = "12"
-                        try:
-                                print("[Videomode] Write to /sys/class/video/screen_mode")
-                                open("/sys/class/video/screen_mode", "w").write(arw)
-                        except IOError:
-                                print("[Videomode] Write to /sys/class/video/screen_mode failed.")
-                elif HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
-                        arw = "0"
-                        if config.av.policy_43.value == "bestfit":
-                                arw = "10"
-                        if config.av.policy_43.value == "panscan":
-                                arw = "12"
-                        if config.av.policy_43.value == "letterbox":
-                                arw = "11"
-                        try:
-                                print("[Videomode] Write to /sys/class/video/screen_mode")
-                                open("/sys/class/video/screen_mode", "w").write(arw)
-                        except IOError:
-                                print("[Videomode] Write to /sys/class/video/screen_mode failed.")
+               if chipsetstring.startswith("meson-6") and if HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+                       arw = "0"
+                       if config.av.policy_43.value == "bestfit":
+                               arw = "10"
+                       if config.av.policy_43.value == "panscan":
+                               arw = "11"
+                       if config.av.policy_43.value == "letterbox":
+                               arw = "12"
+                       try:
+                               print("[Videomode] Write to /sys/class/video/screen_mode")
+                               open("/sys/class/video/screen_mode", "w").write(arw)
+                       except IOError:
+                               print("[Videomode] Write to /sys/class/video/screen_mode failed.")
+               elif HardwareInfo().get_device_name() in ("dreamone", "dreamtwo"):
+                       arw = "0"
+                       if config.av.policy_43.value == "bestfit":
+                               arw = "10"
+                       if config.av.policy_43.value == "panscan":
+                               arw = "12"
+                       if config.av.policy_43.value == "letterbox":
+                               arw = "11"
+                       try:
+                               print("[Videomode] Write to /sys/class/video/screen_mode")
+                               open("/sys/class/video/screen_mode", "w").write(arw)
+                       except IOError:
+                               print("[Videomode] Write to /sys/class/video/screen_mode failed.")
 
                 open("/proc/stb/video/aspect", "w").write(aspect)
                 open("/proc/stb/video/policy", "w").write(policy)
