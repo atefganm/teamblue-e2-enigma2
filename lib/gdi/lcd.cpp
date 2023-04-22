@@ -181,7 +181,7 @@ int eDBoxLCD::setLCDContrast(int contrast)
 
 int eDBoxLCD::setLCDBrightness(int brightness)
 {
-#ifndef NO_LCD
+/*#ifndef NO_LCD*/
 //	eDebug("setLCDBrightness %d", brightness);
 	FILE *f = fopen("/proc/stb/lcd/oled_brightness", "w");
 	if (!f)
