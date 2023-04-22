@@ -279,7 +279,7 @@ class HotkeySetup(Screen):
 	else:
 		skin = '''
 			<screen name="HotkeySetup" position="center,center" size="800,870" title="Input">
-				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />				
 				<widget objectTypes="key_red,StaticText" source="key_red" render="Pixmap" pixmap="buttons/red.png" position="0,0" size="200,40" zPosition="1" alphatest="blend">
 					<convert type="ConditionalShowHide"/>
 				</widget>
@@ -403,7 +403,7 @@ class HotkeySetupSelect(Screen):
 	else:
 		skin = '''
 			<screen name="HotkeySetupSelect" position="center,center" size="800,870" title="Input">
-				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />				
 				<widget objectTypes="key_red,StaticText" source="key_red" render="Pixmap" pixmap="buttons/red.png" position="0,0" size="200,40" zPosition="1" alphatest="blend">
 					<convert type="ConditionalShowHide"/>
 				</widget>
