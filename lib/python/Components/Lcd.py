@@ -1,12 +1,13 @@
 from __future__ import division
 from Components.config import config, ConfigSubsection, ConfigSlider, ConfigYesNo, ConfigNothing, ConfigSelection
-from enigma import eDBoxLCD
+from enigma import eDBoxLCD, eActionMap
 from Components.SystemInfo import SystemInfo
 from Tools.Directories import fileExists
 from Screens.InfoBar import InfoBar
 from Screens.Screen import Screen
 
 from boxbranding import getBoxType
+from sys import maxint
 
 
 class dummyScreen(Screen):
@@ -21,14 +22,67 @@ class dummyScreen(Screen):
 
 class LCD:
 	def __init__(self):
-		pass
+		eActionMap.getInstance().bindAction('', -maxint -1, self.DimUpEvent)
+		self.autoDimDownLCDTimer = eTimer()
+		self.autoDimDownLCDTimer.callback.append(self.autoDimDownLCD)
+		self.autoDimUpLCDTimer = eTimer()
+		self.autoDimUpLCDTimer.callback.append(self.autoDimUpLCD)
+
+		self.currBrightness = self.dimBrightness = self.Brightness = None
+		self.dimDelay = 10
+
+	def DimUpEvent(self, key, flag):
+		self.autoDimDownLCDTimer.stop()
+		if self.Brightness is not None and not self.autoDimUpLCDTimer.isActive():
+			self.autoDimUpLCDTimer.start(1)
+
+	def autoDimDownLCD(self):
+		if self.dimBrightness is not None and  self.currBrightness > self.dimBrightness:
+			self.autoDimDownLCDTimer.start(10, True)
+			self.currBrightness = self.currBrightness - 1
+			eDBoxLCD.getInstance().setLCDBrightness(self.currBrightness)
+
+	def autoDimUpLCD(self):
+		if self.currBrightness < self.Brightness:
+			self.currBrightness = self.currBrightness + 1
+			eDBoxLCD.getInstance().setLCDBrightness(self.currBrightness)
+		else:
+			self.autoDimUpLCDTimer.stop()
+			if self.dimBrightness is not None and  self.currBrightness > self.dimBrightness:
+				if self.dimDelay is not None and self.dimDelay > 0:
+					self.autoDimDownLCDTimer.startLongTimer(self.dimDelay)
 
 	def setBright(self, value):
 		value *= 255
 		value //= 10
 		if value > 255:
 			value = 255
-		eDBoxLCD.getInstance().setLCDBrightness(value)
+		self.Brightness = value
+		self.DimUpEvent(None, None)
+
+	def setStandbyBright(self, value):
+		value *= 255
+		value //= 10
+		if value > 255:
+			value = 255
+		self.autoDimDownLCDTimer.stop()
+		self.autoDimUpLCDTimer.stop()
+		self.Brightness = value
+		if self.dimBrightness is None:
+			self.dimBrightness = value
+		if self.currBrightness is None:
+			self.currBrightness = value
+		self.autoDimDownLCD()
+
+	def setDimBright(self, value):
+		value *= 255
+		value //= 10
+		if value > 255:
+			value = 255
+		self.dimBrightness = value
+
+	def setDimDelay(self, value):
+		self.dimDelay = int(value)
 
 	def setContrast(self, value):
 		value *= 63
@@ -100,7 +154,40 @@ def InitLcd():
 					pass
 
 			def setLCDModePiP(configElement):
-				pass
+				pass  # DEBUG: Should this be doing something?
+
+			config.lcd.modepip = ConfigSelection(choices={
+				"0": _("Off"),
+				"5": _("PiP"),
+				"7": _("PiP with OSD")
+			}, default="0")
+			config.lcd.modepip.addNotifier(setLCDModePiP)
+			config.lcd.modeminitv = ConfigSelection(choices={
+				"0": _("normal"),
+				"1": _("MiniTV"),
+				"2": _("OSD"),
+				"3": _("MiniTV with OSD")
+			}, default="0")
+			config.lcd.fpsminitv = ConfigSlider(default=30, limits=(0, 30))
+			config.lcd.modeminitv.addNotifier(setLCDModeMinitTV)
+			config.lcd.fpsminitv.addNotifier(setMiniTVFPS)
+		else:
+			config.lcd.modeminitv = ConfigNothing()
+			config.lcd.screenshot = ConfigNothing()
+			config.lcd.fpsminitv = ConfigNothing()
+		config.lcd.scroll_speed = ConfigSelection(choices=[
+			("500", _("slow")),
+			("300", _("normal")),
+			("100", _("fast"))
+		], default="300")
+		config.lcd.scroll_delay = ConfigSelection(choices=[
+			("10000", "10 %s" % _("Seconds")),
+			("20000", "20 %s" % _("Seconds")),
+			("30000", "30 %s" % _("Seconds")),
+			("60000", "1 %s" % _("Minute")),
+			("300000", "5 %s" % _("Minutes")),
+			("noscrolling", _("Off"))
+		], default="10000")
 
 			def setLCDScreenshot(configElement):
 				ilcd.setScreenShot(configElement.value)
@@ -135,6 +222,15 @@ def InitLcd():
 		def setLCDbright(configElement):
 			ilcd.setBright(configElement.value)
 
+		def setLCDstandbybright(configElement):
+			ilcd.setStandbyBright(configElement.value);
+
+		def setLCDdimbright(configElement):
+			ilcd.setDimBright(configElement.value);
+
+		def setLCDdimdelay(configElement):
+			ilcd.setDimDelay(configElement.value);
+
 		def setLCDcontrast(configElement):
 			ilcd.setContrast(configElement.value)
 
@@ -160,8 +256,15 @@ def InitLcd():
 
 		config.lcd.standby = ConfigSlider(default=standby_default, limits=(0, 10))
 		config.lcd.standby.addNotifier(setLCDbright)
+		config.lcd.dimbright = ConfigSlider(default=standby_default, limits=(0, 4))
 		config.lcd.standby.apply = lambda: setLCDbright(config.lcd.standby)
+		config.lcd.dimbright = ConfigSlider(default=standby_default, limits=(0, 10))
 		config.lcd.bright = ConfigSlider(default=5, limits=(0, 10))
+		config.lcd.dimbright.addNotifier(setLCDdimbright);
+		config.lcd.dimbright.apply = lambda : setLCDdimbright(config.lcd.dimbright)
+		config.lcd.dimdelay.addNotifier(setLCDdimdelay);
+		config.lcd.standby.addNotifier(setLCDstandbybright);
+		config.lcd.standby.apply = lambda : setLCDstandbybright(config.lcd.standby)
 		config.lcd.bright.addNotifier(setLCDbright)
 		config.lcd.bright.apply = lambda: setLCDbright(config.lcd.bright)
 		config.lcd.bright.callNotifiersOnSaveAndCancel = True
