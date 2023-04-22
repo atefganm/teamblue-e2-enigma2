@@ -97,7 +97,6 @@ class CronTimers(Screen):
 				</widget>
 				<widget name="key" position="5,70" size="981,45" font="Regular;28" halign="center" transparent="1" valign="center" backgroundColor="background" />
 			</screen>'''
-''
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
