@@ -5,9 +5,9 @@ from Components.SystemInfo import SystemInfo
 from Tools.Directories import fileExists
 from Screens.InfoBar import InfoBar
 from Screens.Screen import Screen
+from sys import maxsize
 
 from boxbranding import getBoxType
-from sys import maxint
 
 
 class dummyScreen(Screen):
@@ -22,7 +22,7 @@ class dummyScreen(Screen):
 
 class LCD:
 	def __init__(self):
-		eActionMap.getInstance().bindAction('', -maxint -1, self.DimUpEvent)
+		eActionMap.getInstance().bindAction("", -maxsize - 1, self.DimUpEvent)
 		self.autoDimDownLCDTimer = eTimer()
 		self.autoDimDownLCDTimer.callback.append(self.autoDimDownLCD)
 		self.autoDimUpLCDTimer = eTimer()
