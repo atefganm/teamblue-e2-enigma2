@@ -189,8 +189,8 @@ def InitLcd():
 			("noscrolling", _("Off"))
 		], default="10000")
 
-			def setLCDScreenshot(configElement):
-				ilcd.setScreenShot(configElement.value)
+		def setLCDScreenshot(configElement):
+			ilcd.setScreenShot(configElement.value)
 
 			config.lcd.modepip = ConfigSelection(default="0", choices=[
 					("0", _("off")),
