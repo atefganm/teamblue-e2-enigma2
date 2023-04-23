@@ -11,6 +11,13 @@
 #define LCD_BRIGHTNESS_MIN 0
 #define LCD_BRIGHTNESS_MAX 255
 
+enum op { LED_BRIGHTNESS = 0, LED_DEEPSTANDBY, LED_BLINKINGTIME };
+
+#define LED_IOCTL_BRIGHTNESS_NORMAL 0X10
+#define LED_IOCTL_BRIGHTNESS_DEEPSTANDBY 0X11
+#define LED_IOCTL_BLINKING_TIME 0X12
+#define LED_IOCTL_SET_DEFAULT 0x13
+
 class eLCD
 {
 #ifdef SWIG
@@ -26,6 +33,7 @@ protected:
 	int locked;
 	static eLCD *instance;
 	void setSize(int xres, int yres, int bpp);
+	char boxtype_name[20];
 #endif
 public:
 	static eLCD *getInstance();
@@ -35,6 +43,7 @@ public:
 	virtual bool detected() { return lcdfd >= 0; };
 	virtual int setLCDContrast(int contrast)=0;
 	virtual int setLCDBrightness(int brightness)=0;
+	virtual int setLED(int value, int option)=0;
 	virtual void setInverted( unsigned char )=0;
 	virtual void setFlipped(bool)=0;
 	virtual void setDump(bool)=0;
@@ -49,7 +58,7 @@ public:
 	int stride() { return _stride; };
 	virtual eSize size() { return res; };
 	virtual void update()=0;
-#ifdef HAVE_TEXTLCD
+#if defined(HAVE_TEXTLCD) || defined(HAVE_7SEGMENT)
 	virtual void renderText(ePoint start, const char *text);
 #endif
 #endif
@@ -71,6 +80,7 @@ public:
 #endif
 	int setLCDContrast(int contrast);
 	int setLCDBrightness(int brightness);
+	int setLED(int value, int option);
 	void setInverted( unsigned char );
 	void setFlipped(bool);
 	void setDump(bool);
