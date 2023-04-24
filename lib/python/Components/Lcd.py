@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 from __future__ import division
 from Components.config import config, ConfigSubsection, ConfigSlider, ConfigYesNo, ConfigNothing, ConfigSelection
-from enigma import eDBoxLCD, eActionMap
+from enigma import eDBoxLCD
 from Components.SystemInfo import SystemInfo
 from Tools.Directories import fileExists
 from Screens.InfoBar import InfoBar
 from Screens.Screen import Screen
-from sys import maxsize
 
 from boxbranding import getBoxType
 
@@ -23,67 +21,14 @@ class dummyScreen(Screen):
 
 class LCD:
 	def __init__(self):
-		eActionMap.getInstance().bindAction("", -maxsize - 1, self.DimUpEvent)
-		self.autoDimDownLCDTimer = eTimer()
-		self.autoDimDownLCDTimer.callback.append(self.autoDimDownLCD)
-		self.autoDimUpLCDTimer = eTimer()
-		self.autoDimUpLCDTimer.callback.append(self.autoDimUpLCD)
-
-		self.currBrightness = self.dimBrightness = self.Brightness = None
-		self.dimDelay = 10
-
-	def DimUpEvent(self, key, flag):
-		self.autoDimDownLCDTimer.stop()
-		if self.Brightness is not None and not self.autoDimUpLCDTimer.isActive():
-			self.autoDimUpLCDTimer.start(1)
-
-	def autoDimDownLCD(self):
-		if self.dimBrightness is not None and  self.currBrightness > self.dimBrightness:
-			self.autoDimDownLCDTimer.start(10, True)
-			self.currBrightness = self.currBrightness - 1
-			eDBoxLCD.getInstance().setLCDBrightness(self.currBrightness)
-
-	def autoDimUpLCD(self):
-		if self.currBrightness < self.Brightness:
-			self.currBrightness = self.currBrightness + 1
-			eDBoxLCD.getInstance().setLCDBrightness(self.currBrightness)
-		else:
-			self.autoDimUpLCDTimer.stop()
-			if self.dimBrightness is not None and  self.currBrightness > self.dimBrightness:
-				if self.dimDelay is not None and self.dimDelay > 0:
-					self.autoDimDownLCDTimer.startLongTimer(self.dimDelay)
+		pass
 
 	def setBright(self, value):
 		value *= 255
 		value //= 10
 		if value > 255:
 			value = 255
-		self.Brightness = value
-		self.DimUpEvent(None, None)
-
-	def setStandbyBright(self, value):
-		value *= 255
-		value //= 10
-		if value > 255:
-			value = 255
-		self.autoDimDownLCDTimer.stop()
-		self.autoDimUpLCDTimer.stop()
-		self.Brightness = value
-		if self.dimBrightness is None:
-			self.dimBrightness = value
-		if self.currBrightness is None:
-			self.currBrightness = value
-		self.autoDimDownLCD()
-
-	def setDimBright(self, value):
-		value *= 255
-		value //= 10
-		if value > 255:
-			value = 255
-		self.dimBrightness = value
-
-	def setDimDelay(self, value):
-		self.dimDelay = int(value)
+		eDBoxLCD.getInstance().setLCDBrightness(value)
 
 	def setContrast(self, value):
 		value *= 63
@@ -161,52 +106,40 @@ def InitLcd():
 					pass
 
 			def setLCDModePiP(configElement):
-				pass  # DEBUG: Should this be doing something?
+				pass
 
-			config.lcd.modepip = ConfigSelection(choices={
-				"0": _("Off"),
-				"5": _("PiP"),
-				"7": _("PiP with OSD")
-			}, default="0")
-			config.lcd.modepip.addNotifier(setLCDModePiP)
-			config.lcd.modeminitv = ConfigSelection(choices={
-				"0": _("normal"),
-				"1": _("MiniTV"),
-				"2": _("OSD"),
-				"3": _("MiniTV with OSD")
-			}, default="0")
+			def setLCDScreenshot(configElement):
+				ilcd.setScreenShot(configElement.value)
+
+			config.lcd.modepip = ConfigSelection(default="0", choices=[
+					("0", _("off")),
+					("5", _("PIP")),
+					("7", _("PIP with OSD"))])
+
+			if getBoxType() in ('gbquad', 'gbquadplus'):
+				config.lcd.modepip.addNotifier(setLCDModePiP)
+			else:
+				config.lcd.modepip = ConfigNothing()
+
+			config.lcd.screenshot = ConfigYesNo(default=False)
+			config.lcd.screenshot.addNotifier(setLCDScreenshot)
+
+			config.lcd.modeminitv = ConfigSelection(default="0", choices=[
+					("0", _("normal")),
+					("1", _("MiniTV - video0")),
+					("2", _("OSD - fb")),
+					("3", _("MiniTV with OSD - video0+fb"))])
 			config.lcd.fpsminitv = ConfigSlider(default=30, limits=(0, 30))
 			config.lcd.modeminitv.addNotifier(setLCDModeMinitTV)
 			config.lcd.fpsminitv.addNotifier(setMiniTVFPS)
 		else:
 			config.lcd.modeminitv = ConfigNothing()
+			config.lcd.modepip = ConfigNothing()
 			config.lcd.screenshot = ConfigNothing()
 			config.lcd.fpsminitv = ConfigNothing()
-		config.lcd.scroll_speed = ConfigSelection(choices=[
-			("500", _("slow")),
-			("300", _("normal")),
-			("100", _("fast"))
-		], default="300")
-		config.lcd.scroll_delay = ConfigSelection(choices=[
-			("10000", "10 %s" % _("Seconds")),
-			("20000", "20 %s" % _("Seconds")),
-			("30000", "30 %s" % _("Seconds")),
-			("60000", "1 %s" % _("Minute")),
-			("300000", "5 %s" % _("Minutes")),
-			("noscrolling", _("Off"))
-		], default="10000")
 
 		def setLCDbright(configElement):
 			ilcd.setBright(configElement.value)
-
-		def setLCDstandbybright(configElement):
-			ilcd.setStandbyBright(configElement.value);
-
-		def setLCDdimbright(configElement):
-			ilcd.setDimBright(configElement.value);
-
-		def setLCDdimdelay(configElement):
-			ilcd.setDimDelay(configElement.value);
 
 		def setLCDcontrast(configElement):
 			ilcd.setContrast(configElement.value)
@@ -217,42 +150,6 @@ def InitLcd():
 		def setLCDflipped(configElement):
 			ilcd.setFlipped(configElement.value)
 
-		def setLedPowerColor(configElement):
-			if fileExists("/proc/stb/fp/ledpowercolor"):
-				f = open("/proc/stb/fp/ledpowercolor", "w")
-				f.write(configElement.value)
-				f.close()
-
-		def setLedStandbyColor(configElement):
-			if fileExists("/proc/stb/fp/ledstandbycolor"):
-				f = open("/proc/stb/fp/ledstandbycolor", "w")
-				f.write(configElement.value)
-				f.close()
-
-		def setLedSuspendColor(configElement):
-			if fileExists("/proc/stb/fp/ledsuspendledcolor"):
-				f = open("/proc/stb/fp/ledsuspendledcolor", "w")
-				f.write(configElement.value)
-				f.close()
-
-		def setPower4x7On(configElement):
-			if fileExists("/proc/stb/fp/power4x7on"):
-				f = open("/proc/stb/fp/power4x7on", "w")
-				f.write(configElement.value)
-				f.close()
-
-		def setPower4x7Standby(configElement):
-			if fileExists("/proc/stb/fp/power4x7standby"):
-				f = open("/proc/stb/fp/power4x7standby", "w")
-				f.write(configElement.value)
-				f.close()
-
-		def setPower4x7Suspend(configElement):
-			if fileExists("/proc/stb/fp/power4x7suspend"):
-				f = open("/proc/stb/fp/power4x7suspend", "w")
-				f.write(configElement.value)
-				f.close()
-
 		standby_default = 0
 
 		ilcd = LCD()
@@ -262,43 +159,15 @@ def InitLcd():
 			config.lcd.contrast.addNotifier(setLCDcontrast)
 		else:
 			config.lcd.contrast = ConfigNothing()
-
-		config.usage.lcd_ledpowercolor = ConfigSelection(default = "1", choices = [("0", _("off")),("1", _("blue")), ("2", _("red")), ("3", _("violet"))])
-		config.usage.lcd_ledpowercolor.addNotifier(setLedPowerColor)
-
-		config.usage.lcd_ledstandbycolor = ConfigSelection(default = "3", choices = [("0", _("off")),("1", _("blue")), ("2", _("red")), ("3", _("violet"))])
-		config.usage.lcd_ledstandbycolor.addNotifier(setLedStandbyColor)
-
-		config.usage.lcd_ledsuspendcolor = ConfigSelection(default = "2", choices = [("0", _("off")),("1", _("blue")), ("2", _("red")), ("3", _("violet"))])
-		config.usage.lcd_ledsuspendcolor.addNotifier(setLedSuspendColor)
-
-		config.usage.lcd_power4x7on = ConfigSelection(default = "on", choices = [("off", _("Off")), ("on", _("On"))])
-		config.usage.lcd_power4x7on.addNotifier(setPower4x7On)
-
-		config.usage.lcd_power4x7standby = ConfigSelection(default = "off", choices = [("off", _("Off")), ("on", _("On"))])
-		config.usage.lcd_power4x7standby.addNotifier(setPower4x7Standby)
-
-		config.usage.lcd_power4x7suspend = ConfigSelection(default = "off", choices = [("off", _("Off")), ("on", _("On"))])
-		config.usage.lcd_power4x7suspend.addNotifier(setPower4x7Suspend)
-
-		if getBoxType() in ('dm900', 'dm920', 'e4hdultra'):
-			standby_default = 4
-		elif getBoxType() in ('spycat4kmini', 'osmega'):
-			standby_default = 10
-		else:
-			standby_default = 1
+			if getBoxType() in ('dm900','dm920'):
+				standby_default = 4
+			else:
+				standby_default = 1
 
 		config.lcd.standby = ConfigSlider(default=standby_default, limits=(0, 10))
 		config.lcd.standby.addNotifier(setLCDbright)
-		config.lcd.dimbright = ConfigSlider(default=standby_default, limits=(0, 4))
 		config.lcd.standby.apply = lambda: setLCDbright(config.lcd.standby)
-		config.lcd.dimbright = ConfigSlider(default=standby_default, limits=(0, 10))
 		config.lcd.bright = ConfigSlider(default=5, limits=(0, 10))
-		config.lcd.dimbright.addNotifier(setLCDdimbright);
-		config.lcd.dimbright.apply = lambda : setLCDdimbright(config.lcd.dimbright)
-		config.lcd.dimdelay.addNotifier(setLCDdimdelay);
-		config.lcd.standby.addNotifier(setLCDstandbybright);
-		config.lcd.standby.apply = lambda : setLCDstandbybright(config.lcd.standby)
 		config.lcd.bright.addNotifier(setLCDbright)
 		config.lcd.bright.apply = lambda: setLCDbright(config.lcd.bright)
 		config.lcd.bright.callNotifiersOnSaveAndCancel = True
@@ -306,6 +175,42 @@ def InitLcd():
 		config.lcd.invert.addNotifier(setLCDinverted)
 		config.lcd.flip = ConfigYesNo(default=False)
 		config.lcd.flip.addNotifier(setLCDflipped)
+
+		if SystemInfo["LedPowerColor"]:
+			def setLedPowerColor(configElement):
+				open(SystemInfo["LedPowerColor"], "w").write(configElement.value)
+			config.lcd.ledpowercolor = ConfigSelection(default="1", choices=[("0", _("off")), ("1", _("blue")), ("2", _("red")), ("3", _("violet"))])
+			config.lcd.ledpowercolor.addNotifier(setLedPowerColor)
+
+		if SystemInfo["LedStandbyColor"]:
+			def setLedStandbyColor(configElement):
+				open(SystemInfo["LedStandbyColor"], "w").write(configElement.value)
+			config.lcd.ledstandbycolor = ConfigSelection(default="3", choices=[("0", _("off")), ("1", _("blue")), ("2", _("red")), ("3", _("violet"))])
+			config.lcd.ledstandbycolor.addNotifier(setLedStandbyColor)
+
+		if SystemInfo["LedSuspendColor"]:
+			def setLedSuspendColor(configElement):
+				open(SystemInfo["LedSuspendColor"], "w").write(configElement.value)
+			config.lcd.ledsuspendcolor = ConfigSelection(default="2", choices=[("0", _("off")), ("1", _("blue")), ("2", _("red")), ("3", _("violet"))])
+			config.lcd.ledsuspendcolor.addNotifier(setLedSuspendColor)
+
+		if SystemInfo["Power4x7On"]:
+			def setPower4x7On(configElement):
+				open(SystemInfo["Power4x7On"], "w").write(configElement.value)
+			config.lcd.power4x7on = ConfigSelection(default="on", choices=[("off", _("Off")), ("on", _("On"))])
+			config.lcd.power4x7on.addNotifier(setPower4x7On)
+
+		if SystemInfo["Power4x7Standby"]:
+			def setPower4x7Standby(configElement):
+				open(SystemInfo["Power4x7Standby"], "w").write(configElement.value)
+			config.lcd.power4x7standby = ConfigSelection(default="on", choices=[("off", _("Off")), ("on", _("On"))])
+			config.lcd.power4x7standby.addNotifier(setPower4x7Standby)
+
+		if SystemInfo["Power4x7Suspend"]:
+			def setPower4x7Suspend(configElement):
+				open(SystemInfo["Power4x7Suspend"], "w").write(configElement.value)
+			config.lcd.power4x7suspend = ConfigSelection(default="off", choices=[("off", _("Off")), ("on", _("On"))])
+			config.lcd.power4x7suspend.addNotifier(setPower4x7Suspend)
 
 		if SystemInfo["LcdLiveTV"]:
 			def lcdLiveTvChanged(configElement):
