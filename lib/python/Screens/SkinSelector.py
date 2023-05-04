@@ -240,7 +240,7 @@ class LcdSkinSelector(SkinSelector):
 		self.rootDir = resolveFilename(SCOPE_LCDSKIN, "lcd_skin/")
 		self.config = config.skin.display_skin
 		self.current = currentDisplaySkin
-		self.xmlList = []
+		self.xmlList = ["skin_display.xml", "skin_display_picon.xml"]
 		for root, dirs, files in walk(self.rootDir, followlinks=True):
 			for x in files:
 				if x.startswith("skin_lcd") and x.endswith(".xml"):
