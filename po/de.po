@@ -5115,6 +5115,9 @@ msgstr "Festplatten Info"
 msgid "HDMI CEC setup"
 msgstr "HDMI-CEC Einstellungen"
 
+msgid "HDMI"
+msgstr "HDMI"
+
 msgid "HDMI Colordepth"
 msgstr "HDMI Farbtiefe"
 
@@ -12452,6 +12455,9 @@ msgstr "Adresse automatisch beziehen (DHCP)"
 msgid "Use EIT EPG information when it is available."
 msgstr "Verwende EIT EPG Information falls vorhanden."
 
+msgid "Use HDMI pre-emphasis"
+msgstr "Verwenden Sie HDMI Pre-Emphasis"
+
 msgid "Use FreeSat EPG information when it is available."
 msgstr "Verwende FreeSat EPG Information falls vorhanden."
 
@@ -14013,7 +14019,7 @@ msgid "connected"
 msgstr "Verbunden"
 
 msgid "controlled by HDMI"
-msgstr "HDMI gesteuert"
+msgstr "gesteuert von HDMI"
 
 msgid "convert to multi channel PCM"
 msgstr "Konvertiere zu Mehrkanal-PCM"
@@ -14952,8 +14958,11 @@ msgstr "nicht prüfbar"
 msgid "until standby/restart"
 msgstr "Bis zum Standby/Neustart"
 
-msgid "use best, controlled by HDMI"
-msgstr "am besten, HDMI-gesteuert"
+msgid "use HDMI cacenter"
+msgstr "HDMI"
+
+msgid "use best / controlled by HDMI"
+msgstr "gesteuert von HDMI"
 
 msgid "user defined"
 msgstr "Benutzerdefiniert"
