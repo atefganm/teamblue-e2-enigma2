@@ -15,7 +15,6 @@ from ServiceReference import ServiceReference
 from enigma import eServiceReference, getDesktop
 from Components.Pixmap import Pixmap
 from Components.Label import Label
-from boxbranding import getHaveHDMIinHD, getHaveHDMIinFHD
 import os
 
 def getDesktopSize():
@@ -186,6 +185,7 @@ def getHotkeyFunctions():
 	hotkey.functions.append((_("Switch to TV mode"), "Infobar/showTv", "InfoBar"))
 	hotkey.functions.append((_("Instant recording"), "Infobar/instantRecord", "InfoBar"))
 	hotkey.functions.append((_("Start instant recording"), "Infobar/startInstantRecording", "InfoBar"))
+	hotkey.functions.append((_("Start recording current event"), "Infobar/startRecordingCurrentEvent", "InfoBar"))
 	hotkey.functions.append((_("Activate timeshift End"), "Infobar/activateTimeshiftEnd", "InfoBar"))
 	hotkey.functions.append((_("Activate timeshift end and pause"), "Infobar/activateTimeshiftEndAndPause", "InfoBar"))
 	hotkey.functions.append((_("Start timeshift"), "Infobar/startTimeshift", "InfoBar"))
@@ -206,15 +206,10 @@ def getHotkeyFunctions():
 	hotkey.functions.append((_("Activate HbbTV (Redbutton)"), "Infobar/activateRedButton", "InfoBar"))
 	if SystemInfo["HasHDMI-In"]:
 		hotkey.functions.append((_("Toggle HDMI In"), "Infobar/HDMIIn", "InfoBar"))
-	if getHaveHDMIinHD() == 'True' or getHaveHDMIinFHD() == 'True':
-                hotkey.functions.append((_("Toggle HDMI-In full screen"), "Infobar/HDMIInFull", "InfoBar"))
-                hotkey.functions.append((_("Toggle HDMI-In PiP"), "Infobar/HDMIInPiP", "InfoBar"))
 	if SystemInfo["LcdLiveTV"]:
 		hotkey.functions.append((_("Toggle LCD LiveTV"), "Infobar/ToggleLCDLiveTV", "InfoBar"))
 	hotkey.functions.append((_("Toggle dashed flickering line for this service"), "Infobar/ToggleHideVBI", "InfoBar"))
 	hotkey.functions.append((_("Do nothing"), "Void", "InfoBar"))
-	if SystemInfo["canMultiBoot"]:
-		hotkey.functions.append((_("MultiBoot Selector"), "Module/Screens.MultiBootSelector/MultiBootSelector", "InfoBar"))
 	if SystemInfo["HasHDMI-CEC"]:
 		hotkey.functions.append((_("HDMI-CEC Source Active"), "Infobar/SourceActiveHdmiCec", "InfoBar"))
 		hotkey.functions.append((_("HDMI-CEC Source Inactive"), "Infobar/SourceInactiveHdmiCec", "InfoBar"))
@@ -248,6 +243,8 @@ def getHotkeyFunctions():
 	hotkey.functions.append((_("Language"), "Module/Screens.LanguageSelection/LanguageSelection", "Setup"))
 	hotkey.functions.append((_("Skin setup"), "Module/Screens.SkinSelector/SkinSelector", "Setup"))
 	hotkey.functions.append((_("Memory Info"), "Module/Screens.About/MemoryInfo", "Setup"))
+	if SystemInfo["canMultiBoot"]:
+		hotkey.functions.append((_("Multiboot image selector"), "Module/Screens.FlashImage/MultibootSelection", "Setup"))
 	if os.path.isdir("/etc/ppanels"):
 		for x in [x for x in os.listdir("/etc/ppanels") if x.endswith(".xml")]:
 			x = x[:-4]
@@ -279,7 +276,7 @@ class HotkeySetup(Screen):
 	else:
 		skin = '''
 			<screen name="HotkeySetup" position="center,center" size="800,870" title="Input">
-				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />				
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />
 				<widget objectTypes="key_red,StaticText" source="key_red" render="Pixmap" pixmap="buttons/red.png" position="0,0" size="200,40" zPosition="1" alphatest="blend">
 					<convert type="ConditionalShowHide"/>
 				</widget>
@@ -403,7 +400,7 @@ class HotkeySetupSelect(Screen):
 	else:
 		skin = '''
 			<screen name="HotkeySetupSelect" position="center,center" size="800,870" title="Input">
-				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />				
+				<ePixmap pixmap="buttons/red.png" position="0,0" size="200,40" alphatest="on" zPosition="1" />
 				<widget objectTypes="key_red,StaticText" source="key_red" render="Pixmap" pixmap="buttons/red.png" position="0,0" size="200,40" zPosition="1" alphatest="blend">
 					<convert type="ConditionalShowHide"/>
 				</widget>

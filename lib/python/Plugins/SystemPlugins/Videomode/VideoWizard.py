@@ -1,7 +1,8 @@
+from boxbranding import getBoxType
 from Screens.Wizard import WizardSummary
 from Screens.WizardLanguage import WizardLanguage
 from Screens.Rc import Rc
-from Plugins.SystemPlugins.Videomode.VideoHardware import video_hw
+from .VideoHardware import video_hw
 
 from Components.Pixmap import Pixmap
 from Components.config import config, ConfigBoolean, configfile
@@ -12,6 +13,17 @@ from Tools.HardwareInfo import HardwareInfo
 
 config.misc.showtestcard = ConfigBoolean(default=False)
 
+try:
+	_file = open("/proc/stb/info/chipset", "r")
+	chipset = _file.readline().strip()
+	_file.close()
+except:
+	chipset = "unknown"
+
+has_rca = False
+if getBoxType() in ('mutant51', 'ax51', 'gb800seplus', 'gb800ueplus', 'gbquad', 'gbquadplus', 'gbipbox', 'gbultra', 'gbultraue', 'gbultraueh', 'gbultrase', 'spycat', 'quadbox2400', 'gbx1', 'gbx2', 'gbx3', 'gbx3h', 'gbx34k'):
+	has_rca = True
+
 
 class VideoWizardSummary(WizardSummary):
 	def __init__(self, session, parent):
@@ -20,8 +32,8 @@ class VideoWizardSummary(WizardSummary):
 	def setLCDPicCallback(self):
 		self.parent.setLCDTextCallback(self.setText)
 
-	def setLCDPic(self, file):
-		self["pic"].instance.setPixmapFromFile(file)
+	def setLCDPic(self, _file):
+		self["pic"].instance.setPixmapFromFile(_file)
 
 
 class VideoWizard(WizardLanguage, Rc):
@@ -76,18 +88,20 @@ class VideoWizard(WizardLanguage, Rc):
 	def listInputChannels(self):
 		hw_type = HardwareInfo().get_device_name()
 		has_hdmi = HardwareInfo().has_hdmi()
-		list = []
+		_list = []
 
 		for port in self.hw.getPortList():
 			if self.hw.isPortUsed(port):
 				descr = port
 				if descr == 'DVI' and has_hdmi:
 					descr = 'HDMI'
+				if descr == 'Scart' and has_rca:
+					descr = 'RCA'
 				if port != "DVI-PC":
-					list.append((descr, port))
-		list.sort(key=lambda x: x[0])
-		print("[VideoWizard] listInputChannels:", list)
-		return list
+					_list.append((descr, port))
+		_list.sort(key=lambda x: x[0])
+		print("[VideoWizard] listInputChannels:", _list)
+		return _list
 
 	def inputSelectionMade(self, index):
 		print("[VideoWizard] inputSelectionMade:", index)
@@ -103,6 +117,8 @@ class VideoWizard(WizardLanguage, Rc):
 			picname = self.selection
 			if picname == 'DVI' and has_hdmi:
 				picname = "HDMI"
+			if picname == 'Scart' and has_rca:
+				picname = "RCA"
 			self["portpic"].instance.setPixmapFromFile(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/Videomode/" + picname + ".png"))
 
 	def inputSelect(self, port):
@@ -115,13 +131,13 @@ class VideoWizard(WizardLanguage, Rc):
 			self.hw.setMode(port=port, mode=modeList[0][0], rate=ratesList[0][0])
 
 	def listModes(self):
-		list = []
+		_list = []
 		print("[VideoWizard] modes for port", self.port)
 		for mode in self.hw.getModeList(self.port):
 			#if mode[0] != "PC":
-				list.append((mode[0], mode[0]))
-		print("[VideoWizard] modeslist:", list)
-		return list
+				_list.append((mode[0], mode[0]))
+		print("[VideoWizard] modeslist:", _list)
+		return _list
 
 	def modeSelectionMade(self, index):
 		print("[VideoWizard] modeSelectionMade:", index)
@@ -148,19 +164,21 @@ class VideoWizard(WizardLanguage, Rc):
 	def listRates(self, querymode=None):
 		if querymode is None:
 			querymode = self.mode
-		list = []
+		_list = []
 		print("[VideoWizard] modes for port", self.port, "and mode", querymode)
 		for mode in self.hw.getModeList(self.port):
 			print("[VideoWizard] mode:", mode)
 			if mode[0] == querymode:
 				for rate in mode[1]:
+					if rate in ("auto") and not SystemInfo["Has24hz"]:
+						continue
 					if self.port == "DVI-PC":
 						print("[VideoWizard] rate:", rate)
 						if rate == "640x480":
-							list.insert(0, (rate, rate))
+							_list.insert(0, (rate, rate))
 							continue
-					list.append((rate, rate))
-		return list
+					_list.append((rate, rate))
+		return _list
 
 	def rateSelectionMade(self, index):
 		print("[VideoWizard] rateSelectionMade:", index)

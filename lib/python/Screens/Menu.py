@@ -1,7 +1,6 @@
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.ParentalControlSetup import ProtectedScreen
-from xml.etree.cElementTree import parse
 from Components.Sources.List import List
 from Components.ActionMap import NumberActionMap, ActionMap
 from Components.Sources.StaticText import StaticText

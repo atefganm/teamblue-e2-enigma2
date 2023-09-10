@@ -10,9 +10,6 @@ from builtins import round
 
 from boxbranding import getBoxType, getMachineBuild, getImageType, getImageVersion
 from sys import maxsize, modules, version_info
-from Tools.Directories import fileReadLine
-
-MODULE_NAME = __name__.split(".")[-1]
 
 
 def getVersionString():
@@ -55,7 +52,7 @@ def getGStreamerVersionString():
 	try:
 		from glob import glob
 		gst = [x.split("Version: ") for x in open(glob("/var/lib/opkg/info/gstreamer[0-9].[0-9].control")[0], "r") if x.startswith("Version:")][0]
-		return "%s" % gst[1].split("+")[0].replace("\n", "")
+		return "%s" % gst[1].split("+")[0].split("-")[0].replace("\n", "")
 	except:
 		return ""
 
@@ -77,38 +74,30 @@ def getKernelVersionString():
 
 
 def getChipSetString():
-	if getMachineBuild() in ('dm7080', 'dm820'):
-		return "7435"
-	elif getMachineBuild() in ('dm520', 'dm525'):
-		return "73625"
-	elif getMachineBuild() in ('dm900', 'dm920', 'et13000', 'sf5008'):
-		return "7252S"
-	elif getMachineBuild() in ('hd51', 'vs1500', 'h7'):
-		return "7251S"
-	elif getMachineBuild() in ('alien5',):
-		return "S905D"
+	if getMachineBuild() in ('gb73625', ):
+		return "BCM73625"
 	else:
 		try:
 			f = open('/proc/stb/info/chipset', 'r')
 			chipset = f.read()
 			f.close()
-			return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
+			return str(chipset.lower().replace('\n', '').replace('bcm', 'BCM').replace('brcm', 'BRCM').replace('sti', ''))
 		except IOError:
 			return "unavailable"
 
 
 def getCPUString():
-	if getMachineBuild() in ('vuduo4k', 'vuduo4kse', 'osmio4k', 'osmio4kplus', 'osmini4k', 'dags72604', 'vuuno4kse', 'vuuno4k', 'vuultimo4k', 'vusolo4k', 'vuzero4k', 'hd51', 'hd52', 'sf4008', 'dm900', 'dm920', 'gb7252', 'gb72604', 'dags7252', 'vs1500', 'et1x000', 'xc7439', 'h7', '8100s', 'et13000', 'sf5008'):
+	if getMachineBuild() in ('xc7362', ):
 		return "Broadcom"
-	elif getMachineBuild() in ('dagsmv200', 'gbmv200', 'u41', 'u42', 'u43', 'u45', 'u51', 'u52', 'u53', 'u532', 'u533', 'u54', 'u55', 'u56', 'u57', 'u571', 'u5', 'u5pvr', 'h9', 'i55se', 'h9se', 'h9combose', 'h9combo', 'h10', 'h11', 'cc1', 'sf8008', 'sf8008m', 'sf8008opt', 'hd60', 'hd61', 'pulse4k', 'pulse4kmini', 'i55plus', 'ustym4kpro', 'beyonwizv2', 'viper4k', 'multibox', 'multiboxse', 'hzero', 'h8'):
+	elif getMachineBuild() in ('gbmv200', ):
 		return "Hisilicon"
-	elif getMachineBuild() in ('alien5',):
-		return "AMlogic"
+	#elif getMachineBuild() in ('gb73625', ):
+	#	return "BCM73625"
 	else:
 		try:
 			system = "unknown"
-			file = open('/proc/cpuinfo', 'r')
-			lines = file.readlines()
+			_file = open('/proc/cpuinfo', 'r')
+			lines = _file.readlines()
 			for x in lines:
 				splitted = x.split(': ')
 				if len(splitted) > 1:
@@ -117,7 +106,7 @@ def getCPUString():
 						system = splitted[1].split(' ')[0]
 					elif splitted[0].startswith("Processor"):
 						system = splitted[1].split(' ')[0]
-			file.close()
+			_file.close()
 			return system
 		except IOError:
 			return "unavailable"
@@ -125,22 +114,18 @@ def getCPUString():
 
 def getCpuCoresString():
 	try:
-		file = open('/proc/cpuinfo', 'r')
-		lines = file.readlines()
+		_file = open('/proc/cpuinfo', 'r')
+		lines = _file.readlines()
 		for x in lines:
 			splitted = x.split(': ')
 			if len(splitted) > 1:
 				splitted[1] = splitted[1].replace('\n', '')
 				if splitted[0].startswith("processor"):
-					if getMachineBuild() in ('dagsmv200', 'gbmv200', 'u51', 'u52', 'u53', 'u532', 'u533', 'u54', 'u55', 'u56', 'u57', 'u571', 'vuultimo4k', 'u5', 'u5pvr', 'h9', 'i55se', 'h9se', 'h9combose', 'h9combo', 'h10', 'h11', 'alien5', 'cc1', 'sf8008', 'sf8008m', 'sf8008opt', 'hd60', 'hd61', 'pulse4k', 'pulse4kmini', 'i55plus', 'ustym4kpro', 'beyonwizv2', 'viper4k', 'vuduo4k', 'vuduo4kse', 'multibox', 'multiboxse'):
-						cores = 4
-					elif getMachineBuild() in ('u41', 'u42', 'u43', 'u45'):
-						cores = 1
-					elif int(splitted[1]) > 0:
+					if int(splitted[1]) > 0:
 						cores = 2
 					else:
 						cores = 1
-		file.close()
+		_file.close()
 		return cores
 	except IOError:
 		return "unavailable"
@@ -180,11 +165,11 @@ def getCPUInfoString():
 
 		if not cpu_speed:
 			try:
-				cpu_speed = int(open("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq").read()) / 1000
+				cpu_speed = int(open("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq").read()) // 1000
 			except:
 				try:
 					import binascii
-					cpu_speed = int(int(binascii.hexlify(open('/sys/firmware/devicetree/base/cpus/cpu@0/clock-frequency', 'rb').read()), 16) / 100000000) * 100
+					cpu_speed = int(int(binascii.hexlify(open('/sys/firmware/devicetree/base/cpus/cpu@0/clock-frequency', 'rb').read()), 16) // 100000000) * 100
 				except:
 					cpu_speed = "-"
 
@@ -194,7 +179,7 @@ def getCPUInfoString():
 			temperature = open("/proc/stb/fp/temp_sensor_avs").readline().replace('\n', '')
 		if os.path.isfile("/sys/devices/virtual/thermal/thermal_zone0/temp"):
 			try:
-				temperature = int(open("/sys/devices/virtual/thermal/thermal_zone0/temp").read().strip()) / 1000
+				temperature = int(open("/sys/devices/virtual/thermal/thermal_zone0/temp").read().strip()) // 1000
 			except:
 				pass
 		elif os.path.isfile("/proc/hisi/msp/pm_cpu"):
@@ -323,7 +308,7 @@ def GetIPsFromNetworkInterfaces():
 def getBoxUptime():
 	try:
 		time = ''
-		f = open("/proc/uptime", "rb")
+		f = open("/proc/uptime", "r")
 		secs = int(f.readline().split('.')[0])
 		f.close()
 		if secs > 86400:

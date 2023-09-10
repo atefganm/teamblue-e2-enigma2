@@ -116,102 +116,8 @@ eDVBResourceManager::eDVBResourceManager()
 
 	setUsbTuner();
 
-	int fd = open("/proc/stb/info/model", O_RDONLY);
-	char tmp[16];
-	int rd = fd >= 0 ? read(fd, tmp, sizeof(tmp)) : 0;
-	if (fd >= 0)
-		close(fd);
-
-	if (!strncmp(tmp, "dm7025\n", rd))
-		m_boxtype = DM7025;
-	else if (!strncmp(tmp, "dm8000\n", rd))
-		m_boxtype = DM8000;
-	else if (!strncmp(tmp, "dm800\n", rd))
-		m_boxtype = DM800;
-	else if (!strncmp(tmp, "dm500hd\n", rd))
-		m_boxtype = DM500HD;
-	else if (!strncmp(tmp, "dm800se\n", rd))
-		m_boxtype = DM800SE;
-	else if (!strncmp(tmp, "dm7020hd\n", rd))
-		m_boxtype = DM7020HD;
-	else if (!strncmp(tmp, "dm7080\n", rd))
-		m_boxtype = DM7080;
-	else if (!strncmp(tmp, "dm820\n", rd))
-		m_boxtype = DM820;
-	else if (!strncmp(tmp, "dm520\n", rd))
-		m_boxtype = DM520;
-	else if (!strncmp(tmp, "dm525\n", rd))
-		m_boxtype = DM525;
-	else if (!strncmp(tmp, "dm900\n", rd))
-		m_boxtype = DM900;
-	else if (!strncmp(tmp, "dm920\n", rd))
-		m_boxtype = DM920;
-	else if (!strncmp(tmp, "Gigablue\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800solo\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800se\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800ue\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800seplus\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800ueplus\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbipbox\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbquad\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbquadplus\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbultra\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbultrase\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbultraue\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbultraueh\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx1\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx2\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx3\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx3h\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbquad4k\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbue4k\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx34k\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "ebox5000\n", rd))
-		m_boxtype = DM800;
-	else if (!strncmp(tmp, "ebox5100\n", rd))
-		m_boxtype = DM800;
-	else if (!strncmp(tmp, "eboxlumi\n", rd))
-		m_boxtype = DM800;
-	else if (!strncmp(tmp, "ebox7358\n", rd))
-		m_boxtype = DM800SE;
-	else if (!strncmp(tmp, "wetekplay\n", rd))
-		m_boxtype = WETEKPLAY;
-	else if (!strncmp(tmp, "wetekplay2\n", rd))
-		m_boxtype = WETEKPLAY2;
-	else if (!strncmp(tmp, "wetekhub\n", rd))
-		m_boxtype = WETEKHUB;
-	else {
-		eDebug("[eDVBResourceManager] boxtype detection via /proc/stb/info not possible... use fallback via demux count!");
-		if (m_demux.size() == 3)
-			m_boxtype = DM800;
-		else if (m_demux.size() < 5)
-			m_boxtype = DM7025;
-		else
-			m_boxtype = DM8000;
-	}
-
-	eDebug("[eDVBResourceManager] found %zd adapter, %zd frontends(%zd sim) and %zd demux, boxtype %d",
-		m_adapter.size(), m_frontend.size(), m_simulate_frontend.size(), m_demux.size(), m_boxtype);
+	eDebug("[eDVBResourceManager] found %zd adapter, %zd frontends(%zd sim) and %zd demux",
+		m_adapter.size(), m_frontend.size(), m_simulate_frontend.size(), m_demux.size());
 
 	m_fbcmng = new eFBCTunerManager(instance);
 
@@ -359,11 +265,13 @@ eDVBUsbAdapter::eDVBUsbAdapter(int nr)
 : eDVBAdapterLinux(nr)
 {
 	int file;
-	char type[8];
-	struct dvb_frontend_info fe_info;
+	char type[8] = {};
+	struct dvb_frontend_info fe_info = {};
+	struct dtv_properties props = {};
+	struct dtv_property prop[1] = {};
 	int frontend = -1;
-	char filename[256];
-	char name[128] = {0};
+	char filename[256] = {};
+	char name[128] = {};
 	int vtunerid = nr - 1;
 
 	pumpThread = 0;
@@ -418,9 +326,6 @@ eDVBUsbAdapter::eDVBUsbAdapter(int nr)
 		frontend = -1;
 		goto error;
 	}
-
-	struct dtv_properties props;
-	struct dtv_property prop[1];
 
 	prop[0].cmd = DTV_ENUM_DELSYS;
 	memset(prop[0].u.buffer.data, 0, sizeof(prop[0].u.buffer.data));
@@ -631,7 +536,7 @@ void *eDVBUsbAdapter::vtunerPump()
 		{
 			if (FD_ISSET(vtunerFd, &xset))
 			{
-				struct vtuner_message message;
+				struct vtuner_message message = {};
 				memset(message.pidlist, 0xff, sizeof(message.pidlist));
 				::ioctl(vtunerFd, VTUNER_GET_MESSAGE, &message);
 
@@ -673,7 +578,7 @@ void *eDVBUsbAdapter::vtunerPump()
 						}
 						else
 						{
-							struct dmx_pes_filter_params filter;
+							struct dmx_pes_filter_params filter = {};
 							filter.input = DMX_IN_FRONTEND;
 							filter.flags = 0;
 							filter.pid = message.pidlist[i];
@@ -1853,24 +1758,6 @@ void eDVBChannel::pvrEvent(int event)
 		eDebug("[eDVBChannel] End of file!");
 		m_event(this, evtEOF);
 		break;
-	case eFilePushThread::evtReadError:
-		eDebug("eDVBChannel: Read error!");
-		if (m_source->isStream()) {
-			eDebug("eDVBChannel: We are in stream mode, trying to reconnect it!");
-			ePtr<iTsSource> source = m_source;
-			stop();
-			source->reconnect();
-			playSource(source, m_streaminfo_file.c_str());
-		}
-		else {
-			stop();
-		}
-		break;
-	case eFilePushThread::evtFlush:
-		eDebug("eDVBChannel: pvrEvent evtFlush");
-		if (m_decoder_demux)
-			m_decoder_demux->get().flush();
-		break;
 	case eFilePushThread::evtUser: /* start */
 		eDebug("[eDVBChannel] SOF");
 		m_event(this, evtSOF);
@@ -1986,7 +1873,7 @@ static size_t diff_upto(off_t high, off_t low, size_t max)
 }
 
 	/* remember, this gets called from another thread. */
-void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off_t &start, size_t &size, int blocksize, int &sof)
+void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off_t &start, size_t &size, int blocksize)
 {
 	unsigned int max = align(1024*1024*1024, blocksize);
 	current_offset = align(current_offset, blocksize);
@@ -2174,7 +2061,7 @@ void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off
 				{
 					eDebug("[eDVBChannel] reached SOF");
 					m_skipmode_m = 0;
-					sof = 1;
+					m_pvr_thread->sendEvent(eFilePushThread::evtUser);
 				}
 			}
 			else
@@ -2193,11 +2080,11 @@ void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off
 		}
 	}
 
-	if ((current_offset < 0) && (m_skipmode_m < 0))
+	if ((current_offset < -m_skipmode_m) && (m_skipmode_m < 0))
 	{
 		eDebug("[eDVBChannel] reached SOF");
 		m_skipmode_m = 0;
-		sof = 1;
+		m_pvr_thread->sendEvent(eFilePushThread::evtUser);
 	}
 
 	start = current_offset;
@@ -2425,7 +2312,6 @@ RESULT eDVBChannel::playSource(ePtr<iTsSource> &source, const char *streaminfo_f
 	}
 
 	m_source = source;
-	m_streaminfo_file = std::string(streaminfo_file);
 	m_tstools.setSource(m_source, streaminfo_file);
 
 	if (m_pvr_fd_dst < 0)

@@ -43,21 +43,6 @@ gRC::gRC(): rp(0), wp(0)
 #endif
 }
 
-#ifdef CONFIG_ION
-void gRC::lock()
-{
-#ifndef SYNC_PAINT
-	pthread_mutex_lock(&mutex);
-#endif
-}
-void gRC::unlock()
-{
-#ifndef SYNC_PAINT
-	pthread_mutex_unlock(&mutex);
-#endif
-}
-#endif
-
 DEFINE_REF(gRC);
 
 gRC::~gRC()
@@ -166,7 +151,7 @@ void *gRC::thread()
 
 					/* when the main thread is non-idle for a too long time without any display output,
 					   we want to display a spinner. */
-				struct timespec timeout;
+				struct timespec timeout = {};
 				clock_gettime(CLOCK_REALTIME, &timeout);
 
 				if (m_spinner_enabled)

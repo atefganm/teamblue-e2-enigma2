@@ -13,10 +13,6 @@ enigma.eTimer = eBaseImpl.eTimer
 enigma.eSocketNotifier = eBaseImpl.eSocketNotifier
 enigma.eConsoleAppContainer = eConsoleImpl.eConsoleAppContainer
 
-from boxbranding import getBoxType
-
-boxtype = getBoxType()
-
 from traceback import print_exc
 
 profile("SetupDevices")
@@ -72,7 +68,7 @@ config.misc.prev_wakeup_time = ConfigInteger(default=0)
 #config.misc.prev_wakeup_time_type is only valid when wakeup_time is not 0
 config.misc.prev_wakeup_time_type = ConfigInteger(default=0)
 # 0 = RecordTimer, 1 = ZapTimer, 2 = Plugins, 3 = WakeupTimer
-config.misc.epgcache_filename = ConfigText(default="/media/hdd/epg.dat", fixed_size=False)
+config.misc.epgcache_filename = ConfigText(default='/etc/enigma2/epg.dat', fixed_size=False)
 config.misc.SyncTimeUsing = ConfigSelection(default="0", choices=[("0", "Transponder Time"), ("1", _("NTP"))])
 config.misc.NTPserver = ConfigText(default='pool.ntp.org', fixed_size=False)
 config.misc.useNTPminutes = ConfigSelection(default="30", choices=[("30", "30" + " " + _("minutes")), ("60", _("Hour")), ("1440", _("Once per day"))])
@@ -92,36 +88,6 @@ def setEPGCachePath(configElement):
 
 #config.misc.standbyCounter.addNotifier(standbyCountChanged, initial_call = False)
 ####################################################
-
-
-def useSyncUsingChanged(configelement):
-	if config.misc.SyncTimeUsing.value == "0":
-		print("[StartEnigma] Time by Transponder")
-		enigma.eDVBLocalTimeHandler.getInstance().setUseDVBTime(True)
-		enigma.eEPGCache.getInstance().timeUpdated()
-	else:
-		print("[StartEnigma] Time by NTP")
-		enigma.eDVBLocalTimeHandler.getInstance().setUseDVBTime(False)
-		enigma.eEPGCache.getInstance().timeUpdated()
-
-
-config.misc.SyncTimeUsing.addNotifier(useSyncUsingChanged, immediate_feedback=True)
-
-
-def NTPserverChanged(configelement):
-	if config.misc.NTPserver.value == "pool.ntp.org":
-		return
-	print("[StartEnigma] save /etc/default/ntpdate")
-	f = open("/etc/default/ntpdate", "w")
-	f.write('NTPSERVERS="' + config.misc.NTPserver.value + '"')
-	f.close()
-	os.chmod("/etc/default/ntpdate", 0o755)
-	from Components.Console import Console
-	Console = Console()
-	Console.ePopen('/usr/bin/ntpdate-sync')
-
-
-config.misc.NTPserver.addNotifier(NTPserverChanged, immediate_feedback=True)
 
 profile("Twisted")
 try:
@@ -371,8 +337,8 @@ class Session:
 	def pushSummary(self):
 		if self.summary:
 			self.summary.hide()
-		self.summary_stack.append(self.summary)
-		self.summary = None
+			self.summary_stack.append(self.summary)
+			self.summary = None
 
 	def popSummary(self):
 		if self.summary:
@@ -698,19 +664,6 @@ profile("LCD")
 import Components.Lcd
 Components.Lcd.InitLcd()
 
-from Tools.HardwareInfo import HardwareInfo
-if HardwareInfo().get_device_model() in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
-	print("[StartEnigma] Read /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-	check = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r").read()
-	if check.startswith("on"):
-		print("[StartEnigma] Write to /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-		open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w").write("off")
-	print("[StartEnigma] Read /proc/stb/audio/hdmi_rx_monitor")
-	checkaudio = open("/proc/stb/audio/hdmi_rx_monitor", "r").read()
-	if checkaudio.startswith("on"):
-		print("[StartEnigma] Write to /proc/stb/audio/hdmi_rx_monitor")
-		open("/proc/stb/audio/hdmi_rx_monitor", "w").write("off")
-
 profile("EpgCacheSched")
 import Components.EpgLoadSave
 Components.EpgLoadSave.EpgCacheSaveCheck()
@@ -740,9 +693,9 @@ profile("Init:PowerOffTimer")
 from Components.PowerOffTimer import powerOffTimer
 
 from Components.SystemInfo import SystemInfo
-with open("/tmp/SystemInfo" ,"w") as f:
+with open("/tmp/SystemInfo", "w") as f:
 	for key, value in sorted(SystemInfo.items()):
-		f.write("%s %s %s\n" % (key, int(35-len(key))*' ', value))
+		f.write("%s %s %s\n" % (key, int(35 - len(key)) * ' ', value))
 
 #from enigma import dump_malloc_stats
 #t = eTimer()

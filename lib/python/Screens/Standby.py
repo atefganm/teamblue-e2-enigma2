@@ -37,7 +37,6 @@ QUIT_MAINT = 16
 QUIT_UPGRADE_PROGRAM = 42
 QUIT_IMAGE_RESTORE = 43
 GB_ENTER_WOL = 44
-QUIT_RRECVERY_MODE = 45
 
 
 def setLCDModeMinitTV(value):
@@ -278,7 +277,6 @@ class QuitMainloopScreen(Screen):
 			QUIT_SHUTDOWN: _("Your %s %s is shutting down") % (MACHINEBRAND, MACHINENAME),
 			QUIT_REBOOT: _("Your %s %s is rebooting") % (MACHINEBRAND, MACHINENAME),
 			QUIT_RESTART: _("The user interface of your %s %s is restarting") % (MACHINEBRAND, MACHINENAME),
-			QUIT_RRECVERY_MODE: _("Your receiver is rebooting into Recovery Mode"),
 			QUIT_UPGRADE_FP: _("Your frontprocessor will be updated\nPlease wait until your %s %s reboots\nThis may take a few minutes") % (MACHINEBRAND, MACHINENAME),
 			QUIT_UPGRADE_PROGRAM: _("Unattended update in progress\nPlease wait until your %s %s reboots\nThis may take a few minutes") % (MACHINEBRAND, MACHINENAME),
 			GB_ENTER_WOL: _("Your %s %s goes to WOL") % (MACHINEBRAND, MACHINENAME)
@@ -324,7 +322,6 @@ class TryQuitMainloop(MessageBox):
 				QUIT_SHUTDOWN: _("Really shutdown your %s %s now?") % (MACHINEBRAND, MACHINENAME),
 				QUIT_REBOOT: _("Really reboot your %s %s now?") % (MACHINEBRAND, MACHINENAME),
 				QUIT_RESTART: _("Really restart your %s %s now?") % (MACHINEBRAND, MACHINENAME),
-				QUIT_RRECVERY_MODE: _("Really reboot into Recovery Mode?"),
 				QUIT_UPGRADE_FP: _("Really update the frontprocessor and reboot now?"),
 				QUIT_UPGRADE_PROGRAM: _("Really update your %s %s and reboot now?") % (MACHINEBRAND, MACHINENAME),
 				GB_ENTER_WOL: _("Really WOL now?")
@@ -372,8 +369,11 @@ class TryQuitMainloop(MessageBox):
 						if config.hdmicec.control_tv_standby.value and config.hdmicec.next_boxes_detect.value:
 							import Components.HdmiCec
 							Components.HdmiCec.hdmi_cec.secondBoxActive()
+						if not hasattr(self, "quitScreen"):
+							self.quitScreen = self.session.instantiateDialog(QuitMainloopScreen)
+							self.quitScreen.show()
 						self.delay = eTimer()
-						self.delay.timeout.callback.append(self.quitMainloop)
+						self.delay.timeout.callback.append(self.quitMainloopDelay)
 						self.delay.start(1500, True)
 						return
 			elif not inStandby:
@@ -382,6 +382,10 @@ class TryQuitMainloop(MessageBox):
 			self.quitMainloop()
 		else:
 			MessageBox.close(self, True)
+
+	def quitMainloopDelay(self):
+		self.session.nav.stopService()
+		quitMainloop(self.retval)
 
 	def quitMainloop(self):
 		if self.retval is QUIT_RESTART:

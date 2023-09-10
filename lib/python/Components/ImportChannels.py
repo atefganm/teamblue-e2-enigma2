@@ -20,7 +20,7 @@ import six
 
 supportfiles = ('lamedb', 'blacklist', 'whitelist', 'alternatives.')
 
-e2path = "/etc/enigma2"
+e2path = resolveFilename(SCOPE_CONFIG)
 
 
 class ImportChannels:
@@ -53,7 +53,7 @@ class ImportChannels:
 				sleep(5)
 				return self.getUrl(url, timeout)
 			print("[Import Channels] URLError ", e)
-			raise(e)
+			raise (e)
 		return result
 
 	def getTerrestrialUrl(self):
@@ -92,13 +92,13 @@ class ImportChannels:
 			try:
 				if remote:
 					try:
-						content = self.getUrl("%s/file?file=%s/%s" % (self.url, e2path, quote(file))).readlines()
+						content = self.getUrl("%s/file?file=%s/%s" % (self.url, e2path, quote(_file))).readlines()
 					except Exception as e:
 						print("[Import Channels] Exception: %s" % str(e))
-						self.ImportChannelsDone(False, _("ERROR downloading file %s/%s") % (e2path, file))
+						self.ImportChannelsDone(False, _("ERROR downloading file %s/%s") % (e2path, _file))
 						return
 				else:
-					with open('%s/%s' % (e2path, file), 'r') as f:
+					with open('%s/%s' % (e2path, _file), 'r') as f:
 						content = f.readlines()
 			except Exception as e:
 				# for the moment just log and ignore
@@ -166,34 +166,34 @@ class ImportChannels:
 
 		if "channels" in self.remote_fallback_import:
 			print("[Import Channels] Enumerate remote files")
-			files = self.ImportGetFilelist(True, 'bouquets.tv', 'bouquets.radio');
+			files = self.ImportGetFilelist(True, 'bouquets.tv', 'bouquets.radio')
 
 			print("[Import Channels] Enumerate remote support files")
-			for file in loads(self.getUrl("%s/file?dir=%s" % (self.url, e2path)).read())["files"]:
-				if os.path.basename(file).startswith(supportfiles):
-					files.append(file.replace(e2path, ''))
+			for _file in loads(self.getUrl("%s/file?dir=%s" % (self.url, e2path)).read())["files"]:
+				if os.path.basename(_file).startswith(supportfiles):
+					files.append(_file.replace(e2path, ''))
 
 			print("[Import Channels] Fetch remote files")
-			for file in files:
-#				print("[Import Channels] Downloading %s..." % file)
+			for _file in files:
+				print("[Import Channels] Downloading %s..." % _file)
 				try:
-					open(os.path.join(self.tmp_dir, os.path.basename(file)), "wb").write(self.getUrl("%s/file?file=%s/%s" % (self.url, e2path, quote(file))).read())
+					open(os.path.join(self.tmp_dir, os.path.basename(_file)), "wb").write(self.getUrl("%s/file?file=%s/%s" % (self.url, e2path, quote(_file))).read())
 				except Exception as e:
 					print("[Import Channels] Exception: %s" % str(e))
 
 			print("[Import Channels] Enumerate local files")
-			files = self.ImportGetFilelist(False, 'bouquets.tv', 'bouquets.radio');
+			files = self.ImportGetFilelist(False, 'bouquets.tv', 'bouquets.radio')
 
 			print("[Import Channels] Removing old local files...")
-			for file in files:
-#				print("- Removing %s..." % file)
-				os.remove(os.path.join(e2path, file))
+			for _file in files:
+				print("- Removing %s..." % _file)
+				os.remove(os.path.join(e2path, _file))
 
 			print("[Import Channels] Updating files...")
 			files = [x for x in os.listdir(self.tmp_dir)]
-			for file in files:
-#				print("- Moving %s..." % file)
-				shutil.move(os.path.join(self.tmp_dir, file), os.path.join(e2path, file))
+			for _file in files:
+				print("- Moving %s..." % _file)
+				shutil.move(os.path.join(self.tmp_dir, _file), os.path.join(e2path, _file))
 
 		self.ImportChannelsDone(True, {"channels": _("Channels"), "epg": _("EPG"), "channels_epg": _("Channels and EPG")}[self.remote_fallback_import])
 
