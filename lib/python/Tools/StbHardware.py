@@ -3,16 +3,21 @@ from fcntl import ioctl
 from struct import pack, unpack
 from boxbranding import getBoxType
 from time import time, localtime, gmtime
+from Tools.HardwareInfo import HardwareInfo
 
 
 def getFPVersion():
 	ret = None
 	try:
-		ret = int(open("/proc/stb/fp/version", "r").read())
+		if  HardwareInfo().get_device_model() in ('dm7080','dm820','dm520','dm525','dm900','dm920','dreamone','dreamtwo'):
+			ret = open("/proc/stb/fp/version", "r").read()
+		else:
+			ret = long(open("/proc/stb/fp/version", "r").read())
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
 			ret = ioctl(fp.fileno(), 0)
+			fp.close()
 		except IOError:
 			try:
 				ret = open("/sys/firmware/devicetree/base/bolt/tag", "r").read().rstrip("\0")
