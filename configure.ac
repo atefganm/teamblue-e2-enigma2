@@ -175,6 +175,36 @@ AC_ARG_WITH(7segment,
 )
 AC_SUBST(TEXTSKIN)
 
+AC_ARG_WITH(bwlcd96,
+	AC_HELP_STRING([--with-bwlcd96], [use 96x64 1bpp black and white display, yes or no]),
+	[[withbwlcd96=$withval]],
+	[[withbwlcd96=no]]
+)
+if test x"$withbwlcd96" != xno ; then
+	AC_DEFINE(HAVE_BWLCD96, 1,[Define when using a 96x64 black and white display device])
+fi
+AM_CONDITIONAL(HAVE_BWLCD96, test x"$withbwlcd96" != xno)
+
+AC_ARG_WITH(colorlcd,
+	AC_HELP_STRING([--with-colorlcd], [use 96x64 16bpp color display, yes or no]),
+	[[withcolorlcd=$withval]],
+	[[withcolorlcd=no]]
+)
+if test x"$withcolorlcd" != xno ; then
+	AC_DEFINE(HAVE_COLORLCD, 1,[Define when using a 96x64 color display device])
+fi
+AM_CONDITIONAL(HAVE_COLORLCD, test x"$withcolorlcd" != xno)
+
+AC_ARG_WITH(colorlcd128,
+	AC_HELP_STRING([--with-colorlcd128], [use 128x64 16bpp color display, yes or no]),
+	[[withcolorlcd128=$withval]],
+	[[withcolorlcd128=no]]
+)
+if test x"$withcolorlcd128" != xno ; then
+	AC_DEFINE(HAVE_COLORLCD128, 1,[Define when using a 128x64 color display device])
+fi
+AM_CONDITIONAL(HAVE_COLORLCD128, test x"$withcolorlcd" != xno)
+
 AC_ARG_WITH(colorlcd220,
 	AC_HELP_STRING([--with-colorlcd220], [use 220x176 16bpp color display, yes or no]),
 	[[withcolorlcd220=$withval]],
@@ -184,6 +214,17 @@ if test x"$withcolorlcd220" != xno ; then
 	AC_DEFINE(HAVE_COLORLCD220, 1,[Define when using a 220x176 color display device])
 fi
 AM_CONDITIONAL(HAVE_COLORLCD220, test x"$withcolorlcd220" != xno)
+
+AC_ARG_WITH(colorlcd390,
+	AC_HELP_STRING([--with-colorlcd390], [use 390x240 16bpp color display, yes or no]),
+	[[withcolorlcd390=$withval]],
+	[[withcolorlcd390=no]]
+)
+if test x"$withcolorlcd390" != xno ; then
+	AC_DEFINE(HAVE_COLORLCD390, 1,[Define when using a 390x240 color display device])
+fi
+
+AM_CONDITIONAL(HAVE_COLORLCD390, test x"$withcolorlcd390" != xno)
 
 AC_ARG_WITH(colorlcd400,
 	AC_HELP_STRING([--with-colorlcd400], [use 400x240 16bpp color display, yes or no]),
@@ -195,6 +236,17 @@ if test x"$withcolorlcd400" != xno ; then
 fi
 
 AM_CONDITIONAL(HAVE_COLORLCD400, test x"$withcolorlcd400" != xno)
+
+AC_ARG_WITH(colorlcd480,
+	AC_HELP_STRING([--with-colorlcd480], [use 480x320 16bpp color display, yes or no]),
+	[[withcolorlcd480=$withval]],
+	[[withcolorlcd480=no]]
+)
+if test x"$withcolorlcd480" != xno ; then
+	AC_DEFINE(HAVE_COLORLCD480, 1,[Define when using a 480x320 color display device])
+fi
+
+AM_CONDITIONAL(HAVE_COLORLCD480, test x"$withcolorlcd480" != xno)
 
 AC_ARG_WITH(bwlcd255,
 	AC_HELP_STRING([--with-bwlcd255], [use 255x64 1bpp black and white display, yes or no]),
@@ -462,10 +514,14 @@ data/Makefile
 data/fonts/Makefile
 data/countries/Makefile
 data/display/Makefile
+data/display/display96/Makefile
+data/display/display128/Makefile
+data/display/display128dm/Makefile
 data/display/lcd220/Makefile
-data/display/lcd400/Makefile
 data/display/lcd_skin220/Makefile
-data/display/lcd_skin400/Makefile
+data/display/display390/Makefile
+data/display/display400/Makefile
+data/display/display480/Makefile
 data/display/vfd255/Makefile
 data/extensions/Makefile
 data/gbipbox/Makefile
