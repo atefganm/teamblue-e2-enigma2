@@ -1,5 +1,5 @@
 import re
-from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager
+from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, getBoxType
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_SKIN, fileCheck, fileExists, fileHas, pathExists, resolveFilename, isPluginInstalled
 from Tools.HardwareInfo import HardwareInfo
 from boxbranding import getBoxType, getMachineBuild, getBrandOEM, getMachineMtdRoot
@@ -16,6 +16,7 @@ with open("/proc/cmdline", "r") as fd:
 	cmdline = fd.read()
 cmdline = {k: v.strip('"') for k, v in re.findall(r'(\S+)=(".*?"|\S+)', cmdline)}
 
+boxtype = getBoxType()
 
 def getNumVideoDecoders():
 	numVideoDecoders = 0
@@ -126,7 +127,7 @@ SystemInfo["Has24hz"] = fileCheck("/proc/stb/video/videomode_24hz")
 SystemInfo["Has2160p"] = fileHas("/proc/stb/video/videomode_preferred", "2160p50")
 SystemInfo["HasHDMIpreemphasis"] = fileCheck("/proc/stb/hdmi/preemphasis")
 SystemInfo["HasColorimetry"] = fileCheck("/proc/stb/video/hdmi_colorimetry")
-SystemInfo["HDMIin"] = getMachineBuild() in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo')
+SystemInfo["HDMIin"] = boxtype in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo')
 SystemInfo["HasHdrType"] = fileCheck("/proc/stb/video/hdmi_hdrtype")
 SystemInfo["HasScaler_sharpness"] = pathExists("/proc/stb/vmpeg/0/pep_scaler_sharpness")
 SystemInfo["HasHDMIin"] = model in ("vuduo4k", "vuduo4kse", "vuultimo4k", "vuuno4kse", "gbquad4k", "hd2400", "et10000")
