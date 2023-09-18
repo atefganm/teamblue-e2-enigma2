@@ -33,6 +33,7 @@ enigma2_LDADD_WHOLE = \
 	$(top_builddir)/lib/service/libenigma_service.a
 
 enigma2_LDADD = \
+	@TUXTXT_LIBS@ \
 	@BASE_LIBS@ \
 	@LIBGIF_LIBS@ \
 	@LIBJPEG_LIBS@ \
@@ -44,7 +45,7 @@ enigma2_LDADD = \
 	@ALSA_LIBS@ \
 	@AVAHI_LIBS@ \
 	@LIBDL_LIBS@ \
-	-ltuxtxt -ltuxtxt32bpp
+	-ltuxtxt32bpp
 
 enigma2_LDFLAGS = -Wl,--export-dynamic
 
