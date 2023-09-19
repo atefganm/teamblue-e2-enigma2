@@ -169,6 +169,10 @@ while : ; do
 		6)
 			DEBUG_LVL=4
 			;;
+		16)
+				echo "rescue" > /proc/stb/fp/boot_mode
+			/sbin/reboot
+			;;
 		7)
 			rm -R /etc/enigma2
 			;;

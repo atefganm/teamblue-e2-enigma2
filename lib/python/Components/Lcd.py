@@ -5,6 +5,9 @@ from Components.SystemInfo import SystemInfo
 from Tools.Directories import fileExists
 from Screens.InfoBar import InfoBar
 from Screens.Screen import Screen
+from enigma import getBoxType
+
+model = getBoxType()
 
 from boxbranding import getBoxType
 
