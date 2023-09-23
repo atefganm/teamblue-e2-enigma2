@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Screens.Setup import getConfigMenuItem, Setup
 from Screens.InputBox import PinInput
@@ -12,12 +13,12 @@ from Components.Sources.List import List
 from Components.Sources.Boolean import Boolean
 from Components.SystemInfo import SystemInfo
 from Components.VolumeControl import VolumeControl
-from Components.UsageConfig import originalAudioTracks, visuallyImpairedCommentary
+from  Components.UsageConfig import originalAudioTracks, visuallyImpairedCommentary
 from Tools.ISO639 import LanguageCodes
 
 from enigma import iPlayableService, eTimer, eSize, eDVBDB, eServiceReference, eServiceCenter, iServiceInformation
 
-FOCUS_CONFIG, FOCUS_STREAMS = range(2)
+FOCUS_CONFIG, FOCUS_STREAMS = list(range(2))
 [PAGE_AUDIO, PAGE_SUBTITLES] = ["audio", "subtitles"]
 
 
@@ -93,18 +94,14 @@ class AudioSelection(ConfigListScreen, Screen):
 			self.audioTracks = audio = service and service.audioTracks()
 			n = audio and audio.getNumberOfTracks() or 0
 			if SystemInfo["CanDownmixAC3"]:
-				downmix_ac3_value = config.av.downmix_ac3.value
-				if downmix_ac3_value in ("downmix", "passthrough"):
-					self.settings.downmix = ConfigSelection(choices=[("downmix", _("Downmix")), ("passthrough", _("Passthrough"))], default=downmix_ac3_value)
-					self.settings.downmix.addNotifier(self.changeAC3Downmix, initial_call=False)
-					extra_text = " - AC3"
-					if SystemInfo["CanDownmixDTS"]:
-						extra_text += ",DTS"
-					if SystemInfo["CanDownmixAAC"]:
-						extra_text += ",AAC"
-					conflist.append((_("Multi channel downmix") + extra_text, self.settings.downmix))
-					self["key_red"].setBoolean(True)
-
+				if SystemInfo["DreamBoxAudio"]:
+					choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI"))]
+					self.settings.downmix_ac3 = ConfigSelection(choices=choice_list, default=config.av.downmix_ac3.value)
+				else:
+					self.settings.downmix_ac3 = ConfigOnOff(default=config.av.downmix_ac3.value)
+				self.settings.downmix_ac3.addNotifier(self.changeAC3Downmix, initial_call=False)
+				conflist.append((_("AC3 downmix"), self.settings.downmix_ac3, None))
+				self["key_red"].setBoolean(True)
 			if n > 0:
 				self.audioChannel = service.audioChannel()
 				if self.audioChannel:
@@ -117,7 +114,7 @@ class AudioSelection(ConfigListScreen, Screen):
 					conflist.append(('',))
 					self["key_green"].setBoolean(False)
 				selectedAudio = self.audioTracks.getCurrentTrack()
-				for x in range(n):
+				for x in list(range(n)):
 					number = str(x + 1)
 					i = audio.getTrackInfo(x)
 					languages = i.getLanguage().split('/')
@@ -158,6 +155,24 @@ class AudioSelection(ConfigListScreen, Screen):
 			else:
 				self["key_yellow"].setBoolean(False)
 				conflist.append(('',))
+
+			if SystemInfo["Has3DSurround"]:
+				choice_list = [("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))]
+				self.settings.surround_3d = ConfigSelection(choices=choice_list, default=config.av.surround_3d.value)
+				self.settings.surround_3d.addNotifier(self.change3DSurround, initial_call=False)
+				conflist.append((_("3D Surround"), self.settings.surround_3d, None))
+
+			if SystemInfo["Has3DSpeaker"] and config.av.surround_3d.value != "none":
+				choice_list = [("center", _("center")), ("wide", _("wide")), ("extrawide", _("extra wide"))]
+				self.settings.surround_3d_speaker = ConfigSelection(choices=choice_list, default=config.av.surround_3d_speaker.value)
+				self.settings.surround_3d_speaker.addNotifier(self.change3DSurroundSpeaker, initial_call=False)
+				conflist.append((_("3D Surround Speaker Position"), self.settings.surround_3d_speaker, None))
+
+			if SystemInfo["HasAutoVolume"]:
+				choice_list = [("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))]
+				self.settings.autovolume = ConfigSelection(choices=choice_list, default=config.av.autovolume.value)
+				self.settings.autovolume.addNotifier(self.changeAutoVolume, initial_call=False)
+				conflist.append((_("Auto Volume Level"), self.settings.autovolume, None))
 
 			from Components.PluginComponent import plugins
 			from Plugins.Plugin import PluginDescriptor
@@ -256,15 +271,96 @@ class AudioSelection(ConfigListScreen, Screen):
 			subtitlelist.append(self.selectedSubtitle)
 		return subtitlelist
 
-	def changeAC3Downmix(self, configElement):
-		config.av.downmix_ac3.value = configElement.value
+	def change3DSurround(self, surround_3d):
+		if surround_3d.value:
+			config.av.surround_3d.value = surround_3d.value
+		config.av.surround_3d.save()
+
+	def change3DSurroundSpeaker(self, surround_3d_speaker):
+		if surround_3d_speaker.value:
+			config.av.surround_3d_speaker.value = surround_3d_speaker.value
+		config.av.surround_3d_speaker.save()
+
+	def changeAutoVolume(self, autovolume):
+		if autovolume.value:
+			config.av.autovolume.value = autovolume.value
+		config.av.autovolume.save()
+
+	def changeAC3Downmix(self, downmix):
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.downmix_ac3.setValue(downmix.value)
+		else:
+			if downmix.value:
+				config.av.downmix_ac3.setValue(True)
+				if SystemInfo["HasMultichannelPCM"]:
+					config.av.multichannel_pcm.setValue(False)
+			else:
+				config.av.downmix_ac3.setValue(False)
 		config.av.downmix_ac3.save()
-		if SystemInfo["CanDownmixDTS"]:
-			config.av.downmix_dts.value = configElement.value
-			config.av.downmix_dts.save()
-		if SystemInfo["CanDownmixAAC"]:
-			config.av.downmix_aac.value = configElement.value
-			config.av.downmix_aac.save()
+		if SystemInfo["HasMultichannelPCM"]:
+			config.av.multichannel_pcm.save()
+		self.fillList()
+
+	def changeBTAudio(self, btaudio):
+		if btaudio.value:
+			config.av.btaudio.value = btaudio.value
+		config.av.btaudio.save()
+
+	def changePCMMultichannel(self, multichan):
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.multichannel_pcm.setValue(multichan.value)
+		else:
+			if multichan.value:
+				config.av.multichannel_pcm.setValue(True)
+			else:
+				config.av.multichannel_pcm.setValue(False)
+		config.av.multichannel_pcm.save()
+		self.fillList()
+
+	def changeAACDownmix(self, downmix):
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.downmix_aac.setValue(downmix.value)
+		else:
+			if downmix.value:
+				config.av.downmix_aac.setValue(True)
+			else:
+				config.av.downmix_aac.setValue(False)
+		config.av.downmix_aac.save()
+
+	def changeAACDownmixPlus(self, downmix):
+		config.av.downmix_aacplus.setValue(downmix.value)
+		config.av.downmix_aacplus.save()
+
+	def setAC3plusTranscode(self, transcode):
+		config.av.transcodeac3plus.setValue(transcode.value)
+		config.av.transcodeac3plus.save()
+
+	def setWMAPro(self, downmix):
+		config.av.wmapro.setValue(downmix.value)
+		config.av.wmapro.save()
+
+	def setDTSHD(self, downmix):
+		config.av.dtshd.setValue(downmix.value)
+		config.av.dtshd.save()
+
+	def setAACTranscode(self, transcode):
+		config.av.transcodeaac.setValue(transcode)
+		config.av.transcodeaac.save()
+
+	def changeDTSDownmix(self, downmix):
+		if downmix.value:
+			config.av.downmix_dts.setValue(True)
+		else:
+			config.av.downmix_dts.setValue(False)
+		config.av.downmix_dts.save()
+
+	def setAC3plusTranscode(self, transcode):
+		config.av.transcode_ac3plus.setValue(transcode)
+		config.av.transcode_ac3plus.save()
+
+	def setAACTranscode(self, transcode):
+		config.av.transcode_aac.setValue(transcode)
+		config.av.transcode_aac.save()
 
 	def changeMode(self, mode):
 		if mode is not None and self.audioChannel:
@@ -284,7 +380,7 @@ class AudioSelection(ConfigListScreen, Screen):
 
 	def keyRight(self, config=False):
 		if config or self.focus == FOCUS_CONFIG:
-			if self["config"].getCurrentIndex() < 3:
+			if self["config"].getCurrentIndex() < 3 or self["config"].getCurrentIndex() >= 4:
 				ConfigListScreen.keyRight(self)
 			elif self["config"].getCurrentIndex() == 3:
 				if self.settings.menupage.getValue() == PAGE_AUDIO and hasattr(self, "plugincallfunc"):
@@ -398,7 +494,7 @@ class AudioSelection(ConfigListScreen, Screen):
 
 	def protectResult(self, answer):
 		if answer:
-			self.session.open(Setup, "autolanguagesetup")
+			self.session.open(Setup, "AutoLanguage")
 			self.protectContextMenu = False
 		elif answer is not None:
 			self.session.openWithCallback(self.close, MessageBox, _("The PIN code you entered is wrong."), MessageBox.TYPE_ERROR)
@@ -428,6 +524,8 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 		self.infobar = infobar or self.session.infobar
 		self.wait = eTimer()
 		self.wait.timeout.get().append(self.resyncSubtitles)
+		self.resume = eTimer()
+		self.resume.timeout.get().append(self.resyncSubtitlesResume)
 		self.service = self.session.nav.getCurrentlyPlayingServiceReference()
 		servicepath = self.service and self.service.getPath()
 		if servicepath and servicepath.startswith("/") and self.service.toString().startswith("1:"):
@@ -454,8 +552,8 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 			menu = [
 				getConfigMenuItem("config.subtitles.ttx_subtitle_colors"),
 				getConfigMenuItem("config.subtitles.ttx_subtitle_original_position"),
+				getConfigMenuItem("config.subtitles.ttx_subtitle_position"),
 				getConfigMenuItem("config.subtitles.subtitle_fontsize"),
-				getConfigMenuItem("config.subtitles.subtitle_position"),
 				getConfigMenuItem("config.subtitles.subtitle_rewrap"),
 				getConfigMenuItem("config.subtitles.subtitle_borderwidth"),
 				getConfigMenuItem("config.subtitles.showbackground"),
@@ -508,6 +606,9 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 
 	def resyncSubtitles(self):
 		self.infobar.setSeekState(self.infobar.SEEK_STATE_PAUSE)
+		self.resume.start(100, True)
+
+	def resyncSubtitlesResume(self):
 		self.infobar.setSeekState(self.infobar.SEEK_STATE_PLAY)
 
 	def getFps(self):
