@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import division
 from Components.config import config, ConfigSubsection, ConfigSlider, ConfigYesNo, ConfigNothing, ConfigSelection
 from enigma import eDBoxLCD
@@ -5,11 +6,10 @@ from Components.SystemInfo import SystemInfo
 from Tools.Directories import fileExists
 from Screens.InfoBar import InfoBar
 from Screens.Screen import Screen
+from Tools.HardwareInfo import HardwareInfo
 from enigma import getBoxType
 
 model = getBoxType()
-
-from boxbranding import getBoxType
 
 
 class dummyScreen(Screen):
@@ -161,7 +161,7 @@ def InitLcd():
 			config.lcd.contrast.addNotifier(setLCDcontrast)
 		else:
 			config.lcd.contrast = ConfigNothing()
-			if getBoxType() in ('dm900','dm920'):
+			if HardwareInfo().get_device_model() in ('dm900', 'dm920'):
 				standby_default = 4
 			else:
 				standby_default = 1
@@ -247,7 +247,7 @@ def InitLcd():
 			config.lcd.ledbrightnessstandby.apply = lambda : doNothing()
 			config.lcd.ledbrightnessdeepstandby = ConfigNothing()
 			config.lcd.ledbrightnessdeepstandby.apply = lambda : doNothing()
-			config.lcd.ledblinkingtime = ConfigNothing
+			config.lcd.ledblinkingtime = ConfigNothing()
 	else:
 		def doNothing():
 			pass
