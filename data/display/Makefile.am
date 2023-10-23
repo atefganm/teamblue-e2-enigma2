@@ -6,32 +6,12 @@ else
 DISPLAYTYPE = display
 endif
 
-if HAVE_COLORLCD2
-SUBDIRS = display96
-endif
-
-if HAVE_COLORLCD3
-SUBDIRS = display128dm
-endif
-
-if HAVE_COLORLCD1
-SUBDIRS = display128
-endif
-
 if HAVE_COLORLCD220
 SUBDIRS = lcd220 lcd_skin220
 endif
 
-if HAVE_COLORLCD390
-SUBDIRS = display390
-endif
-
 if HAVE_COLORLCD400
-SUBDIRS = display400
-endif
-
-if HAVE_COLORLCD480
-SUBDIRS = display480
+SUBDIRS = lcd400 lcd_skin400
 endif
 
 if HAVE_BWLCD255
