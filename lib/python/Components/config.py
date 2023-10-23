@@ -617,7 +617,6 @@ class ConfigSequence(ConfigElement):
 		for i in self._value:
 			max_pos += len(str(self.limits[num][1]))
 
-			self._value[num]= int(self._value[num])
 			if self._value[num] < self.limits[num][0]:
 				self._value[num] = self.limits[num][0]
 
@@ -835,7 +834,8 @@ class ConfigIP(ConfigSequence):
 		else:
 			return ("text", value)
 
-	def getHTML(self, id):
+	def getHTML(self, id=0):
+		# I do not know why id is here but it is used in the sources renderer and I'm afraid we should keep it for compatibily. It is not used here but I give at a default value
 		# we definitely don't want leading zeros
 		return '.'.join(["%d" % d for d in self.value])
 
@@ -1341,18 +1341,6 @@ class ConfigSelectionNumber(ConfigSelection):
 
 	value = property(getValue, setValue)
 
-	def getIndex(self):
-		return self.choices.index(self.value)
-
-	index = property(getIndex)
-
-	def isChanged(self):
-		sv = self.saved_value
-		strv = str(self.tostring(self.value))
-		if sv is None and strv == str(self.default):
-			return False
-		return strv != str(sv)
-
 	def handleKey(self, key):
 		if not self.wraparound:
 			if key == KEY_RIGHT:
@@ -1457,6 +1445,8 @@ class ConfigDirectory(ConfigText):
 		if val is None:
 			val = ""
 		ConfigText.setValue(self, val)
+
+	value = property(getValue, setValue)
 
 	def getMulti(self, selected):
 		if self.text == "":

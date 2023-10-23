@@ -16,6 +16,7 @@ import NavigationInstance
 import ServiceReference
 from Screens.InfoBar import InfoBar
 from Components.Sources.StreamService import StreamServiceList
+from Screens.InfoBarGenerics import streamrelayChecker
 
 # TODO: remove pNavgation, eNavigation and rewrite this stuff in python.
 
@@ -156,6 +157,9 @@ class Navigation:
 		for x in self.record_event:
 			x(rec_service, event)
 
+	def restartService(self):
+		self.playService(self.currentlyPlayingServiceOrGroup, forceRestart=True)
+
 	def playService(self, ref, checkParentalControl=True, forceRestart=False, adjust=True):
 		session = None
 		startPlayingServiceOrGroup = None
@@ -218,6 +222,7 @@ class Navigation:
 					return 0
 				self.pnav.stopService()
 				self.currentlyPlayingServiceReference = playref
+				playref = streamrelayChecker(playref)
 				self.currentlyPlayingServiceOrGroup = ref
 				if startPlayingServiceOrGroup and startPlayingServiceOrGroup.flags & eServiceReference.isGroup and not ref.flags & eServiceReference.isGroup:
 					self.currentlyPlayingServiceOrGroup = startPlayingServiceOrGroup
@@ -280,9 +285,12 @@ class Navigation:
 			print("[Navigation] recording service: %s" % (str(ref)))
 		if isinstance(ref, ServiceReference.ServiceReference):
 			ref = ref.ref
+		if not simulate:
+			print("[Navigation] recording service: %s" % (ref and ref.toString() or "None"))
 		if ref:
 			if ref.flags & eServiceReference.isGroup:
 				ref = getBestPlayableServiceReference(ref, eServiceReference(), simulate)
+			ref = streamrelayChecker(ref)
 			service = ref and self.pnav and self.pnav.recordService(ref, simulate)
 			if service is None:
 				print("[Navigation] record returned non-zero")

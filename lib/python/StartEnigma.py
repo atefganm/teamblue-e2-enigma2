@@ -68,10 +68,7 @@ config.misc.prev_wakeup_time = ConfigInteger(default=0)
 #config.misc.prev_wakeup_time_type is only valid when wakeup_time is not 0
 config.misc.prev_wakeup_time_type = ConfigInteger(default=0)
 # 0 = RecordTimer, 1 = ZapTimer, 2 = Plugins, 3 = WakeupTimer
-config.misc.epgcache_filename = ConfigText(default="/media/hdd/epg.dat", fixed_size=False)
-config.misc.SyncTimeUsing = ConfigSelection(default="0", choices=[("0", "Transponder Time"), ("1", _("NTP"))])
-config.misc.NTPserver = ConfigText(default='pool.ntp.org', fixed_size=False)
-config.misc.useNTPminutes = ConfigSelection(default="30", choices=[("30", "30" + " " + _("minutes")), ("60", _("Hour")), ("1440", _("Once per day"))])
+config.misc.epgcache_filename = ConfigText(default='/etc/enigma2/epg.dat', fixed_size=False)
 
 
 def setEPGCachePath(configElement):
@@ -643,10 +640,6 @@ profile("UsageConfig")
 import Components.UsageConfig
 Components.UsageConfig.InitUsageConfig()
 
-profile("Init:NTPSync")
-import Components.NetworkTime
-Components.NetworkTime.AutoNTPSync()
-
 profile("Timezones")
 import Components.Timezones
 Components.Timezones.InitTimeZones()
@@ -663,19 +656,6 @@ Components.Network.waitForNetwork()
 profile("LCD")
 import Components.Lcd
 Components.Lcd.InitLcd()
-
-from Tools.HardwareInfo import HardwareInfo
-if HardwareInfo().get_device_model() in ('dm7080', 'dm820', 'dm900', 'dm920', 'dreamone', 'dreamtwo'):
-	print("[StartEnigma] Read /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-	check = open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "r").read()
-	if check.startswith("on"):
-		print("[StartEnigma] Write to /proc/stb/hdmi-rx/0/hdmi_rx_monitor")
-		open("/proc/stb/hdmi-rx/0/hdmi_rx_monitor", "w").write("off")
-	print("[StartEnigma] Read /proc/stb/audio/hdmi_rx_monitor")
-	checkaudio = open("/proc/stb/audio/hdmi_rx_monitor", "r").read()
-	if checkaudio.startswith("on"):
-		print("[StartEnigma] Write to /proc/stb/audio/hdmi_rx_monitor")
-		open("/proc/stb/audio/hdmi_rx_monitor", "w").write("off")
 
 profile("EpgCacheSched")
 import Components.EpgLoadSave
