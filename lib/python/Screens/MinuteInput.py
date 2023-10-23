@@ -4,10 +4,10 @@ from Components.Input import Input
 
 
 class MinuteInput(Screen):
-		def __init__(self, session, basemins=5, maxValue=False):
+		def __init__(self, session, basemins=5):
 			Screen.__init__(self, session)
 
-			self["minutes"] = Input(str(basemins), type=Input.NUMBER, maxValue=maxValue)
+			self["minutes"] = Input(str(basemins), type=Input.NUMBER)
 
 			self["actions"] = NumberActionMap(["InputActions", "MinuteInputActions", "TextEntryActions", "KeyboardInputActions"],
 			{

@@ -204,8 +204,7 @@ class PictureInPicture(Screen):
 		Notifications.RemovePopup("ZapPipError")
 		if service is None:
 			return False
-		from Screens.InfoBarGenerics import streamrelayChecker
-		ref = streamrelayChecker(self.resolveAlternatePipService(service))
+		ref = self.resolveAlternatePipService(service)
 		if ref:
 			if SystemInfo["CanNotDoSimultaneousTranscodeAndPIP"] and StreamServiceList:
 				self.pipservice = None

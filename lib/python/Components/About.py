@@ -10,6 +10,9 @@ from builtins import round
 
 from boxbranding import getBoxType, getMachineBuild, getImageType, getImageVersion
 from sys import maxsize, modules, version_info
+from Tools.Directories import fileReadLine
+
+MODULE_NAME = __name__.split(".")[-1]
 
 
 def getVersionString():
@@ -74,30 +77,38 @@ def getKernelVersionString():
 
 
 def getChipSetString():
-	if getMachineBuild() in ('gb73625', ):
-		return "BCM73625"
+	if getMachineBuild() in ('dm7080', 'dm820'):
+		return "7435"
+	elif getMachineBuild() in ('dm520', 'dm525'):
+		return "73625"
+	elif getMachineBuild() in ('dm900', 'dm920', 'et13000', 'sf5008'):
+		return "7252S"
+	elif getMachineBuild() in ('hd51', 'vs1500', 'h7'):
+		return "7251S"
+	elif getMachineBuild() in ('alien5',):
+		return "S905D"
 	else:
 		try:
 			f = open('/proc/stb/info/chipset', 'r')
 			chipset = f.read()
 			f.close()
-			return str(chipset.lower().replace('\n', '').replace('bcm', 'BCM').replace('brcm', 'BRCM').replace('sti', ''))
+			return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
 		except IOError:
 			return "unavailable"
 
 
 def getCPUString():
-	if getMachineBuild() in ('xc7362', ):
+	if getMachineBuild() in ('vuduo4k', 'vuduo4kse', 'osmio4k', 'osmio4kplus', 'osmini4k', 'dags72604', 'vuuno4kse', 'vuuno4k', 'vuultimo4k', 'vusolo4k', 'vuzero4k', 'hd51', 'hd52', 'sf4008', 'dm900', 'dm920', 'gb7252', 'gb72604', 'dags7252', 'vs1500', 'et1x000', 'xc7439', 'h7', '8100s', 'et13000', 'sf5008'):
 		return "Broadcom"
-	elif getMachineBuild() in ('gbmv200', ):
+	elif getMachineBuild() in ('dagsmv200', 'gbmv200', 'u41', 'u42', 'u43', 'u45', 'u51', 'u52', 'u53', 'u532', 'u533', 'u54', 'u55', 'u56', 'u57', 'u571', 'u5', 'u5pvr', 'h9', 'i55se', 'h9se', 'h9combose', 'h9combo', 'h10', 'h11', 'cc1', 'sf8008', 'sf8008m', 'sf8008opt', 'hd60', 'hd61', 'pulse4k', 'pulse4kmini', 'i55plus', 'ustym4kpro', 'beyonwizv2', 'viper4k', 'multibox', 'multiboxse', 'hzero', 'h8'):
 		return "Hisilicon"
-	#elif getMachineBuild() in ('gb73625', ):
-	#	return "BCM73625"
+	elif getMachineBuild() in ('alien5',):
+		return "AMlogic"
 	else:
 		try:
 			system = "unknown"
-			_file = open('/proc/cpuinfo', 'r')
-			lines = _file.readlines()
+			file = open('/proc/cpuinfo', 'r')
+			lines = file.readlines()
 			for x in lines:
 				splitted = x.split(': ')
 				if len(splitted) > 1:
@@ -106,7 +117,7 @@ def getCPUString():
 						system = splitted[1].split(' ')[0]
 					elif splitted[0].startswith("Processor"):
 						system = splitted[1].split(' ')[0]
-			_file.close()
+			file.close()
 			return system
 		except IOError:
 			return "unavailable"
@@ -114,18 +125,22 @@ def getCPUString():
 
 def getCpuCoresString():
 	try:
-		_file = open('/proc/cpuinfo', 'r')
-		lines = _file.readlines()
+		file = open('/proc/cpuinfo', 'r')
+		lines = file.readlines()
 		for x in lines:
 			splitted = x.split(': ')
 			if len(splitted) > 1:
 				splitted[1] = splitted[1].replace('\n', '')
 				if splitted[0].startswith("processor"):
-					if int(splitted[1]) > 0:
+					if getMachineBuild() in ('dagsmv200', 'gbmv200', 'u51', 'u52', 'u53', 'u532', 'u533', 'u54', 'u55', 'u56', 'u57', 'u571', 'vuultimo4k', 'u5', 'u5pvr', 'h9', 'i55se', 'h9se', 'h9combose', 'h9combo', 'h10', 'h11', 'alien5', 'cc1', 'sf8008', 'sf8008m', 'sf8008opt', 'hd60', 'hd61', 'pulse4k', 'pulse4kmini', 'i55plus', 'ustym4kpro', 'beyonwizv2', 'viper4k', 'vuduo4k', 'vuduo4kse', 'multibox', 'multiboxse'):
+						cores = 4
+					elif getMachineBuild() in ('u41', 'u42', 'u43', 'u45'):
+						cores = 1
+					elif int(splitted[1]) > 0:
 						cores = 2
 					else:
 						cores = 1
-		_file.close()
+		file.close()
 		return cores
 	except IOError:
 		return "unavailable"
@@ -259,10 +274,8 @@ def getDriverInstalledDate():
 	try:
 		from glob import glob
 		try:
-			driver = [x.split("-") for x in open(glob("/var/lib/opkg/info/*-dvb-modules-*.control")[0], "r") if x.startswith("Version:")][0]
-			if len(driver) == 2:
-				driver = driver[0].split('+')
-			return "%s-%s-%s" % (driver[1][:4], driver[1][4:6], driver[1][6:])
+			driver = [x.split("-")[-2:-1][0][-8:] for x in open(glob("/var/lib/opkg/info/*-dvb-modules-*.control")[0], "r") if x.startswith("Version:")][0]
+			return "%s-%s-%s" % (driver[:4], driver[4:6], driver[6:])
 		except:
 			driver = [x.split("Version:") for x in open(glob("/var/lib/opkg/info/*-dvb-proxy-*.control")[0], "r") if x.startswith("Version:")][0]
 			return "%s" % driver[1].replace("\n", "")
@@ -297,7 +310,7 @@ def GetIPsFromNetworkInterfaces():
 			max_possible *= 2
 		else:
 			break
-	namestr = names.tobytes()
+	namestr = names.tostring()
 	ifaces = []
 	for i in list(range(0, outbytes, struct_size)):
 		iface_name = bytes.decode(namestr[i:i + 16]).split('\0', 1)[0].encode('ascii')
