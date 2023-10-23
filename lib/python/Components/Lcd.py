@@ -5,8 +5,10 @@ from Components.SystemInfo import SystemInfo
 from Tools.Directories import fileExists
 from Screens.InfoBar import InfoBar
 from Screens.Screen import Screen
+from Tools.HardwareInfo import HardwareInfo
+from enigma import getBoxType
 
-from boxbranding import getBoxType
+model = getBoxType()
 
 
 class dummyScreen(Screen):
@@ -54,12 +56,17 @@ class LCD:
 
 def leaveStandby():
 	config.lcd.bright.apply()
+	if model == "vuultimo":
+		config.lcd.ledbrightness.apply()
+		config.lcd.ledbrightnessdeepstandby.apply()
 
 
 def standbyCounterChanged(dummy):
 	from Screens.Standby import inStandby
 	inStandby.onClose.append(leaveStandby)
 	config.lcd.standby.apply()
+	config.lcd.ledbrightnessstandby.apply()
+	config.lcd.ledbrightnessdeepstandby.apply()
 
 
 def InitLcd():
@@ -146,12 +153,17 @@ def InitLcd():
 
 		standby_default = 0
 
+		ilcd = LCD()
+
 		if not ilcd.isOled():
 			config.lcd.contrast = ConfigSlider(default=5, limits=(0, 20))
 			config.lcd.contrast.addNotifier(setLCDcontrast)
 		else:
 			config.lcd.contrast = ConfigNothing()
-			standby_default = 1
+			if HardwareInfo().get_device_model() in ('dm900', 'dm920'):
+				standby_default = 4
+			else:
+				standby_default = 1
 
 		config.lcd.standby = ConfigSlider(default=standby_default, limits=(0, 10))
 		config.lcd.standby.addNotifier(setLCDbright)
@@ -210,6 +222,31 @@ def InitLcd():
 
 			if "live_enable" in SystemInfo["LcdLiveTV"]:
 				config.misc.standbyCounter.addNotifier(standbyCounterChangedLCDLiveTV, initial_call=False)
+
+		if model == "vuultimo":
+			config.lcd.ledblinkingtime = ConfigSlider(default = 5, increment = 1, limits = (0, 15))
+			config.lcd.ledblinkingtime.addNotifier(setLEDblinkingtime);
+			config.lcd.ledbrightnessdeepstandby = ConfigSlider(default = 1, increment = 1, limits = (0, 15))
+			config.lcd.ledbrightnessdeepstandby.addNotifier(setLEDnormalstate);
+			config.lcd.ledbrightnessdeepstandby.addNotifier(setLEDdeepstandby);
+			config.lcd.ledbrightnessdeepstandby.apply = lambda : setLEDdeepstandby(config.lcd.ledbrightnessdeepstandby)
+			config.lcd.ledbrightnessstandby = ConfigSlider(default = 1, increment = 1, limits = (0, 15))
+			config.lcd.ledbrightnessstandby.addNotifier(setLEDnormalstate);
+			config.lcd.ledbrightnessstandby.apply = lambda : setLEDnormalstate(config.lcd.ledbrightnessstandby)
+			config.lcd.ledbrightness = ConfigSlider(default = 3, increment = 1, limits = (0, 15))
+			config.lcd.ledbrightness.addNotifier(setLEDnormalstate);
+			config.lcd.ledbrightness.apply = lambda : setLEDnormalstate(config.lcd.ledbrightness)
+			config.lcd.ledbrightness.callNotifiersOnSaveAndCancel = True
+		else:
+			def doNothing():
+				pass
+			config.lcd.ledbrightness = ConfigNothing()
+			config.lcd.ledbrightness.apply = lambda : doNothing()
+			config.lcd.ledbrightnessstandby = ConfigNothing()
+			config.lcd.ledbrightnessstandby.apply = lambda : doNothing()
+			config.lcd.ledbrightnessdeepstandby = ConfigNothing()
+			config.lcd.ledbrightnessdeepstandby.apply = lambda : doNothing()
+			config.lcd.ledblinkingtime = ConfigNothing()
 	else:
 		def doNothing():
 			pass
@@ -218,6 +255,12 @@ def InitLcd():
 		config.lcd.standby = ConfigNothing()
 		config.lcd.bright.apply = lambda: doNothing()
 		config.lcd.standby.apply = lambda: doNothing()
+		config.lcd.ledbrightness = ConfigNothing()
+		config.lcd.ledbrightness.apply = lambda : doNothing()
+		config.lcd.ledbrightnessstandby = ConfigNothing()
+		config.lcd.ledbrightnessstandby.apply = lambda : doNothing()
+		config.lcd.ledbrightnessdeepstandby = ConfigNothing()
+		config.lcd.ledbrightnessdeepstandby.apply = lambda : doNothing()
 
 	config.misc.standbyCounter.addNotifier(standbyCounterChanged, initial_call=False)
 

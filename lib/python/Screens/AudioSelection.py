@@ -6,7 +6,7 @@ from Screens.ChoiceBox import ChoiceBox
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.ActionMap import NumberActionMap
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, ConfigSubsection, ConfigNothing, ConfigSelection, ConfigYesNo
+from Components.config import config, ConfigSubsection, ConfigNothing, ConfigSelection, ConfigOnOff, ConfigYesNo
 from Components.Label import Label
 from Components.Sources.List import List
 from Components.Sources.Boolean import Boolean
@@ -111,6 +111,15 @@ class AudioSelection(ConfigListScreen, Screen):
 					conflist.append((_("Multi channel downmix") + extra_text, self.settings.downmix))
 					self["key_red"].setBoolean(True)
 
+				if SystemInfo["DreamBoxAudio"]:
+					choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI"))]
+					self.settings.downmix_ac3 = ConfigSelection(choices=choice_list, default=config.av.downmix_ac3.value)
+				else:
+					self.settings.downmix_ac3 = ConfigOnOff(default=config.av.downmix_ac3.value)
+				self.settings.downmix_ac3.addNotifier(self.changeAC3Downmix, initial_call=False)
+				conflist.append((_("AC3 downmix"), self.settings.downmix_ac3, None))
+				self["key_red"].setBoolean(True)
+
 			if n > 0:
 				self.audioChannel = service.audioChannel()
 				if self.audioChannel:
@@ -164,6 +173,24 @@ class AudioSelection(ConfigListScreen, Screen):
 			else:
 				self["key_yellow"].setBoolean(False)
 				conflist.append(('',))
+
+			if SystemInfo["Has3DSurround"]:
+				choice_list = [("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))]
+				self.settings.surround_3d = ConfigSelection(choices=choice_list, default=config.av.surround_3d.value)
+				self.settings.surround_3d.addNotifier(self.change3DSurround, initial_call=False)
+				conflist.append((_("3D Surround"), self.settings.surround_3d, None))
+
+			if SystemInfo["Has3DSpeaker"] and config.av.surround_3d.value != "none":
+				choice_list = [("center", _("center")), ("wide", _("wide")), ("extrawide", _("extra wide"))]
+				self.settings.surround_3d_speaker = ConfigSelection(choices=choice_list, default=config.av.surround_3d_speaker.value)
+				self.settings.surround_3d_speaker.addNotifier(self.change3DSurroundSpeaker, initial_call=False)
+				conflist.append((_("3D Surround Speaker Position"), self.settings.surround_3d_speaker, None))
+
+			if SystemInfo["HasAutoVolume"]:
+				choice_list = [("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))]
+				self.settings.autovolume = ConfigSelection(choices=choice_list, default=config.av.autovolume.value)
+				self.settings.autovolume.addNotifier(self.changeAutoVolume, initial_call=False)
+				conflist.append((_("Auto Volume Level"), self.settings.autovolume, None))
 
 			from Components.PluginComponent import plugins
 			from Plugins.Plugin import PluginDescriptor
@@ -271,6 +298,97 @@ class AudioSelection(ConfigListScreen, Screen):
 		if SystemInfo["CanDownmixAAC"]:
 			config.av.downmix_aac.value = configElement.value
 			config.av.downmix_aac.save()
+
+	def change3DSurround(self, surround_3d):
+		if surround_3d.value:
+			config.av.surround_3d.value = surround_3d.value
+		config.av.surround_3d.save()
+
+	def change3DSurroundSpeaker(self, surround_3d_speaker):
+		if surround_3d_speaker.value:
+			config.av.surround_3d_speaker.value = surround_3d_speaker.value
+		config.av.surround_3d_speaker.save()
+
+	def changeAutoVolume(self, autovolume):
+		if autovolume.value:
+			config.av.autovolume.value = autovolume.value
+		config.av.autovolume.save()
+
+	def changeAC3Downmix(self, downmix):
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.downmix_ac3.setValue(downmix.value)
+		else:
+			if downmix.value:
+				config.av.downmix_ac3.setValue(True)
+				if SystemInfo["HasMultichannelPCM"]:
+					config.av.multichannel_pcm.setValue(False)
+			else:
+				config.av.downmix_ac3.setValue(False)
+
+		if SystemInfo["HasMultichannelPCM"]:
+			config.av.multichannel_pcm.save()
+		self.fillList()
+
+	def changeBTAudio(self, btaudio):
+		if btaudio.value:
+			config.av.btaudio.value = btaudio.value
+		config.av.btaudio.save()
+
+	def changePCMMultichannel(self, multichan):
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.multichannel_pcm.setValue(multichan.value)
+		else:
+			if multichan.value:
+				config.av.multichannel_pcm.setValue(True)
+			else:
+				config.av.multichannel_pcm.setValue(False)
+		config.av.multichannel_pcm.save()
+		self.fillList()
+
+	def changeAACDownmix(self, downmix):
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.downmix_aac.setValue(downmix.value)
+		else:
+			if downmix.value:
+				config.av.downmix_aac.setValue(True)
+			else:
+				config.av.downmix_aac.setValue(False)
+		config.av.downmix_aac.save()
+
+	def changeAACDownmixPlus(self, downmix):
+		config.av.downmix_aacplus.setValue(downmix.value)
+		config.av.downmix_aacplus.save()
+
+	def setAC3plusTranscode(self, transcode):
+		config.av.transcodeac3plus.setValue(transcode.value)
+		config.av.transcodeac3plus.save()
+
+	def setWMAPro(self, downmix):
+		config.av.wmapro.setValue(downmix.value)
+		config.av.wmapro.save()
+
+	def setDTSHD(self, downmix):
+		config.av.dtshd.setValue(downmix.value)
+		config.av.dtshd.save()
+
+	def setAACTranscode(self, transcode):
+		config.av.transcodeaac.setValue(transcode)
+		config.av.transcodeaac.save()
+
+	def changeDTSDownmix(self, downmix):
+		if downmix.value:
+			config.av.downmix_dts.setValue(True)
+		else:
+			config.av.downmix_dts.setValue(False)
+		config.av.downmix_dts.save()
+
+	def setAC3plusTranscode(self, transcode):
+		config.av.transcode_ac3plus.setValue(transcode)
+		config.av.transcode_ac3plus.save()
+
+	def setAACTranscode(self, transcode):
+		config.av.transcode_aac.setValue(transcode)
+		config.av.transcode_aac.save()
 
 	def changeMode(self, mode):
 		if mode is not None and self.audioChannel:
