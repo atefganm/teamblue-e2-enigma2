@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--suppress XmlUnboundNsPrefix, XmlUnboundNsPrefix -->
-<!--  Skin: LCD -->
+<!-- This skin is at github.com/OpenViX/enigma2/tree/master/data/display96 -->
 <skin>
 	<windowstyle id="2" type="skinned">
 		<color color="#000000" name="Background"/>
@@ -208,11 +207,11 @@
 			<convert type="ServiceName">Name</convert>
 		</widget>
 		<!-- Movie progress -->
-		<widget source="Service" render="PositionGauge" position="1,40" size="94,8" zPosition="2" pointer="/usr/lib/enigma2/python/Plugins/Extensions/EnhancedMovieCenter/img/progress.png:94,0" transparent="1" >
+		<widget source="Service" render="EMCPositionGauge" position="1,40" size="94,8" zPosition="2" pointer="/usr/lib/enigma2/python/Plugins/Extensions/EnhancedMovieCenter/img/progress.png:94,0" transparent="1" >
 			<convert type="EMCServicePosition">Position</convert>
 		</widget>
 		<!-- Movie recording progress -->
-		<widget source="Service" render="PositionGauge" position="1,40" size="94,8" zPosition="1" pointer="/usr/lib/enigma2/python/Plugins/Extensions/EnhancedMovieCenter/img/progress_rec.png:94,0" transparent="1" >
+		<widget source="Service" render="EMCPositionGauge" position="1,40" size="94,8" zPosition="1" pointer="/usr/lib/enigma2/python/Plugins/Extensions/EnhancedMovieCenter/img/progress_rec.png:94,0" transparent="1" >
 			<convert type="EMCRecordPosition">Position</convert>
 		</widget>
 		<!-- Progress border -->
