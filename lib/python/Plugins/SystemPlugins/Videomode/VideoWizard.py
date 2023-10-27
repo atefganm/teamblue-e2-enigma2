@@ -33,6 +33,22 @@ class VideoWizard(WizardLanguage, Rc):
 		self["lab5"] = StaticText(_("Sources are available at:"))
 		self["lab6"] = StaticText(_("https://github.com/OpenVisionE2"))
 
+	def listInputChannels(self):
+		hw_type = HardwareInfo().get_device_name()
+		has_hdmi = HardwareInfo().has_hdmi()
+		list = []
+
+		for port in self.hw.getPortList():
+			if self.hw.isPortUsed(port):
+				descr = port
+				if descr == 'DVI' and has_hdmi:
+					descr = 'HDMI'
+				if port != "DVI-PC":
+					list.append((descr, port))
+		list.sort(key=lambda x: x[0])
+		print("[VideoWizard] listInputChannels:", list)
+		return list
+
 	def listPorts(self):  # Called by videowizard.xml
 		ports = []
 		for port in self.avSwitch.getPortList():
