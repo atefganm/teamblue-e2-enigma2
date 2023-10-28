@@ -90,7 +90,6 @@
 					<item weight="0" level="0" entryID="user_interface"><setup id="userinterface" /></item>
 					<item weight="5" level="0" text="Language" entryID="language_setup"><screen module="LanguageSelection" /></item>
 					<item weight="15" level="0" text="GUI Skin" entryID="primary_skin_selector"><screen module="SkinSelector" screen="SkinSelector"/></item>
-					<item level="0" requires="FrontpanelDisplay" text="Display Skin" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
 				</menu>
 
 				<!-- Menu / Settings / System / Frontpanel Menu -->
@@ -99,6 +98,7 @@
 					<item weight="0" level="0" text="Basic settings" requires="Display"><setup level="1" id="lcd" /></item>
 					<item weight="5" level="0" text="Display Skin" entryID="display_skin_selector" requires="OledDisplay"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
 					<item weight="10" level="0" text="Clock Skin" entryID="clock_skin_selector" requires="OledDisplay"><screen module="SkinSelector" screen="ClockSkinSelector"/></item>
+					<item weight="10" level="0" text="Display Skin" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
 				</menu>
 
 				<!-- Menu / Settings / System / Recording Menu -->
