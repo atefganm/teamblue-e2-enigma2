@@ -556,7 +556,7 @@ class AVSwitch:
 	def getFramebufferScale(self):
 		aspect = self.getOutputAspect()
 		fb_size = getDesktop(0).size()
-		return (aspect[0] * fb_size.height(), aspect[1] * fb_size.width())
+		return aspect[0] * fb_size.height(), aspect[1] * fb_size.width()
 
 	def setAspectRatio(self, value):
 		eAVSwitch.getInstance().setAspectRatio(value)
@@ -584,81 +584,141 @@ iAVSwitch = AVSwitch()
 
 
 def InitAVSwitch():
-	config.av = ConfigSubsection()
-	config.av.yuvenabled = ConfigBoolean(default=True)
-	colorformat_choices = {"cvbs": "CVBS"}
+	if MACHINEBUILD == 'vuduo':
+		config.av.yuvenabled = ConfigBoolean(default=False)
+	else:
+		config.av.yuvenabled = ConfigBoolean(default=True)
+	config.av.osd_alpha = ConfigSlider(default=255, increment=5, limits=(20, 255))
+	colorformat_choices = {"cvbs": _("CVBS"), "rgb": _("RGB"), "svideo": _("S-Video")}
+	# when YUV is not enabled, don't let the user select it
+	if config.av.yuvenabled.value:
+		colorformat_choices["yuv"] = _("YPbPr")
 
-	# when YUV, Scart or S-Video is not support by HW, don't let the user select it
-	if SystemInfo["HasYPbPr"]:
-		colorformat_choices["yuv"] = "YPbPr"
-	if SystemInfo["HasScart"]:
-		colorformat_choices["rgb"] = "RGB"
-	if SystemInfo["HasSVideo"]:
-		colorformat_choices["svideo"] = "S-Video"
-
-	config.av.colorformat = ConfigSelection(choices=colorformat_choices, default="cvbs")
+	config.av.autores = ConfigSelection(choices={"disabled": _("Disabled"), "simple": _("Simple"), "native": _("Native"), "all": _("All resolutions"), "hd": _("only HD")}, default="disabled")
+	config.av.autores_preview = NoSave(ConfigYesNo(default=False))
+	config.av.autores_1080i_deinterlace = ConfigYesNo(default=False)
+	choicelist = {
+			"24,24": _("24p/24p"),
+			"24,25": _("24p/25p"),
+			"24,30": _("24p/30p"),
+			"24,50": _("24p/50p"),
+			"24,60": _("24p/60p"),
+			"25,24": _("25p/24p"),
+			"30,24": _("30p/24p"),
+			"50,24": _("50p/24p"),
+			"60,24": _("60p/24p"),
+			"25,25": _("25p/25p"),
+			"25,30": _("25p/30p"),
+			"25,50": _("25p/50p"),
+			"25,60": _("25p/60p"),
+			"30,25": _("30p/25p"),
+			"50,25": _("50p/25p"),
+			"60,25": _("60p/25p"),
+			"30,30": _("30p/30p"),
+			"30,50": _("30p/50p"),
+			"30,60": _("30p/60p"),
+			"50,30": _("50p/30p"),
+			"60,30": _("60p/30p"),
+			"50,50": _("50p/50p"),
+			"50,60": _("50p/60p"),
+			"60,50": _("60p/50p"),
+			"60,60": _("60p/60p")
+				}  # first value <=720p , second value > 720p
+	config.av.autores_24p = ConfigSelection(choices=choicelist, default="50,24")
+	config.av.autores_25p = ConfigSelection(choices=choicelist, default="50,25")
+	config.av.autores_30p = ConfigSelection(choices=choicelist, default="60,30")
+	config.av.autores_unknownres = ConfigSelection(choices={"next": _("next higher Resolution"), "highest": _("highest Resolution")}, default="next")
+	choicelist = []
+	for i in list(range(5, 16)):
+		choicelist.append(("%d" % i, ngettext("%d Second", "%d Seconds", i) % i))
+	config.av.autores_label_timeout = ConfigSelection(default="5", choices=[("0", _("Not Shown"))] + choicelist)
+	config.av.autores_delay = ConfigSelectionNumber(min=0, max=3000, stepwidth=50, default=400, wraparound=True)
+	config.av.autores_deinterlace = ConfigYesNo(default=False)
+	if BoxInfo.getItem("AmlogicFamily"):
+		config.av.autores_sd = ConfigSelection(choices={"720p50hz": _("720p50Hz"), "720p": _("720p"), "1080i50hz": _("1080i50Hz"), "1080i": _("1080i")}, default="720p50hz")
+		config.av.autores_480p24 = ConfigSelection(choices={"480p24": _("480p 24Hz"), "720p24hz": _("720p 24Hz"), "1080p24hz": _("1080p 24Hz")}, default="1080p24hz")
+		config.av.autores_720p24 = ConfigSelection(choices={"720p24hz": _("720p 24Hz"), "1080p24hz": _("1080p 24Hz"), "1080i50hz": _("1080i 50Hz"), "1080i": _("1080i 60Hz")}, default="720p24hz")
+		config.av.autores_1080p24 = ConfigSelection(choices={"1080p24hz": _("1080p 24Hz"), "1080p25hz": _("1080p 25Hz"), "1080i50hz": _("1080p 50Hz"), "1080i": _("1080i 60Hz")}, default="1080p24hz")
+		config.av.autores_1080p25 = ConfigSelection(choices={"1080p25hz": _("1080p 25Hz"), "1080p50hz": _("1080p 50Hz"), "1080i50hz": _("1080i 50Hz")}, default="1080p25hz")
+		config.av.autores_1080p30 = ConfigSelection(choices={"1080p30hz": _("1080p 30Hz"), "1080p60hz": _("1080p 60Hz"), "1080i": _("1080i 60Hz")}, default="1080p30hz")
+		config.av.autores_2160p24 = ConfigSelection(choices={"2160p24hz": _("2160p 24Hz"), "2160p25hz": _("2160p 25Hz"), "2160p30hz": _("2160p 30Hz")}, default="2160p24hz")
+		config.av.autores_2160p25 = ConfigSelection(choices={"2160p25hz": _("2160p 25Hz"), "2160p50hz": _("2160p 50Hz")}, default="2160p25hz")
+		config.av.autores_2160p30 = ConfigSelection(choices={"2160p30hz": _("2160p 30Hz"), "2160p60hz": _("2160p 60Hz")}, default="2160p30hz")
+	else:
+		config.av.autores_sd = ConfigSelection(choices={"720p50": _("720p50"), "720p": _("720p"), "1080i50": _("1080i50"), "1080i": _("1080i")}, default="720p50")
+		config.av.autores_480p24 = ConfigSelection(choices={"480p24": _("480p 24Hz"), "720p24": _("720p 24Hz"), "1080p24": _("1080p 24Hz")}, default="1080p24")
+		config.av.autores_720p24 = ConfigSelection(choices={"720p24": _("720p 24Hz"), "1080p24": _("1080p 24Hz"), "1080i50": _("1080i 50Hz"), "1080i": _("1080i 60Hz")}, default="720p24")
+		config.av.autores_1080p24 = ConfigSelection(choices={"1080p24": _("1080p 24Hz"), "1080p25": _("1080p 25Hz"), "1080i50": _("1080p 50Hz"), "1080i": _("1080i 60Hz")}, default="1080p24")
+		config.av.autores_1080p25 = ConfigSelection(choices={"1080p25": _("1080p 25Hz"), "1080p50": _("1080p 50Hz"), "1080i50": _("1080i 50Hz")}, default="1080p25")
+		config.av.autores_1080p30 = ConfigSelection(choices={"1080p30": _("1080p 30Hz"), "1080p60": _("1080p 60Hz"), "1080i": _("1080i 60Hz")}, default="1080p30")
+		config.av.autores_2160p24 = ConfigSelection(choices={"2160p24": _("2160p 24Hz"), "2160p25": _("2160p 25Hz"), "2160p30": _("2160p 30Hz")}, default="2160p24")
+		config.av.autores_2160p25 = ConfigSelection(choices={"2160p25": _("2160p 25Hz"), "2160p50": _("2160p 50Hz")}, default="2160p25")
+		config.av.autores_2160p30 = ConfigSelection(choices={"2160p30": _("2160p 30Hz"), "2160p60": _("2160p 60Hz")}, default="2160p30")
+	config.av.smart1080p = ConfigSelection(choices={"false": _("Off"), "true": _("1080p50: 24p/50p/60p"), "2160p50": _("2160p50: 24p/50p/60p"), "1080i50": _("1080i50: 24p/50i/60i"), "720p50": _("720p50: 24p/50p/60p")}, default="false")
+	config.av.colorformat = ConfigSelection(choices=colorformat_choices, default="rgb")
 	config.av.aspectratio = ConfigSelection(choices={
 			"4_3_letterbox": _("4:3 Letterbox"),
 			"4_3_panscan": _("4:3 PanScan"),
-			"16_9": "16:9",
-			"16_9_always": _("16:9 always"),
+			"16_9": _("16:9"),
+			"16_9_always": _("16:9 Always"),
 			"16_10_letterbox": _("16:10 Letterbox"),
 			"16_10_panscan": _("16:10 PanScan"),
 			"16_9_letterbox": _("16:9 Letterbox")},
 			default="16_9")
 	config.av.aspect = ConfigSelection(choices={
-			"4_3": "4:3",
-			"16_9": "16:9",
-			"16_10": "16:10",
-			"auto": _("automatic")},
-			default="auto")
+			"4:3": _("4:3"),
+			"16:9": _("16:9"),
+			"16:10": _("16:10"),
+			"auto": _("Automatic")},
+			default="16:9")
 	policy2_choices = {
 	# TRANSLATORS: (aspect ratio policy: black bars on top/bottom) in doubt, keep english term.
 	"letterbox": _("Letterbox"),
 	# TRANSLATORS: (aspect ratio policy: cropped content on left/right) in doubt, keep english term
-	"panscan": _("Pan&scan"),
+	"panscan": _("Panscan"),
 	# TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
 	"scale": _("Just scale")}
 	try:
-		if "full" in open("/proc/stb/video/policy2_choices").read():
+		if "full" in open("/proc/stb/video/policy2_choices").read().split('\n', 1)[0]:
 			# TRANSLATORS: (aspect ratio policy: display as fullscreen, even if the content aspect ratio does not match the screen ratio)
 			policy2_choices.update({"full": _("Full screen")})
 	except:
-		pass
+		print("[AVSwitch] Read /proc/stb/video/policy2_choices failed!")
 	try:
-		if "auto" in open("/proc/stb/video/policy2_choices").read():
+		if "auto" in open("/proc/stb/video/policy2_choices").read().split('\n', 1)[0]:
 			# TRANSLATORS: (aspect ratio policy: automatically select the best aspect ratio mode)
 			policy2_choices.update({"auto": _("Auto")})
 	except:
-		pass
-	config.av.policy_169 = ConfigSelection(choices=policy2_choices, default="letterbox")
+		print("[AVSwitch] Read /proc/stb/video/policy2_choices failed!")
+	config.av.policy_169 = ConfigSelection(choices=policy2_choices, default="scale")
 	policy_choices = {
 	# TRANSLATORS: (aspect ratio policy: black bars on left/right) in doubt, keep english term.
 	"pillarbox": _("Pillarbox"),
 	# TRANSLATORS: (aspect ratio policy: cropped content on left/right) in doubt, keep english term
-	"panscan": _("Pan&scan"),
+	"panscan": _("Panscan"),
 	# TRANSLATORS: (aspect ratio policy: scale as close to fullscreen as possible)
 	"scale": _("Just scale")}
 	try:
-		if "nonlinear" in open("/proc/stb/video/policy_choices").read():
+		if "nonlinear" in open("/proc/stb/video/policy_choices").read().split('\n', 1)[0]:
 			# TRANSLATORS: (aspect ratio policy: display as fullscreen, with stretching the left/right)
 			policy_choices.update({"nonlinear": _("Nonlinear")})
 	except:
-		pass
+		print("[AVSwitch] Read /proc/stb/video/policy_choices failed!")
 	try:
-		if "full" in open("/proc/stb/video/policy_choices").read():
+		if "full" in open("/proc/stb/video/policy_choices").read().split('\n', 1)[0]:
 			# TRANSLATORS: (aspect ratio policy: display as fullscreen, even if the content aspect ratio does not match the screen ratio)
 			policy_choices.update({"full": _("Full screen")})
 	except:
-		pass
+		print("[AVSwitch] Read /proc/stb/video/policy_choices failed!")
 	try:
-		if "auto" in open("/proc/stb/video/policy_choices").read():
+		if "auto" in open("/proc/stb/video/policy_choices").read().split('\n', 1)[0]:
 			# TRANSLATORS: (aspect ratio policy: automatically select the best aspect ratio mode)
 			policy_choices.update({"auto": _("Auto")})
 	except:
-		pass
-	config.av.policy_43 = ConfigSelection(choices=policy_choices, default="pillarbox")
-	config.av.tvsystem = ConfigSelection(choices={"pal": "PAL", "ntsc": "NTSC", "multinorm": "multinorm"}, default="pal")
+		print("[AVSwitch] Read /proc/stb/video/policy_choices failed!")
+
+	config.av.policy_43 = ConfigSelection(choices=policy_choices, default="panscan")
+	config.av.tvsystem = ConfigSelection(choices={"pal": _("PAL"), "ntsc": _("NTSC"), "multinorm": _("multinorm")}, default="pal")
 	config.av.wss = ConfigEnableDisable(default=True)
 	config.av.generalAC3delay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
 	config.av.generalPCMdelay = ConfigSelectionNumber(-1000, 1000, 5, default=0)
@@ -1345,6 +1405,15 @@ def InitAVSwitch():
 	else:
 		config.av.scaler_sharpness = NoSave(ConfigNothing())
 
+	if SystemInfo["CanChangeOsdAlpha"]:
+		def setAlpha(config):
+			try:
+				open("/proc/stb/video/alpha", "w").write(str(config.value))
+			except:
+				print("[AVSwitch] Write to /proc/stb/video/alpha failed!")
+		config.av.osd_alpha = ConfigSlider(default=255, limits=(0, 255))
+		config.av.osd_alpha.addNotifier(setAlpha)
+
 
 class VideomodeHotplug:
 	def __init__(self):
@@ -1357,7 +1426,26 @@ class VideomodeHotplug:
 		iAVSwitch.on_hotplug.remove(self.hotplug)
 
 	def hotplug(self, what):
-		iAVSwitch.setMode(port, mode, rate)
+		print("[AVSwitch] hotplug detected on port '%s'" % what)
+#		port = config.av.videoport.value
+#		mode = config.av.videomode[port].value
+		rate = config.av.videorate[mode].value
+
+		if not iAVSwitch.isModeAvailable(port, mode, rate):
+			print("[AVSwitch] mode %s/%s/%s went away!" % (port, mode, rate))
+			modelist = iAVSwitch.getModeList(port)
+			if not len(modelist):
+				print("[AVSwitch] sorry, no other mode is available (unplug?). Doing nothing.")
+				return
+			mode = modelist[0][0]
+			rate = modelist[0][1]
+			# FIXME The rate needs to be a single value
+			if isinstance(rate, list):
+				print("[AVSwitch] ERROR rate is a list and needs to be a single value")
+				rate = rate[0]
+
+			print("[AVSwitch] setting %s/%s/%s" % (port, mode, rate))
+			iAVSwitch.setMode(port, mode, rate)
 
 
 hotplug = None
