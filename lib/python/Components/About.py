@@ -15,6 +15,11 @@ from Tools.Directories import fileReadLine
 MODULE_NAME = __name__.split(".")[-1]
 
 
+def getModelString():
+	model = getBoxType()
+	return model
+
+
 def getVersionString():
 	return getImageVersionString()
 

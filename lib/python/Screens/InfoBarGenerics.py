@@ -395,10 +395,13 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		self.doWriteAlpha(config.av.osd_alpha.value)
 
 	def doWriteAlpha(self, value):
-		if fileExists("/proc/stb/video/alpha"):
-			f = open("/proc/stb/video/alpha", "w")
-			f.write("%i" % (value))
-			f.close()
+		if SystemInfo["CanChangeOsdAlpha"]:
+#			print("[InfoBarGenerics] Write to /proc/stb/video/alpha")
+			open("/proc/stb/video/alpha", "w").write(str(value))
+			if value == config.av.osd_alpha.value:
+				self.lastResetAlpha = True
+			else:
+				self.lastResetAlpha = False
 
 	def __onHide(self):
 		self.unDimmingTimer = eTimer()
@@ -515,7 +518,6 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			else:
 				self.DimmingTimer.stop()
 				self.hide()
-
 		self.DimmingTimer = eTimer()
 		self.DimmingTimer.callback.append(self.doDimming)
 		self.DimmingTimer.start(70, True)
