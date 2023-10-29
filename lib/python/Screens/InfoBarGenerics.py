@@ -380,33 +380,8 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		for x in self.onShowHideNotifiers:
 			x(True)
 		self.startHideTimer()
-		VolumeControl.instance and VolumeControl.instance.showMute()
-
-	def doDimming(self):
-		if config.usage.show_infobar_do_dimming.value:
-			self.dimmed = self.dimmed - 1
-		else:
-			self.dimmed = 0
-		self.DimmingTimer.stop()
-		self.doHide()
-
-	def unDimming(self):
-		self.unDimmingTimer.stop()
-		self.doWriteAlpha(config.av.osd_alpha.value)
-
-	def doWriteAlpha(self, value):
-		if SystemInfo["CanChangeOsdAlpha"]:
-#			print("[InfoBarGenerics] Write to /proc/stb/video/alpha")
-			open("/proc/stb/video/alpha", "w").write(str(value))
-			if value == config.av.osd_alpha.value:
-				self.lastResetAlpha = True
-			else:
-				self.lastResetAlpha = False
 
 	def __onHide(self):
-		self.unDimmingTimer = eTimer()
-		self.unDimmingTimer.callback.append(self.unDimming)
-		self.unDimmingTimer.start(100, True)
 		self.__state = self.STATE_HIDDEN
 		if config.usage.show_infobar_do_dimming.value is True:
 			self.resetAlpha()
@@ -432,11 +407,13 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		self.doWriteAlpha(config.av.osd_alpha.value)
 
 	def doWriteAlpha(self, value):
-		open("/proc/stb/video/alpha", "w").write(str(value))
-		if value == config.av.osd_alpha.value:
-			self.lastResetAlpha = True
-		else:
-			self.lastResetAlpha = False
+		if SystemInfo["CanChangeOsdAlpha"]:
+#			print("[InfoBarGenerics] Write to /proc/stb/video/alpha")
+			open("/proc/stb/video/alpha", "w").write(str(value))
+			if value == config.av.osd_alpha.value:
+				self.lastResetAlpha = True
+			else:
+				self.lastResetAlpha = False
 
 	def toggleShowLong(self):
 		if not config.usage.ok_is_channelselection.value:
@@ -518,6 +495,7 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			else:
 				self.DimmingTimer.stop()
 				self.hide()
+
 		self.DimmingTimer = eTimer()
 		self.DimmingTimer.callback.append(self.doDimming)
 		self.DimmingTimer.start(70, True)
