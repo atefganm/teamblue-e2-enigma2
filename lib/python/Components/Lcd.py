@@ -50,35 +50,33 @@ class IconCheckPoller:
 			pass
 		self.timer.startLongTimer(30)
 
-	def JobTask(self):
-		LinkState = 0
-		if fileExists('/sys/class/net/wlan0/operstate'):
+def JobTask(self):
+	LinkState = 0
+	if fileExists('/sys/class/net/wlan0/operstate'):
+		LinkState = open('/sys/class/net/wlan0/operstate').read()
+		if LinkState != 'down':
 			LinkState = open('/sys/class/net/wlan0/operstate').read()
-			if LinkState != 'down':
-				LinkState = open('/sys/class/net/wlan0/operstate').read()
-		elif fileExists('/sys/class/net/eth0/operstate'):
-			LinkState = open('/sys/class/net/eth0/operstate').read()
-			if LinkState != 'down':
-				LinkState = open('/sys/class/net/eth0/carrier').read()
-		LinkState = LinkState[:1]
-		if fileExists("/proc/stb/lcd/symbol_network") and config.lcd.mode.value == '1':
-			open("/proc/stb/lcd/symbol_network", "w").write(str(LinkState))
-		elif fileExists("/proc/stb/lcd/symbol_network") and config.lcd.mode.value == '0':
-			open("/proc/stb/lcd/symbol_network", "w").write("0")
+	elif fileExists('/sys/class/net/eth0/operstate'):
+		LinkState = open('/sys/class/net/eth0/operstate').read()
+		if LinkState != 'down':
+			LinkState = open('/sys/class/net/eth0/carrier').read()
+	LinkState = LinkState[:1]
+	if fileExists("/proc/stb/lcd/symbol_network") and config.lcd.mode.value == '1':
+		open("/proc/stb/lcd/symbol_network", "w").write(str(LinkState))
+	elif fileExists("/proc/stb/lcd/symbol_network") and config.lcd.mode.value == '0':
+		open("/proc/stb/lcd/symbol_network", "w").write("0")
 
-		USBState = 0
-		busses = usb.busses()
-		for bus in busses:
-			devices = bus.devices
-			for dev in devices:
-				if dev.deviceClass != 9 and dev.deviceClass != 2 and dev.idVendor > 0:
-					USBState = 1
-		if fileExists("/proc/stb/lcd/symbol_usb") and config.lcd.mode.value == '1':
-			open("/proc/stb/lcd/symbol_usb", "w").write(str(USBState))
-		elif fileExists("/proc/stb/lcd/symbol_usb") and config.lcd.mode.value == '0':
-			open("/proc/stb/lcd/symbol_usb", "w").write("0")
+	USBState = 0
+	busses = usb.busses()
+	for bus in busses:
+		devices = bus.devices
+		for dev in devices:
+			if dev.deviceClass != 9 and dev.deviceClass != 2 and dev.idVendor != 3034 and dev.idVendor > 0:
+				USBState = 1
+	if fileExists("/proc/stb/lcd/symbol_usb"):
+		open("/proc/stb/lcd/symbol_usb", "w").write(str(USBState))
 
-		self.timer.startLongTimer(30)
+	self.timer.startLongTimer(30)
 
 class LCD:
 	def __init__(self):
@@ -177,7 +175,7 @@ class LCD:
 
 	def setFlipped(self, value):
 		eDBoxLCD.getInstance().setFlipped(value)
-		
+
 	def setScreenShot(self, value):
  		eDBoxLCD.getInstance().setDump(value)
 
@@ -186,7 +184,7 @@ class LCD:
 
 	def setMode(self, value):
 		if fileExists("/proc/stb/lcd/show_symbols"):
-			print 'setLCDMode',value
+			print('setLCDMode',value)
 			open("/proc/stb/lcd/show_symbols", "w").write(value)
 		if config.lcd.mode.value == "0":
 			if fileExists("/proc/stb/lcd/symbol_hdd"):
@@ -206,30 +204,30 @@ class LCD:
 
 	def setPower(self, value):
 		if fileExists("/proc/stb/power/vfd"):
-			print 'setLCDPower',value
+			print('setLCDPower',value)
 			open("/proc/stb/power/vfd", "w").write(value)
 		elif fileExists("/proc/stb/lcd/vfd"):
-			print 'setLCDPower',value
+			print('setLCDPower',value)
 			open("/proc/stb/lcd/vfd", "w").write(value)
 
 	def setShowoutputresolution(self, value):
 		if fileExists("/proc/stb/lcd/show_outputresolution"):
-			print 'setLCDShowoutputresolution',value
+			print('setLCDShowoutputresolution',value)
 			open("/proc/stb/lcd/show_outputresolution", "w").write(value)
 
 	def setfblcddisplay(self, value):
 		if fileExists("/proc/stb/fb/sd_detach"):
-			print 'setfblcddisplay',value
+			print('setfblcddisplay',value)
 			open("/proc/stb/fb/sd_detach", "w").write(value)
 
 	def setRepeat(self, value):
 		if fileExists("/proc/stb/lcd/scroll_repeats"):
-			print 'setLCDRepeat',value
+			print('setLCDRepeat',value)
 			open("/proc/stb/lcd/scroll_repeats", "w").write(value)
 
 	def setScrollspeed(self, value):
 		if fileExists("/proc/stb/lcd/scroll_delay"):
-			print 'setLCDScrollspeed',value
+			print('setLCDScrollspeed',value)
 			open("/proc/stb/lcd/scroll_delay", "w").write(value)
 
 	def setLEDNormalState(self, value):
@@ -243,21 +241,22 @@ class LCD:
 
 	def setLCDMiniTVMode(self, value):
 		if fileExists("/proc/stb/lcd/mode"):
-			print 'setLCDMiniTVMode',value
+			print('setLCDMiniTVMode',value)
 			open("/proc/stb/lcd/mode", "w").write(value)
 
 	def setLCDMiniTVPIPMode(self, value):
-		print 'setLCDMiniTVPIPMode',value
+		print('setLCDMiniTVPIPMode',value)
 
 	def setLCDMiniTVFPS(self, value):
 		if fileExists("/proc/stb/lcd/fps"):
-			print 'setLCDMiniTVFPS',value
+			print('setLCDMiniTVFPS',value)
 			open("/proc/stb/lcd/fps", "w").write(value)
 
 def leaveStandby():
 	config.lcd.bright.apply()
-	config.lcd.ledbrightness.apply()
-	config.lcd.ledbrightnessdeepstandby.apply()
+	if SystemInfo["LEDButtons"]:
+		config.lcd.ledbrightness.apply()
+		config.lcd.ledbrightnessdeepstandby.apply()
 
 
 def standbyCounterChanged(configElement):
@@ -286,13 +285,13 @@ def InitLcd():
 		if can_lcdmodechecking:
 			def setLCDModeMinitTV(configElement):
 				try:
-					print 'setLCDModeMinitTV',configElement.value
+					print('setLCDModeMinitTV',configElement.value)
 					open("/proc/stb/lcd/mode", "w").write(configElement.value)
 				except:
 					pass
 			def setMiniTVFPS(configElement):
 				try:
-					print 'setMiniTVFPS',configElement.value
+					print('setMiniTVFPS',configElement.value)
 					open("/proc/stb/lcd/fps", "w").write(configElement.value)
 				except:
 					pass
@@ -306,10 +305,7 @@ def InitLcd():
 					"5": _("PIP"),
 					"7": _("PIP with OSD")},
 					default = "0")
-			if getBoxType() in ("gbquad","gbquadplus"):
-				config.lcd.modepip.addNotifier(setLCDModePiP)
-			else:
-				config.lcd.modepip = ConfigNothing()
+			config.lcd.modepip.addNotifier(setLCDModePiP)
 			config.lcd.screenshot = ConfigYesNo(default=False)
 			config.lcd.screenshot.addNotifier(setLCDScreenshot)
 
@@ -404,6 +400,30 @@ def InitLcd():
 			if fileExists("/proc/stb/power/suspendled"):
 				open("/proc/stb/power/suspendled", "w").write(configElement.value)
 
+		def setLedPowerColor(configElement):
+			if fileExists("/proc/stb/fp/ledpowercolor"):
+				open("/proc/stb/fp/ledpowercolor", "w").write(configElement.value)
+
+		def setLedStandbyColor(configElement):
+			if fileExists("/proc/stb/fp/ledstandbycolor"):
+				open("/proc/stb/fp/ledstandbycolor", "w").write(configElement.value)
+
+		def setLedSuspendColor(configElement):
+			if fileExists("/proc/stb/fp/ledsuspendledcolor"):
+				open("/proc/stb/fp/ledsuspendledcolor", "w").write(configElement.value)
+
+		def setPower4x7On(configElement):
+			if fileExists("/proc/stb/fp/power4x7on"):
+				open("/proc/stb/fp/power4x7on", "w").write(configElement.value)
+
+		def setPower4x7Standby(configElement):
+			if fileExists("/proc/stb/fp/power4x7standby"):
+				open("/proc/stb/fp/power4x7standby", "w").write(configElement.value)
+
+		def setPower4x7Suspend(configElement):
+			if fileExists("/proc/stb/fp/power4x7suspend"):
+				open("/proc/stb/fp/power4x7suspend", "w").write(configElement.value)
+
 		def setXcoreVFD(configElement):
 			if fileExists("/sys/module/brcmstb_osmega/parameters/pt6302_cgram"):
 				open("/sys/module/brcmstb_osmega/parameters/pt6302_cgram", "w").write(configElement.value)
@@ -425,6 +445,24 @@ def InitLcd():
 
 		config.usage.lcd_deepstandbypowerled = ConfigSelection(default = "on", choices = [("off", _("Off")), ("on", _("On"))])
 		config.usage.lcd_deepstandbypowerled.addNotifier(setPowerLEDdeepstanbystate)
+
+		config.usage.lcd_ledpowercolor = ConfigSelection(default = "1", choices = [("0", _("off")),("1", _("blue")), ("2", _("red")), ("3", _("violet"))])
+		config.usage.lcd_ledpowercolor.addNotifier(setLedPowerColor)
+
+		config.usage.lcd_ledstandbycolor = ConfigSelection(default = "3", choices = [("0", _("off")),("1", _("blue")), ("2", _("red")), ("3", _("violet"))])
+		config.usage.lcd_ledstandbycolor.addNotifier(setLedStandbyColor)
+
+		config.usage.lcd_ledsuspendcolor = ConfigSelection(default = "2", choices = [("0", _("off")),("1", _("blue")), ("2", _("red")), ("3", _("violet"))])
+		config.usage.lcd_ledsuspendcolor.addNotifier(setLedSuspendColor)
+
+		config.usage.lcd_power4x7on = ConfigSelection(default = "on", choices = [("off", _("Off")), ("on", _("On"))])
+		config.usage.lcd_power4x7on.addNotifier(setPower4x7On)
+
+		config.usage.lcd_power4x7standby = ConfigSelection(default = "off", choices = [("off", _("Off")), ("on", _("On"))])
+		config.usage.lcd_power4x7standby.addNotifier(setPower4x7Standby)
+
+		config.usage.lcd_power4x7suspend = ConfigSelection(default = "off", choices = [("off", _("Off")), ("on", _("On"))])
+		config.usage.lcd_power4x7suspend.addNotifier(setPower4x7Suspend)
 
 		if getBoxType() in ("dm900","dm920","e4hdultra","protek4k"):
 			standby_default = 4
@@ -471,6 +509,11 @@ def InitLcd():
 
 		config.lcd.invert = ConfigYesNo(default=False)
 		config.lcd.invert.addNotifier(setLCDinverted)
+
+		def PiconPackChanged(configElement):
+			configElement.save()
+		config.lcd.picon_pack = ConfigYesNo(default=False)
+		config.lcd.picon_pack.addNotifier(PiconPackChanged)
 
 		config.lcd.flip = ConfigYesNo(default=False)
 		config.lcd.flip.addNotifier(setLCDflipped)
@@ -520,7 +563,7 @@ def InitLcd():
 			config.lcd.showTv = ConfigYesNo(default=False)
 			config.lcd.showTv.addNotifier(lcdLiveTvChanged)
 
-		if SystemInfo["LCDMiniTV"] and getBoxType() not in ("gbquad","gbquadplus","gbquad4k","gbue4k"):
+		if SystemInfo["LCDMiniTV"] and not SystemInfo["GigaBlueQuad"] and not SystemInfo["GigaBlueAudio"]:
 			config.lcd.minitvmode = ConfigSelection([("0", _("normal")), ("1", _("MiniTV")), ("2", _("OSD")), ("3", _("MiniTV with OSD"))], "0")
 			config.lcd.minitvmode.addNotifier(setLCDminitvmode)
 			config.lcd.minitvpipmode = ConfigSelection([("0", _("off")), ("5", _("PIP")), ("7", _("PIP with OSD"))], "0")
@@ -528,7 +571,7 @@ def InitLcd():
 			config.lcd.minitvfps = ConfigSlider(default=30, limits=(0, 30))
 			config.lcd.minitvfps.addNotifier(setLCDminitvfps)
 
-		if SystemInfo["VFD_scroll_repeats"] and getBoxType() not in ("ixussone","ixusszero","atemio6000","atemio6100","bwidowx2","mbhybrid","opticumtt","osmini","spycatmini","spycatminiplus","bwidowx","xpeedlx1","odinplus","xp1000","h3","h5","h6","sh1","9910lx","9911lx","9920lx","e4hdcombo","odin2hybrid","bre2ze","h4","h7","lc","vipercombohdd","evominiplus","enfinity","marvel1","vipercombo","formuler3","formuler4","hd1100","hd1200","hd1265","hd1500","hd500c","hd530c","vs1000","classm","axodin","axodinc","starsatlx","genius","evo","galaxym6","9900lx","tiviarmin","t2cable","xcombo","enibox","mago","x1plus","sf108","anadol4k","anadol4kcombo","anadol4kv2","axashis4kcombo","axashis4kcomboplus","dinobot4k","dinobot4kl","dinobot4kmini","dinobot4kplus","dinobot4kpro","dinobot4kse","dinobotu55","ferguson4k","mediabox4k","sf128","sf138","bre2zet2c","formuler4turbo","osninopro","osnino","osninoplus","osmio4k","hd60","hd61","h9combo","et1x000","bcm7358","vp7358ci","gbtrio4k","ustym4kpro","cc1","sf8008","beyonwizv2"):
+		if SystemInfo["VFD_scroll_repeats"] and SystemInfo["VFDRepeats"]:
 			def scroll_repeats(el):
 				open(SystemInfo["VFD_scroll_repeats"], "w").write(el.value)
 			choicelist = [("0", _("None")), ("1", _("1X")), ("2", _("2X")), ("3", _("3X")), ("4", _("4X")), ("500", _("Continues"))]
@@ -537,10 +580,10 @@ def InitLcd():
 		else:
 			config.usage.vfd_scroll_repeats = ConfigNothing()
 
-		if SystemInfo["VFD_scroll_delay"] and getBoxType() not in ("ixussone","ixusszero","atemio6000","atemio6100","bwidowx2","mbhybrid","opticumtt","osmini","spycatmini","spycatminiplus","bwidowx","xpeedlx1","odinplus","xp1000","h3","h5","h6","sh1","9910lx","9911lx","9920lx","e4hdcombo","odin2hybrid","bre2ze","h4","h7","lc","vipercombohdd","evominiplus","enfinity","marvel1","vipercombo","formuler3","formuler4","hd1100","hd1200","hd1265","hd1500","hd500c","hd530c","vs1000","classm","axodin","axodinc","starsatlx","genius","evo","galaxym6","9900lx","tiviarmin","t2cable","xcombo","enibox","mago","x1plus","sf108","anadol4k","anadol4kcombo","anadol4kv2","axashis4kcombo","axashis4kcomboplus","dinobot4k","dinobot4kl","dinobot4kmini","dinobot4kplus","dinobot4kpro","dinobot4kse","dinobotu55","ferguson4k","mediabox4k","sf128","sf138","bre2zet2c","formuler4turbo","osninopro","osnino","osninoplus","osmio4k","hd60","hd61","h9combo","et1x000","bcm7358","vp7358ci","gbtrio4k","ustym4kpro","cc1","sf8008","beyonwizv2"):
+		if SystemInfo["VFD_scroll_delay"] and SystemInfo["VFDRepeats"]:
 			def scroll_delay(el):
 				# add workaround for Boxes who need hex code
-				if getBoxType() in ("sf4008","beyonwizu4"):
+				if SystemInfo["VFDDelay"]:
 					open(SystemInfo["VFD_scroll_delay"], "w").write(hex(int(el.value)))
 				else:
 					open(SystemInfo["VFD_scroll_delay"], "w").write(str(el.value))
@@ -551,9 +594,9 @@ def InitLcd():
 			config.lcd.hdd = ConfigNothing()
 			config.usage.vfd_scroll_delay = ConfigNothing()
 
-		if SystemInfo["VFD_initial_scroll_delay"] and getBoxType() not in ("ixussone","ixusszero","atemio6000","atemio6100","bwidowx2","mbhybrid","opticumtt","osmini","spycatmini","spycatminiplus","bwidowx","xpeedlx1","odinplus","xp1000","h3","h5","h6","sh1","9910lx","9911lx","9920lx","e4hdcombo","odin2hybrid","bre2ze","h4","h7","lc","vipercombohdd","evominiplus","enfinity","marvel1","vipercombo","formuler3","formuler4","hd1100","hd1200","hd1265","hd1500","hd500c","hd530c","vs1000","classm","axodin","axodinc","starsatlx","genius","evo","galaxym6","9900lx","tiviarmin","t2cable","xcombo","enibox","mago","x1plus","sf108","anadol4k","anadol4kcombo","anadol4kv2","axashis4kcombo","axashis4kcomboplus","dinobot4k","dinobot4kl","dinobot4kmini","dinobot4kplus","dinobot4kpro","dinobot4kse","dinobotu55","ferguson4k","mediabox4k","sf128","sf138","bre2zet2c","formuler4turbo","osninopro","osnino","osninoplus","osmio4k","hd60","hd61","h9combo","et1x000","bcm7358","vp7358ci","gbtrio4k","ustym4kpro","cc1","sf8008","beyonwizv2"):
+		if SystemInfo["VFD_initial_scroll_delay"] and SystemInfo["VFDRepeats"]:
 			def initial_scroll_delay(el):
-				if getBoxType() in ("sf4008","beyonwizu4"):
+				if SystemInfo["VFDDelay"]:
 					# add workaround for Boxes who need hex code
 					open(SystemInfo["VFD_initial_scroll_delay"], "w").write(hex(int(el.value)))
 				else:
@@ -571,9 +614,9 @@ def InitLcd():
 		else:
 			config.usage.vfd_initial_scroll_delay = ConfigNothing()
 
-		if SystemInfo["VFD_final_scroll_delay"] and getBoxType() not in ("ixussone","ixusszero","atemio6000","atemio6100","bwidowx2","mbhybrid","opticumtt","osmini","spycatmini","spycatminiplus","bwidowx","xpeedlx1","odinplus","xp1000","h3","h5","h6","sh1","9910lx","9911lx","9920lx","e4hdcombo","odin2hybrid","bre2ze","h4","h7","lc","vipercombohdd","evominiplus","enfinity","marvel1","vipercombo","formuler3","formuler4","hd1100","hd1200","hd1265","hd1500","hd500c","hd530c","vs1000","classm","axodin","axodinc","starsatlx","genius","evo","galaxym6","9900lx","tiviarmin","t2cable","xcombo","enibox","mago","x1plus","sf108","anadol4k","anadol4kcombo","anadol4kv2","axashis4kcombo","axashis4kcomboplus","dinobot4k","dinobot4kl","dinobot4kmini","dinobot4kplus","dinobot4kpro","dinobot4kse","dinobotu55","ferguson4k","mediabox4k","sf128","sf138","bre2zet2c","formuler4turbo","osninopro","osnino","osninoplus","osmio4k","hd60","hd61","h9combo","et1x000","bcm7358","vp7358ci","gbtrio4k","ustym4kpro","cc1","sf8008","beyonwizv2"):
+		if SystemInfo["VFD_final_scroll_delay"] and SystemInfo["VFDRepeats"]:
 			def final_scroll_delay(el):
-				if getBoxType() in ("sf4008","beyonwizu4"):
+				if SystemInfo["VFDDelay"]:
 					# add workaround for Boxes who need hex code
 					open(SystemInfo["VFD_final_scroll_delay"], "w").write(hex(int(el.value)))
 				else:
@@ -670,5 +713,6 @@ def InitLcd():
 		config.lcd.ledbrightnessdeepstandby = ConfigNothing()
 		config.lcd.ledbrightnessdeepstandby.apply = lambda : doNothing()
 		config.lcd.ledblinkingtime = ConfigNothing()
+		config.lcd.picon_pack = ConfigNothing()
 
 	config.misc.standbyCounter.addNotifier(standbyCounterChanged, initial_call=False)

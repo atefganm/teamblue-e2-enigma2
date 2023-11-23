@@ -59,15 +59,26 @@ def findPicon(serviceName):
 			pngname = lastPiconPath + serviceName + ext
 			if pathExists(pngname):
 				return pngname
-	global searchPaths
-	for path in searchPaths:
-		if pathExists(path):
-			for ext in ('.png', '.svg'):
-				pngname = path + serviceName + ext
+		else:
+			return ""
+	else:
+		global searchPaths
+		pngname = ""
+		for path in searchPaths:
+			if pathExists(path) and not path.startswith('/media/net') and not path.startswith('/media/autofs'):
+				pngname = path + serviceName + ".png"
 				if pathExists(pngname):
 					lastPiconPath = path
-					return pngname
-	return ""
+					break
+			elif pathExists(path):
+				pngname = path + serviceName + ".png"
+				if pathExists(pngname):
+					lastPiconPath = path
+					break
+		if pathExists(pngname):
+			return pngname
+		else:
+			return ""
 
 
 def getPiconName(serviceRef):
