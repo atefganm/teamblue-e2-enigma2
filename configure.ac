@@ -527,9 +527,13 @@ data/Makefile
 data/fonts/Makefile
 data/countries/Makefile
 data/display/Makefile
+data/display/7segment/Makefile
+data/display/display/Makefile
 data/display/display96/Makefile
 data/display/display128/Makefile
 data/display/display128dm/Makefile
+data/display/display220/Makefile
+data/display/display240/Makefile
 data/display/lcd220/Makefile
 data/display/lcd_skin220/Makefile
 data/display/display390/Makefile
