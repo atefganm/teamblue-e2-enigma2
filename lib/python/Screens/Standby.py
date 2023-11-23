@@ -38,6 +38,7 @@ QUIT_MAINT = 16
 QUIT_UPGRADE_PROGRAM = 42
 QUIT_IMAGE_RESTORE = 43
 QUIT_RRECVERY_MODE = 44
+GB_ENTER_WOL = 45
 
 def isInfoBarInstance():
 	global infoBarInstance
