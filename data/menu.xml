@@ -90,7 +90,6 @@
 					<item weight="0" level="0" entryID="user_interface"><setup id="userinterface" /></item>
 					<item weight="5" level="0" text="Language" entryID="language_setup"><screen module="LanguageSelection" /></item>
 					<item weight="15" level="0" text="GUI Skin" entryID="primary_skin_selector"><screen module="SkinSelector" screen="SkinSelector"/></item>
-					<item level="0" requires="FrontpanelDisplay" text="Display Skin" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
 				</menu>
 
 				<!-- Menu / Settings / System / Frontpanel Menu -->
@@ -100,6 +99,7 @@
 					<item weight="5" level="0" text="Display Skin" entryID="display_skin_selector" requires="OledDisplay"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
 					<item weight="10" level="0" text="Clock Skin" entryID="clock_skin_selector" requires="OledDisplay"><screen module="SkinSelector" screen="ClockSkinSelector"/></item>
 					<item weight="10" level="0" text="Display Skin" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
+					<item level="0" requires="FrontpanelDisplay" text="Display Skin" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
 				</menu>
 
 				<!-- Menu / Settings / System / Recording Menu -->
@@ -169,7 +169,6 @@ self.session.openWithCallback(msgClosed, EpgSaveMsg)
 						<item weight="15" level="0" text="Filesystem check" entryID="harddisk_check"><screen module="HarddiskSetup" screen="HarddiskFsckSelection"/></item>
 						<item weight="20" level="0" text="Convert ext3 filesystem to ext4" entryID="harddisk_convert" requires="ext4"><screen module="HarddiskSetup" screen="HarddiskConvertExt4Selection"/></item>
 					</menu>
-					<item entryID="led_setup" level="1" text="LED Setup" weight="15"><setup id="ledsetup" /></item>
 					<item weight="10" level="1" text="Keyboard"><setup id="keyboard" /></item>
 					<item weight="15" level="1" text="Input devices" entryID="input_device_setup"><screen module="InputDeviceSetup" screen="InputDeviceSelection" /></item>
 					<item weight="20" level="0" text="HotKey" entryID="hotkey_setup"><screen module="Hotkey" screen="HotkeySetup" /></item>
