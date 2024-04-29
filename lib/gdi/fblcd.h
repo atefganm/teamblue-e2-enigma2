@@ -40,6 +40,7 @@ public:
 	int waitVSync();
 	int setLCDContrast(int contrast) { return 0; };
 	int setLCDBrightness(int brightness);
+	int setLED(int value, int option) { return 0; };
 	void setInverted( unsigned char ) {};
 	void setFlipped(bool) {};
 	bool isOled() const { return 0; };
@@ -47,7 +48,7 @@ public:
 	int lock();
 	void unlock();
 	int islocked() { return locked; }
-	void setDump(bool) {}
+	void setDump(bool);
 	void dumpLCD(bool);
 };
 
