@@ -4,27 +4,23 @@
 #include <lib/base/init_num.h>
 
 #include <lib/gdi/accel.h>
-#ifdef CONFIG_ION
-#include <lib/gdi/grc.h>
-#endif
+
 #include <time.h>
 
-#if defined(CONFIG_HISILICON_FB)
+#if defined(CONFIG_ION) || defined(CONFIG_HISILICON_FB)
 #include <lib/gdi/grc.h>
 
-#ifdef CONFIG_ION
 extern void bcm_accel_blit(
 		int src_addr, int src_width, int src_height, int src_stride, int src_format,
 		int dst_addr, int dst_width, int dst_height, int dst_stride,
 		int src_x, int src_y, int width, int height,
 		int dst_x, int dst_y, int dwidth, int dheight,
-int pal_addr, int flags);
+		int pal_addr, int flags);
 #endif
 
 gFBDC::gFBDC()
 {
 	fb=new fbClass;
-
 #ifndef CONFIG_ION
 	if (!fb->Available())
 		eFatal("[gFBDC] no framebuffer available");
@@ -243,6 +239,7 @@ void gFBDC::setResolution(int xres, int yres, int bpp)
 	if (grc)
 		grc->lock();
 #endif
+
 	fb->SetMode(xres, yres, bpp);
 
 	surface.x = xres;
