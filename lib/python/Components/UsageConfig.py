@@ -6,9 +6,8 @@ from enigma import setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff
 from Components.About import GetIPsFromNetworkInterfaces
 from Components.NimManager import nimmanager
 from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_OFF, PATTERN_BLINK
-from Components.ServiceList import refreshServiceList
-from Components.SystemInfo import SystemInfo
-
+from Components.ServiceList import refreshServiceList, redrawServiceList
+from Components.SystemInfo import BoxInfo
 import os
 import time
 
@@ -50,38 +49,47 @@ def InitUsageConfig():
 		refreshServiceList()
 	config.usage.alternative_number_mode.addNotifier(alternativeNumberModeChange)
 
-	config.usage.servicelist_twolines = ConfigSelection(default="0", choices=[("0", _("Single line mode")), ("1", _("Two lines")), ("2", _("Two lines and next event"))])
-	config.usage.servicelist_twolines.addNotifier(refreshServiceList)
+	config.usage.servicelist_twolines = ConfigSelection(default="0", choices=[("0", _("None")), ("1", _("Two lines")), ("2", _("Two lines and next event"))])
+	config.usage.servicelist_twolines.addNotifier(redrawServiceList, initial_call=False)
 
 	config.usage.hide_number_markers = ConfigYesNo(default=True)
-	config.usage.hide_number_markers.addNotifier(refreshServiceList)
+	config.usage.hide_number_markers.addNotifier(redrawServiceList, initial_call=False)
 
 	config.usage.servicetype_icon_mode = ConfigSelection(default="0", choices=[("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename"))])
-	config.usage.servicetype_icon_mode.addNotifier(refreshServiceList)
+	config.usage.servicetype_icon_mode.addNotifier(redrawServiceList, initial_call=False)
 	config.usage.crypto_icon_mode = ConfigSelection(default="0", choices=[("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename"))])
-	config.usage.crypto_icon_mode.addNotifier(refreshServiceList)
-	config.usage.record_indicator_mode = ConfigSelection(default="2", choices=[("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename")), ("3", _("Red colored"))])
-	config.usage.record_indicator_mode.addNotifier(refreshServiceList)
+	config.usage.crypto_icon_mode.addNotifier(redrawServiceList, initial_call=False)
+	config.usage.record_indicator_mode = ConfigSelection(default="3", choices=[("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename")), ("3", _("Red colored"))])
+	config.usage.record_indicator_mode.addNotifier(redrawServiceList, initial_call=False)
 
 	choicelist = [("-1", _("Disabled"))]
 	for i in list(range(0, 1300, 100)):
 		choicelist.append((str(i), ngettext("%d pixel wide", "%d pixels wide", i) % i))
 	config.usage.servicelist_column = ConfigSelection(default="-1", choices=choicelist)
-	config.usage.servicelist_column.addNotifier(refreshServiceList)
-	config.usage.servicelist_eventinfo_delay = ConfigSelectionNumber(50, 1000, 50, default=150)
+	config.usage.servicelist_column.addNotifier(redrawServiceList, initial_call=False)
+
 	config.usage.service_icon_enable = ConfigYesNo(default=False)
-	config.usage.service_icon_enable.addNotifier(refreshServiceList)
+	config.usage.service_icon_enable.addNotifier(redrawServiceList, initial_call=False)
 	config.usage.servicelist_cursor_behavior = ConfigSelection(default="keep", choices=[
 		("standard", _("Standard")),
 		("keep", _("Keep service")),
 		("reverseB", _("Reverse bouquet buttons")),
 		("keep reverseB", _("Keep service") + " + " + _("Reverse bouquet buttons"))])
+	
+	config.usage.servicenum_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-8, max=10, wraparound=True)
+	config.usage.servicenum_fontsize.addNotifier(redrawServiceList, initial_call=False)
+	config.usage.servicename_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-8, max=10, wraparound=True)
+	config.usage.servicename_fontsize.addNotifier(redrawServiceList, initial_call=False)
+	config.usage.serviceinfo_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-8, max=10, wraparound=True)
+	config.usage.serviceinfo_fontsize.addNotifier(redrawServiceList, initial_call=False)
 
-	choicelist = [("by skin", _("As defined by the skin"))]
-	for i in list(range(5, 41)):
-		choicelist.append((str(i)))
-	config.usage.servicelist_number_of_services = ConfigSelection(default="by skin", choices=choicelist)
-	config.usage.servicelist_number_of_services.addNotifier(refreshServiceList)
+	config.usage.servicenum_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-8, max=10, wraparound=True)
+	config.usage.servicename_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-8, max=10, wraparound=True)
+	config.usage.serviceinfo_fontsize = ConfigSelectionNumber(default=0, stepwidth=1, min=-8, max=10, wraparound=True)
+
+	choicelist = [(0, _("Use skin default"))] + [(i, _("%d") % i) for i in range(5, 41)]
+	config.usage.servicelist_number_of_services = ConfigSelection(default=0, choices=choicelist)
+	config.usage.servicelist_number_of_services.addNotifier(redrawServiceList, initial_call=False)
 
 	config.usage.multiepg_ask_bouquet = ConfigYesNo(default=False)
 
@@ -92,8 +100,6 @@ def InitUsageConfig():
 	for i in list(range(1, 12)):
 		choicelist.append((str(i), ngettext("%d second", "%d seconds", i) % i))
 	config.usage.infobar_timeout = ConfigSelection(default="5", choices=choicelist)
-	config.usage.show_infobar_do_dimming = ConfigYesNo(default = True)
-	config.usage.show_infobar_dimming_speed = ConfigSelectionNumber(min = 1, max = 40, stepwidth = 1, default = 40, wraparound = True)
 	config.usage.show_infobar_do_dimming = ConfigYesNo(default=False)
 	config.usage.show_infobar_dimming_speed = ConfigSelectionNumber(min=1, max=20, stepwidth=1, default=3, wraparound=True)
 	config.usage.show_infobar_on_zap = ConfigYesNo(default=True)
@@ -101,6 +107,7 @@ def InitUsageConfig():
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default=False)
 	config.usage.show_second_infobar = ConfigSelection(default="0", choices=[("", _("None"))] + choicelist + [("EPG", _("EPG"))])
 	config.usage.show_simple_second_infobar = ConfigYesNo(default=False)
+	config.usage.show_infobar_adds = ConfigYesNo(default=False)
 	config.usage.infobar_frontend_source = ConfigSelection(default="settings", choices=[("settings", _("Settings")), ("tuner", _("Tuner"))])
 	config.usage.oldstyle_zap_controls = ConfigYesNo(default=False)
 	config.usage.oldstyle_channel_select_controls = ConfigYesNo(default=False)
@@ -110,6 +117,7 @@ def InitUsageConfig():
 	config.usage.volume_instead_of_channelselection = ConfigYesNo(default=False)
 	config.usage.channelselection_preview = ConfigYesNo(default=False)
 	config.usage.show_spinner = ConfigYesNo(default=True)
+	config.usage.disable_blinking = ConfigYesNo(default=True)
 	config.usage.menu_sort_weight = ConfigDictionarySet(default={"mainmenu": {"submenu": {}}})
 	config.usage.menu_sort_mode = ConfigSelection(default="default", choices=[("a_z", _("alphabetical")), ("default", _("Default")), ("user", _("user defined")), ("user_hidden", _("user defined hidden"))])
 	config.usage.menu_show_numbers = ConfigSelection(default="no", choices=[("no", _("no")), ("menu&plugins", _("in menu and plugins")), ("menu", _("in menu only")), ("plugins", _("in plugins only"))])
@@ -189,15 +197,15 @@ def InitUsageConfig():
 
 	config.usage.poweroff_enabled = ConfigYesNo(default=False)
 	config.usage.poweroff_force = ConfigYesNo(default=False)
-	config.usage.poweroff_nextday = ConfigClock(default = ((6 * 60 + 0) * 60))
+	config.usage.poweroff_nextday = ConfigClock(default=((6 * 60 + 0) * 60))
 	config.usage.poweroff_day = ConfigSubDict()
 	config.usage.poweroff_time = ConfigSubDict()
 	for i in range(7):
 		config.usage.poweroff_day[i] = ConfigEnableDisable(default=False)
-		config.usage.poweroff_time[i] = ConfigClock(default = ((1 * 60 + 0) * 60))
+		config.usage.poweroff_time[i] = ConfigClock(default=((1 * 60 + 0) * 60))
 
-	choicelist = [("0", _("Disabled"))]
-	for i in list(range(3600, 21601, 3600)):
+	choicelist = [("0", _("Disabled")), ("1800", _("Standby in ") + _("half an hour"))]
+	for i in range(3600, 21601, 3600):
 		h = abs(i / 3600)
 		h = ngettext("%d hour", "%d hours", h) % h
 		choicelist.append((str(i), _("Standby in ") + h))
@@ -267,35 +275,6 @@ def InitUsageConfig():
 		("5", "DVB-T/-S/-C"),
 		("127", _("No priority"))])
 
-	config.usage.frontled_color = ConfigSelection(default="2", choices=[
-		("0", _("Off")),
-		("1", _("Blue")),
-		("2", _("Red")),
-		("3", _("Blinking blue")),
-		("4", _("Blinking red"))
-	])
-	config.usage.frontledrec_color = ConfigSelection(default="3", choices=[
-		("0", _("Off")),
-		("1", _("Blue")),
-		("2", _("Red")),
-		("3", _("Blinking blue")),
-		("4", _("Blinking red"))
-	])
-	config.usage.frontledstdby_color = ConfigSelection(default="0", choices=[
-		("0", _("Off")),
-		("1", _("Blue")),
-		("2", _("Red")),
-		("3", _("Blinking blue")),
-		("4", _("Blinking red"))
-	])
-	config.usage.frontledrecstdby_color = ConfigSelection(default="3", choices=[
-		("0", _("Off")),
-		("1", _("Blue")),
-		("2", _("Red")),
-		("3", _("Blinking blue")),
-		("4", _("Blinking red"))
-	])
-
 	def remote_fallback_changed(configElement):
 		if configElement.value:
 			configElement.value = "%s%s" % (not configElement.value.startswith("http://") and "http://" or "", configElement.value)
@@ -320,6 +299,7 @@ def InitUsageConfig():
 	config.usage.remote_fallback_nok = ConfigYesNo(default=False)
 	config.usage.remote_fallback_extension_menu = ConfigYesNo(default=False)
 	config.usage.remote_fallback_external_timer = ConfigYesNo(default=False)
+	config.usage.remote_fallback_external_timer_default = ConfigYesNo(default=True)
 	config.usage.remote_fallback_openwebif_customize = ConfigYesNo(default=False)
 	config.usage.remote_fallback_openwebif_userid = ConfigText(default="root")
 	config.usage.remote_fallback_openwebif_password = ConfigPassword(default="default")
@@ -345,8 +325,8 @@ def InitUsageConfig():
 		('percright', _("Percentage right")),
 		('no', _("no"))])
 	config.usage.show_channel_numbers_in_servicelist = ConfigYesNo(default=True)
-	config.usage.show_event_progress_in_servicelist.addNotifier(refreshServiceList)
-	config.usage.show_channel_numbers_in_servicelist.addNotifier(refreshServiceList)
+	config.usage.show_event_progress_in_servicelist.addNotifier(redrawServiceList, initial_call=False)
+	config.usage.show_channel_numbers_in_servicelist.addNotifier(redrawServiceList, initial_call=False)
 
 	config.usage.blinking_display_clock_during_recording = ConfigYesNo(default=False)
 
@@ -370,11 +350,6 @@ def InitUsageConfig():
 		choicelist.append(("%d" % i, "%d ms" % i))
 	config.usage.numzaptimeout1 = ConfigSelection(default="3000", choices=choicelist)
 	config.usage.numzaptimeout2 = ConfigSelection(default="1000", choices=choicelist)
-
-	config.usage.frontled_color = ConfigSelection(default = "2", choices = [("0", _("Off")), ("1", _("Blue")), ("2", _("Red")), ("3", _("Blinking blue")), ("4", _("Blinking red"))])
-	config.usage.frontledrec_color = ConfigSelection(default = "3", choices = [("0", _("Off")), ("1", _("Blue")), ("2", _("Red")), ("3", _("Blinking blue")), ("4", _("Blinking red"))])
-	config.usage.frontledstdby_color = ConfigSelection(default = "0", choices = [("0", _("Off")), ("1", _("Blue")), ("2", _("Red")), ("3", _("Blinking blue")), ("4", _("Blinking red"))])
-	config.usage.frontledrecstdby_color = ConfigSelection(default = "3", choices = [("0", _("Off")), ("1", _("Blue")), ("2", _("Red")), ("3", _("Blinking blue")), ("4", _("Blinking red"))])
 
 	def SpinnerOnOffChanged(configElement):
 		setSpinnerOnOff(int(configElement.value))
@@ -400,103 +375,102 @@ def InitUsageConfig():
 	config.usage.show_eit_nownext = ConfigYesNo(default=True)
 	config.usage.show_vcr_scart = ConfigYesNo(default=False)
 	config.usage.show_update_disclaimer = ConfigYesNo(default=True)
-	config.usage.pic_resolution = ConfigSelection(default=None, choices=[(None, _("Same resolution as skin")), ("(720, 576)", "720x576"), ("(1280, 720)", "1280x720"), ("(1920, 1080)", "1920x1080")][:SystemInfo["HasFullHDSkinSupport"] and 4 or 3])
+	config.usage.pic_resolution = ConfigSelection(default=None, choices=[(None, _("Same resolution as skin")), ("(720, 576)", "720x576"), ("(1280, 720)", "1280x720"), ("(1920, 1080)", "1920x1080")][:BoxInfo.getItem("HasFullHDSkinSupport") and 4 or 3])
 
-	if SystemInfo["Bootvideo"]:
+	if BoxInfo.getItem("Bootvideo"):
 		config.usage.show_bootvideo = ConfigYesNo(default=False)
 
-	if SystemInfo["Fan"]:
+	if BoxInfo.getItem("Fan"):
 		choicelist = [('off', _("Off")), ('on', _("On")), ('auto', _("Auto"))]
 		if os.path.exists("/proc/stb/fp/fan_choices"):
 			choicelist = [x for x in choicelist if x[0] in open("/proc/stb/fp/fan_choices", "r").read().strip().split(" ")]
 		config.usage.fan = ConfigSelection(choicelist)
 
 		def fanChanged(configElement):
-			open(SystemInfo["Fan"], "w").write(configElement.value)
+			open(BoxInfo.getItem("Fan"), "w").write(configElement.value)
 		config.usage.fan.addNotifier(fanChanged)
 
-	if SystemInfo["FanPWM"]:
+	if BoxInfo.getItem("FanPWM"):
 		def fanSpeedChanged(configElement):
-			open(SystemInfo["FanPWM"], "w").write(hex(configElement.value)[2:])
+			open(BoxInfo.getItem("FanPWM"), "w").write(hex(configElement.value)[2:])
 		config.usage.fanspeed = ConfigSlider(default=127, increment=8, limits=(0, 255))
 		config.usage.fanspeed.addNotifier(fanSpeedChanged)
 
-	if SystemInfo["PowerLED"]:
+	if BoxInfo.getItem("PowerLED"):
 		def powerLEDChanged(configElement):
-			if "fp" in SystemInfo["PowerLED"]:
-				open(SystemInfo["PowerLED"], "w").write(configElement.value and "1" or "0")
-				patterns = [PATTERN_ON, PATTERN_ON, PATTERN_OFF, PATTERN_OFF] if configElement.value else [PATTERN_OFF, PATTERN_OFF, PATTERN_OFF, PATTERN_OFF]
+			if "fp" in BoxInfo.getItem("PowerLED"):
+				open(BoxInfo.getItem("PowerLED"), "w").write(configElement.value and "1" or "0")
+				patterns = [PATTERN_ON, PATTERN_ON, PATTERN_OFF, PATTERN_ON] if configElement.value else [PATTERN_OFF, PATTERN_OFF, PATTERN_OFF, PATTERN_OFF]
 				ledPatterns.setLedPatterns(1, patterns)
 			else:
-				open(SystemInfo["PowerLED"], "w").write(configElement.value and "on" or "off")
+				open(BoxInfo.getItem("PowerLED"), "w").write(configElement.value and "on" or "off")
 		config.usage.powerLED = ConfigYesNo(default=True)
 		config.usage.powerLED.addNotifier(powerLEDChanged)
 
-	if SystemInfo["StandbyLED"]:
+	if BoxInfo.getItem("StandbyLED"):
 		def standbyLEDChanged(configElement):
-			if "fp" in SystemInfo["StandbyLED"]:
+			if "fp" in BoxInfo.getItem("StandbyLED"):
 				patterns = [PATTERN_OFF, PATTERN_BLINK, PATTERN_ON, PATTERN_BLINK] if configElement.value else [PATTERN_OFF, PATTERN_OFF, PATTERN_OFF, PATTERN_OFF]
 				ledPatterns.setLedPatterns(0, patterns)
 			else:
-				open(SystemInfo["StandbyLED"], "w").write(configElement.value and "on" or "off")
+				open(BoxInfo.getItem("StandbyLED"), "w").write(configElement.value and "on" or "off")
 		config.usage.standbyLED = ConfigYesNo(default=True)
 		config.usage.standbyLED.addNotifier(standbyLEDChanged)
 
-	if SystemInfo["SuspendLED"]:
+	if BoxInfo.getItem("SuspendLED"):
 		def suspendLEDChanged(configElement):
-			if "fp" in SystemInfo["SuspendLED"]:
-				open(SystemInfo["SuspendLED"], "w").write(configElement.value and "1" or "0")
+			if "fp" in BoxInfo.getItem("SuspendLED"):
+				open(BoxInfo.getItem("SuspendLED"), "w").write(configElement.value and "1" or "0")
 			else:
-				open(SystemInfo["SuspendLED"], "w").write(configElement.value and "on" or "off")
+				open(BoxInfo.getItem("SuspendLED"), "w").write(configElement.value and "on" or "off")
 		config.usage.suspendLED = ConfigYesNo(default=True)
 		config.usage.suspendLED.addNotifier(suspendLEDChanged)
 
-	if SystemInfo["PowerOffDisplay"]:
+	if BoxInfo.getItem("PowerOffDisplay"):
 		def powerOffDisplayChanged(configElement):
-			open(SystemInfo["PowerOffDisplay"], "w").write(configElement.value and "1" or "0")
+			open(BoxInfo.getItem("PowerOffDisplay"), "w").write(configElement.value and "1" or "0")
 		config.usage.powerOffDisplay = ConfigYesNo(default=True)
 		config.usage.powerOffDisplay.addNotifier(powerOffDisplayChanged)
 
-	if SystemInfo["LCDshow_symbols"]:
+	if BoxInfo.getItem("LCDshow_symbols"):
 		def lcdShowSymbols(configElement):
-			open(SystemInfo["LCDshow_symbols"], "w").write(configElement.value and "1" or "0")
+			open(BoxInfo.getItem("LCDshow_symbols"), "w").write(configElement.value and "1" or "0")
 		config.usage.lcd_show_symbols = ConfigYesNo(default=True)
 		config.usage.lcd_show_symbols.addNotifier(lcdShowSymbols)
 
 	config.network = ConfigSubsection()
-	if SystemInfo["WakeOnLAN"]:
-		f = open(SystemInfo["WakeOnLAN"], "r")
+	if BoxInfo.getItem("WakeOnLAN"):
+		f = open(BoxInfo.getItem("WakeOnLAN"), "r")
 		status = f.read().strip()
 		f.close()
 		def wakeOnLANChanged(configElement):
 			if status in ("enable", "disable"):
-				open(SystemInfo["WakeOnLAN"], "w").write(configElement.value and "enable" or "disable")
+				open(BoxInfo.getItem("WakeOnLAN"), "w").write(configElement.value and "enable" or "disable")
 			else:
-				open(SystemInfo["WakeOnLAN"], "w").write(configElement.value and "on" or "off")
+				open(BoxInfo.getItem("WakeOnLAN"), "w").write(configElement.value and "on" or "off")
 		config.network.wol = ConfigYesNo(default=False)
 		config.network.wol.addNotifier(wakeOnLANChanged)
 
-	if SystemInfo["hasXcoreVFD"]:
+	if BoxInfo.getItem("hasXcoreVFD"):
 		def set12to8characterVFD(configElement):
-			open(SystemInfo["hasXcoreVFD"], "w").write(not configElement.value and "1" or "0")
+			open(BoxInfo.getItem("hasXcoreVFD"), "w").write(not configElement.value and "1" or "0")
 		config.usage.toggle12to8characterVFD = ConfigYesNo(default=False)
 		config.usage.toggle12to8characterVFD.addNotifier(set12to8characterVFD)
 
-	if SystemInfo["LcdLiveTVMode"]:
+	if BoxInfo.getItem("LcdLiveTVMode"):
 		def setLcdLiveTVMode(configElement):
-			open(SystemInfo["LcdLiveTVMode"], "w").write(configElement.value)
-		config.usage.LcdLiveTVMode = ConfigSelection(default="0", choices=[str(x) for x in list(range(0, 9))])
+			open(BoxInfo.getItem("LcdLiveTVMode"), "w").write(configElement.value)
+		config.usage.LcdLiveTVMode = ConfigSelection(default="0", choices=[str(x) for x in range(0, 9)])
 		config.usage.LcdLiveTVMode.addNotifier(setLcdLiveTVMode)
 
-	if SystemInfo["LcdLiveDecoder"]:
+	config.usage.multiboot_order = ConfigYesNo(default=True)
+	if BoxInfo.getItem("LcdLiveDecoder"):
 		def setLcdLiveDecoder(configElement):
-			open(SystemInfo["LcdLiveDecoder"], "w").write(configElement.value)
-		config.usage.LcdLiveDecoder = ConfigSelection(default="0", choices=[str(x) for x in list(range(0, 4))])
+			open(BoxInfo.getItem("LcdLiveDecoder"), "w").write(configElement.value)
+		config.usage.LcdLiveDecoder = ConfigSelection(default="0", choices=[str(x) for x in range(0, 4)])
 		config.usage.LcdLiveDecoder.addNotifier(setLcdLiveDecoder)
 
 	config.usage.boolean_graphic = ConfigSelection(default="true", choices={"false": _("no"), "true": _("yes"), "only_bool": _("yes, but not in multi selections")})
-
-	config.osd.alpha_teletext = ConfigSelectionNumber(default=255, stepwidth=1, min=0, max=255, wraparound=False)
 
 	config.epg = ConfigSubsection()
 	config.epg.eit = ConfigYesNo(default=True)
@@ -591,7 +565,7 @@ def InitUsageConfig():
 			hdd[1].setIdleTime(int(configElement.value))
 	config.usage.hdd_standby.addNotifier(setHDDStandby, immediate_feedback=False)
 
-	if SystemInfo["12V_Output"]:
+	if BoxInfo.getItem("12V_Output"):
 		def set12VOutput(configElement):
 			Misc_Options.getInstance().set_12V_output(configElement.value == "on" and 1 or 0)
 		config.usage.output_12V.addNotifier(set12VOutput, immediate_feedback=False)
@@ -673,96 +647,90 @@ def InitUsageConfig():
 		("3", _("Everywhere"))])
 	config.misc.erase_flags.addNotifier(updateEraseFlags, immediate_feedback=False)
 
-	if SystemInfo["ZapMode"]:
+	if BoxInfo.getItem("ZapMode"):
 		def setZapmode(el):
-			open(SystemInfo["ZapMode"], "w").write(el.value)
+			open(BoxInfo.getItem("ZapMode"), "w").write(el.value)
 		config.misc.zapmode = ConfigSelection(default="mute", choices=[
 			("mute", _("Black screen")), ("hold", _("Hold screen")), ("mutetilllock", _("Black screen till locked")), ("holdtilllock", _("Hold till locked"))])
 		config.misc.zapmode.addNotifier(setZapmode, immediate_feedback=False)
 
-	if not SystemInfo["ZapMode"] and os.path.exists("/proc/stb/info/model"):
-		def setZapmodeDM(el):
-			print('[UsageConfig] >>> zapmodeDM')
-		config.misc.zapmodeDM = ConfigSelection(default="black", choices=[("black", _("Black screen")), ("hold", _("Hold screen"))])
-		config.misc.zapmodeDM.addNotifier(setZapmodeDM, immediate_feedback = False)
-
-	if SystemInfo["VFD_scroll_repeats"]:
+	if BoxInfo.getItem("VFD_scroll_repeats"):
 		def scroll_repeats(el):
-			open(SystemInfo["VFD_scroll_repeats"], "w").write(el.value)
+			open(BoxInfo.getItem("VFD_scroll_repeats"), "w").write(el.value)
 		choicelist = []
 		for i in list(range(1, 11, 1)):
 			choicelist.append((str(i)))
 		config.usage.vfd_scroll_repeats = ConfigSelection(default="3", choices=choicelist)
 		config.usage.vfd_scroll_repeats.addNotifier(scroll_repeats, immediate_feedback=False)
 
-	if SystemInfo["VFD_scroll_delay"]:
+	if BoxInfo.getItem("VFD_scroll_delay"):
 		def scroll_delay(el):
-			open(SystemInfo["VFD_scroll_delay"], "w").write(el.value)
+			open(BoxInfo.getItem("VFD_scroll_delay"), "w").write(el.value)
 		choicelist = []
 		for i in list(range(0, 1001, 50)):
 			choicelist.append((str(i)))
 		config.usage.vfd_scroll_delay = ConfigSelection(default="150", choices=choicelist)
 		config.usage.vfd_scroll_delay.addNotifier(scroll_delay, immediate_feedback=False)
 
-	if SystemInfo["VFD_initial_scroll_delay"]:
+	if BoxInfo.getItem("VFD_initial_scroll_delay"):
 		def initial_scroll_delay(el):
-			open(SystemInfo["VFD_initial_scroll_delay"], "w").write(el.value)
+			open(BoxInfo.getItem("VFD_initial_scroll_delay"), "w").write(el.value)
 		choicelist = []
 		for i in list(range(0, 20001, 500)):
 			choicelist.append((str(i)))
 		config.usage.vfd_initial_scroll_delay = ConfigSelection(default="1000", choices=choicelist)
 		config.usage.vfd_initial_scroll_delay.addNotifier(initial_scroll_delay, immediate_feedback=False)
 
-	if SystemInfo["VFD_final_scroll_delay"]:
+	if BoxInfo.getItem("VFD_final_scroll_delay"):
 		def final_scroll_delay(el):
-			open(SystemInfo["VFD_final_scroll_delay"], "w").write(el.value)
+			open(BoxInfo.getItem("VFD_final_scroll_delay"), "w").write(el.value)
 		choicelist = []
 		for i in list(range(0, 20001, 500)):
 			choicelist.append((str(i)))
 		config.usage.vfd_final_scroll_delay = ConfigSelection(default="1000", choices=choicelist)
 		config.usage.vfd_final_scroll_delay.addNotifier(final_scroll_delay, immediate_feedback=False)
 
-	if SystemInfo["HasBypassEdidChecking"]:
+	if BoxInfo.getItem("HasBypassEdidChecking"):
 		def setHasBypassEdidChecking(configElement):
-			open(SystemInfo["HasBypassEdidChecking"], "w").write("00000001" if configElement.value else "00000000")
+			open(BoxInfo.getItem("HasBypassEdidChecking"), "w").write("00000001" if configElement.value else "00000000")
 		config.av.bypassEdidChecking = ConfigYesNo(default=False)
 		config.av.bypassEdidChecking.addNotifier(setHasBypassEdidChecking)
 
-	if SystemInfo["HasColorspace"]:
+	if BoxInfo.getItem("HasColorspace"):
 		def setHaveColorspace(configElement):
-			open(SystemInfo["HasColorspace"], "w").write(configElement.value)
-		if SystemInfo["HasColorspaceSimple"]:
+			open(BoxInfo.getItem("HasColorspace"), "w").write(configElement.value)
+		if BoxInfo.getItem("HasColorspaceSimple"):
 			config.av.hdmicolorspace = ConfigSelection(default="Edid(Auto)", choices={"Edid(Auto)": _("auto"), "Hdmi_Rgb": "RGB", "444": "YCbCr 4:4:4", "422": "YCbCr 4:2:2", "420": "YCbCr 4:2:0"})
 		else:
 			# config.av.hdmicolorspace = ConfigSelection(default="auto", choices={"auto": _("auto"), "rgb": "RGB", "420": "4:2:0", "422": "4:2:2", "444": "4:4:4"})
 			config.av.hdmicolorspace = ConfigSelection(default="Edid(Auto)", choices={"Edid(Auto)": _("Auto"), "Hdmi_Rgb": _("RGB"), "Itu_R_BT_709": _("Itu_R_BT_709"), "Unknown": _("Unknown")})
 		config.av.hdmicolorspace.addNotifier(setHaveColorspace)
 
-	if SystemInfo["HasColordepth"]:
+	if BoxInfo.getItem("HasColordepth"):
 		def setHaveColordepth(configElement):
-			open(SystemInfo["HasColordepth"], "w").write(configElement.value)
+			open(BoxInfo.getItem("HasColordepth"), "w").write(configElement.value)
 		config.av.hdmicolordepth = ConfigSelection(default="auto", choices={"auto": _("auto"), "8bit": "8bit", "10bit": "10bit", "12bit": "12bit"})
 		config.av.hdmicolordepth.addNotifier(setHaveColordepth)
 
-	if SystemInfo["HasHDMIpreemphasis"]:
+	if BoxInfo.getItem("HasHDMIpreemphasis"):
 		def setHDMIpreemphasis(configElement):
-			open(SystemInfo["HasHDMIpreemphasis"], "w").write("on" if configElement.value else "off")
+			open(BoxInfo.getItem("HasHDMIpreemphasis"), "w").write("on" if configElement.value else "off")
 		config.av.hdmipreemphasis = ConfigYesNo(default=False)
 		config.av.hdmipreemphasis.addNotifier(setHDMIpreemphasis)
 
-	if SystemInfo["HasColorimetry"]:
+	if BoxInfo.getItem("HasColorimetry"):
 		def setColorimetry(configElement):
-			open(SystemInfo["HasColorimetry"], "w").write(configElement.value)
+			open(BoxInfo.getItem("HasColorimetry"), "w").write(configElement.value)
 		config.av.hdmicolorimetry = ConfigSelection(default="auto", choices=[("auto", _("auto")), ("bt2020ncl", "BT 2020 NCL"), ("bt2020cl", "BT 2020 CL"), ("bt709", "BT 709")])
 		config.av.hdmicolorimetry.addNotifier(setColorimetry)
 
-	if SystemInfo["HasHdrType"]:
+	if BoxInfo.getItem("HasHdrType"):
 		def setHdmiHdrType(configElement):
-			open(SystemInfo["HasHdrType"], "w").write(configElement.value)
+			open(BoxInfo.getItem("HasHdrType"), "w").write(configElement.value)
 		config.av.hdmihdrtype = ConfigSelection(default="auto", choices={"auto": _("auto"), "none": "SDR", "hdr10": "HDR10", "hlg": "HLG", "dolby": "Dolby Vision"})
 		config.av.hdmihdrtype.addNotifier(setHdmiHdrType)
 
-	if SystemInfo["HDRSupport"]:
+	if BoxInfo.getItem("HDRSupport"):
 		def setHlgSupport(configElement):
 			open("/proc/stb/hdmi/hlg_support", "w").write(configElement.value)
 		config.av.hlg_support = ConfigSelection(default="auto(EDID)",
@@ -784,17 +752,6 @@ def InitUsageConfig():
 			open("/proc/stb/video/disable_10bit", "w").write("on" if configElement.value else "off")
 		config.av.allow_10bit = ConfigYesNo(default=False)
 		config.av.allow_10bit.addNotifier(setDisable10Bit)
-
-	if SystemInfo["CanSyncMode"]:
-		def setSyncMode(configElement):
-			print("[UsageConfig] Read /proc/stb/video/sync_mode")
-			open("/proc/stb/video/sync_mode", "w").write(configElement.value)
-		config.av.sync_mode = ConfigSelection(default="slow", choices={
-			"slow": _("Slow motion"),
-			"hold": _("Hold first frame"),
-			"black": _("Black screen")
-		})
-		config.av.sync_mode.addNotifier(setSyncMode)
 
 	config.subtitles = ConfigSubsection()
 	config.subtitles.show = ConfigYesNo(default=True)
@@ -882,7 +839,7 @@ def InitUsageConfig():
 		("por dub Dub DUB ud1", _("Portuguese")),
 		("ron rum", _("Romanian")),
 		("rus", _("Russian")),
-		("srp", _("Serbian")),
+		("srp scc", _("Serbian")),
 		("slk slo", _("Slovak")),
 		("slv", _("Slovenian")),
 		("spa", _("Spanish")),
@@ -976,6 +933,7 @@ def InitUsageConfig():
 	config.misc.softcam_setup.extension_menu = ConfigYesNo(default=True)
 	config.misc.softcam_streamrelay_url = ConfigIP(default=[127, 0, 0, 1], auto_jump=True)
 	config.misc.softcam_streamrelay_port = ConfigInteger(default=17999, limits=(0, 65535))
+	config.misc.softcam_streamrelay_delay = ConfigSelectionNumber(min=0, max=2000, stepwidth=50, default=100, wraparound=True)
 
 	config.ntp = ConfigSubsection()
 
@@ -994,7 +952,7 @@ def InitUsageConfig():
 				Console().ePopen("echo '30 * * * *    /usr/sbin/ntpd -nq -p %s' >> /var/spool/cron/crontabs/root" % config.ntp.server.value)
 			if not os.path.islink('/etc/network/if-up.d/ntpd'):
 				Console().ePopen("ln -s /usr/bin/ntpd /etc/network/if-up.d/ntpd")
-				Console().ePopen("/usr/sbin/ntpd -nq -p %s" % config.ntp.server.value)
+			Console().ePopen("/usr/sbin/ntpd -nq -p %s" % config.ntp.server.value)
 	config.ntp.server = ConfigText("pool.ntp.org", fixed_size=False)
 	config.ntp.timesync = ConfigSelection(default="auto", choices=[("auto", _("auto")), ("dvb", _("Transponder Time")), ("ntp", _("Internet (ntp)"))])
 	config.ntp.timesync.addNotifier(timesyncChanged)
@@ -1050,7 +1008,7 @@ def showrotorpositionChoicesUpdate(update=False):
 		config.misc.showrotorposition = ConfigSelection(default="no", choices=choiceslist)
 	else:
 		config.misc.showrotorposition.setChoices(choiceslist, "no")
-	SystemInfo["isRotorTuner"] = count > 0
+	BoxInfo.setItem("isRotorTuner", count > 0)
 
 
 def preferredTunerChoicesUpdate(update=False):
@@ -1119,10 +1077,10 @@ def preferredTunerChoicesUpdate(update=False):
 	else:
 		config.usage.recording_frontend_priority_atsc.setChoices(atsc_nims, "-2")
 
-	SystemInfo["DVB-S_priority_tuner_available"] = len(dvbs_nims) > 3 and any(len(i) > 2 for i in (dvbt_nims, dvbc_nims, atsc_nims))
-	SystemInfo["DVB-T_priority_tuner_available"] = len(dvbt_nims) > 3 and any(len(i) > 2 for i in (dvbs_nims, dvbc_nims, atsc_nims))
-	SystemInfo["DVB-C_priority_tuner_available"] = len(dvbc_nims) > 3 and any(len(i) > 2 for i in (dvbs_nims, dvbt_nims, atsc_nims))
-	SystemInfo["ATSC_priority_tuner_available"] = len(atsc_nims) > 3 and any(len(i) > 2 for i in (dvbs_nims, dvbc_nims, dvbt_nims))
+	BoxInfo.setItem("DVB-S_priority_tuner_available", len(dvbs_nims) > 3 and any(len(i) > 2 for i in (dvbt_nims, dvbc_nims, atsc_nims)))
+	BoxInfo.setItem("DVB-T_priority_tuner_available", len(dvbt_nims) > 3 and any(len(i) > 2 for i in (dvbs_nims, dvbc_nims, atsc_nims)))
+	BoxInfo.setItem("DVB-C_priority_tuner_available", len(dvbc_nims) > 3 and any(len(i) > 2 for i in (dvbs_nims, dvbt_nims, atsc_nims)))
+	BoxInfo.setItem("ATSC_priority_tuner_available", len(atsc_nims) > 3 and any(len(i) > 2 for i in (dvbs_nims, dvbc_nims, dvbt_nims)))
 
 
 def dropEPGNewLines(text):

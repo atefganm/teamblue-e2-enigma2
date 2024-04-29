@@ -8,7 +8,7 @@ from Components.Sources.StaticText import StaticText
 from Components.config import configfile
 from Components.PluginComponent import plugins
 from Components.config import config, ConfigDictionarySet, NoSave
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import BoxInfo
 from Tools.BoundFunction import boundFunction
 from skin import parameters, menus, menuicons
 from Plugins.Plugin import PluginDescriptor
@@ -81,9 +81,9 @@ class Menu(Screen, ProtectedScreen):
 		requires = node.get("requires")
 		if requires:
 			if requires[0] == '!':
-				if SystemInfo.get(requires[1:], False):
+				if BoxInfo.getItem(requires[1:], False):
 					return
-			elif not SystemInfo.get(requires, False):
+			elif not BoxInfo.getItem(requires, False):
 				return
 		MenuTitle = _(node.get("text", "??"))
 		entryID = node.get("entryID", "undefined")
@@ -115,9 +115,9 @@ class Menu(Screen, ProtectedScreen):
 		requires = node.get("requires")
 		if requires:
 			if requires[0] == '!':
-				if SystemInfo.get(requires[1:], False):
+				if BoxInfo.getItem(requires[1:], False):
 					return
-			elif not SystemInfo.get(requires, False):
+			elif not BoxInfo.getItem(requires, False):
 				return
 		conditional = node.get("conditional")
 		if conditional and not eval(conditional):
@@ -172,6 +172,8 @@ class Menu(Screen, ProtectedScreen):
 		Screen.__init__(self, session)
 		self.menulength = 0
 		self["key_blue"] = StaticText("")
+		self["key_previous"] = StaticText(_("PREVIOUS"))
+		self["key_next"] = StaticText(_("NEXT"))
 		self["menu"] = List([])
 		self["menu"].enableWrapAround = True
 		self.showNumericHelp = False
@@ -223,7 +225,8 @@ class Menu(Screen, ProtectedScreen):
 		self.okbuttonClick()
 
 	def layoutFinished(self):
-		if self.menuImage:
+		self.screenContentChanged()
+		if self.menuImage and "menuimage" in self:
 			self["menuimage"].instance.setPixmap(self.menuImage)
 
 	def loadMenuImage(self):
@@ -314,6 +317,7 @@ class Menu(Screen, ProtectedScreen):
 			self.menulength = len(self.list)
 
 		self["menu"].updateList(self.list)
+		self.screenContentChanged()
 
 	def _onSelectionChanged(self):
 		current = self["menu"].current

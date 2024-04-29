@@ -9,7 +9,7 @@ from Components.Network import iNetwork
 from Components.Sources.StaticText import StaticText
 from Components.Sources.Boolean import Boolean
 from Components.Sources.List import List
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import BoxInfo
 from Components.Label import Label, MultiColorLabel
 from Components.Pixmap import Pixmap, MultiPixmap
 from Components.MenuList import MenuList
@@ -40,6 +40,7 @@ class NetworkAdapterSelection(Screen, HelpableScreen):
 		self["key_green"] = StaticText(_("Select"))
 		self["key_yellow"] = StaticText("")
 		self["key_blue"] = StaticText("")
+		self["key_menu"] = StaticText(_("MENU"))
 		self["introduction"] = StaticText(self.edittext)
 
 		self["OkCancelActions"] = HelpableActionMap(self, ["OkCancelActions"],
@@ -499,8 +500,9 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 	def createConfig(self):
 		self.wlanSSID = None
 		self.encryptionKey = None
+		self.ws = None
 
-		if iNetwork.isWirelessInterface(self.iface):
+		if iNetwork.isWirelessInterface(self.iface) and hasattr(config.plugins, "wlan"):
 			from Plugins.SystemPlugins.WirelessLan.Wlan import wpaSupplicant
 			self.ws = wpaSupplicant()
 			encryptionlist = [
@@ -538,7 +540,7 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 		self.secondaryDNS = NoSave(ConfigIP(default=nameserver[1]))
 
 	def createSetup(self, element=None):
-		if SystemInfo["WakeOnLAN"]:
+		if BoxInfo.getItem("WakeOnLAN"):
 			self.wolstartvalue = config.network.wol.value
 		self.list = [(_("Use interface"), self.activateInterfaceEntry)]
 		if self.activateInterfaceEntry.value:
@@ -553,7 +555,7 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 					self.list.append((_('Gateway'), self.gatewayConfigEntry))
 
 			havewol = False
-			if SystemInfo["WakeOnLAN"] and getBoxType() in ('gbquadplus', 'quadbox2400'):
+			if BoxInfo.getItem("WakeOnLAN") and getBoxType() in ('gbquadplus', 'quadbox2400'):
 				havewol = True
 			if havewol and self.iface == 'eth0':
 				self.list.append((_('Enable Wake On LAN'), config.network.wol))
@@ -690,7 +692,8 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 				iNetwork.removeAdapterAttribute(self.iface, "dns-nameservers")
 			if self.extended is not None and self.configStrings is not None:
 				iNetwork.setAdapterAttribute(self.iface, "configStrings", self.configStrings(self.iface))
-				self.ws.writeConfig(self.iface)
+				if self.ws:
+					self.ws.writeConfig(self.iface)
 
 			if not self.activateInterfaceEntry.value:
 				iNetwork.deactivateInterface(self.iface, self.deactivateInterfaceCB)
@@ -734,7 +737,7 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 	def keyCancelConfirm(self, result):
 		if not result:
 			return
-		if SystemInfo["WakeOnLAN"]:
+		if BoxInfo.getItem("WakeOnLAN"):
 			config.network.wol.setValue(self.wolstartvalue)
 		if not self.oldInterfaceState:
 			iNetwork.deactivateInterface(self.iface, self.keyCancelCB)
@@ -743,7 +746,7 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 
 	def keyCancel(self):
 		self.hideInputHelp()
-		if self["config"].isChanged() or (SystemInfo["WakeOnLAN"] and self.wolstartvalue != config.network.wol.value):
+		if self["config"].isChanged() or (BoxInfo.getItem("WakeOnLAN") and self.wolstartvalue != config.network.wol.value):
 			self.session.openWithCallback(self.keyCancelConfirm, MessageBox, _("Really close without saving settings?"), default=False)
 		else:
 			self.close('cancel')
@@ -758,14 +761,15 @@ class AdapterSetup(ConfigListScreen, HelpableScreen, Screen):
 
 	def cleanup(self):
 		iNetwork.stopLinkStateConsole()
-		config.plugins.wlan.encryption.removeNotifier(self.createSetup)
+		if hasattr(config.plugins, "wlan"):
+			config.plugins.wlan.encryption.removeNotifier(self.createSetup)
 		self.activateInterfaceEntry.removeNotifier(self.createSetup)
 		self.dhcpConfigEntry.removeNotifier(self.createSetup)
 		self.hasGatewayConfigEntry.removeNotifier(self.createSetup)
 
 	def hideInputHelp(self):
 		current = self["config"].getCurrent()
-		if current == self.wlanSSID or (current == self.encryptionKey and config.plugins.wlan.encryption.value != "Unencrypted"):
+		if current == self.wlanSSID or (current and current == self.encryptionKey and config.plugins.wlan.encryption.value != "Unencrypted"):
 			if current[1].help_window.instance is not None:
 				current[1].help_window.instance.hide()
 

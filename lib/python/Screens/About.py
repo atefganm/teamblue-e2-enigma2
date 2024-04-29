@@ -9,11 +9,11 @@ from Components.About import about
 from Components.ScrollLabel import ScrollLabel
 from Components.Button import Button
 from Components.config import config
-from enigma import eGetEnigmaDebugLvl
+from enigma import eGetEnigmaDebugLvl, getE2Rev
 
 from Components.Pixmap import MultiPixmap
 from Components.Network import iNetwork
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import BoxInfo
 
 from Components.Label import Label
 from Components.ProgressBar import ProgressBar
@@ -36,87 +36,42 @@ import glob
 class About(Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
-		self.setTitle(_("About"))
 		hddsplit = parameters.get("AboutHddSplit", 0)
 
-		#AboutHddSplit = 0
-		#try:
-		#	hddsplit = parameters.get("AboutHddSplit",(0))[0]
-		#except:
-		#	hddsplit = AboutHddSplit
-
-		if boxtype == 'gb800solo':
-			BoxName = "GigaBlue HD 800SOLO"
-		elif boxtype == 'gb800se':
-			BoxName = "GigaBlue HD 800SE"
-		elif boxtype == 'gb800ue':
-			BoxName = "GigaBlue HD 800UE"
-		elif boxtype == 'gbquad':
-			BoxName = "GigaBlue Quad"
-		elif boxtype == 'gbquad4k':
-			BoxName = "GigaBlue Quad 4k"
-		elif boxtype == 'gbue4k':
-			BoxName = "GigaBlue UE 4k"
-		elif boxtype == 'gbx34k':
-			BoxName = "GigaBlue X3 4k"
-		elif boxtype == 'gbtrio4k':
-			BoxName = "GigaBlue TRIO 4k"
-		elif boxtype == 'gbtrio4kpro':
-			BoxName = "GigaBlue TRIO 4k Pro"
-		elif boxtype == 'gbip4k':
-			BoxName = "GigaBlue IP 4k"
-		elif boxtype == 'gbquadplus':
-			BoxName = "GigaBlue HD Quadplus"
-		elif boxtype == 'gb800seplus':
-			BoxName = "GigaBlue HD 800SEplus"
-		elif boxtype == 'gb800ueplus':
-			BoxName = "GigaBlue HD 800UEplus"
-		elif boxtype == 'gbipbox':
-			BoxName = "GigaBlue IP Box"
-		elif boxtype == 'gbultra':
-			BoxName = "GigaBlue HD Ultra"
-		elif boxtype == 'gbultraue':
-			BoxName = "GigaBlue HD Ultra UE"
-		elif boxtype == 'gbultraueh':
-			BoxName = "GigaBlue HD Ultra UEh"
-		elif boxtype == 'gbultrase':
-			BoxName = "GigaBlue HD Ultra SE"
-		elif boxtype == 'gbx1':
-			BoxName = "GigaBlue X1"
-		elif boxtype == 'gbx2':
-			BoxName = "GigaBlue X2"
-		elif boxtype == 'gbx3':
-			BoxName = "GigaBlue X3"
-		elif boxtype == 'gbx3h':
-			BoxName = "GigaBlue X3h"
-		elif boxtype == 'spycat':
-			BoxName = "XCORE Spycat"
-		elif boxtype == 'quadbox2400':
-			BoxName = "AX Quadbox HD2400"
-		else:
-			BoxName = about.getHardwareTypeString()
-
+		BoxName = "%s %s" % (BoxInfo.getItem("displaybrand"), BoxInfo.getItem("displaymodel"))
 		self.setTitle(_("About") + " " + BoxName)
-
-		ImageType = about.getImageTypeString()
+		ImageType = BoxInfo.getItem("imagetype")
 		self["ImageType"] = StaticText(ImageType)
 
 		Boxserial = popen('cat /proc/stb/info/sn').read().strip()
 		serial = ""
 		if Boxserial != "":
-			serial = ":Serial : " + Boxserial
+			serial = Boxserial
+		cpu = about.getCPUInfoString()
+
+		AboutText = _("Hardware: ") + BoxName + "\n"
+		AboutText += _("Serial: ") + serial + "\n"
+		AboutText += _("CPU: ") + cpu + "\n"
+		AboutText += _("Image: ") + about.getImageTypeString() + " " + ImageType + "\n"
+		AboutText += _("Image revision: ") + getE2Rev() +  "\n"
+		AboutText += _("OE Version: ") + about.getOEVersionString() + "\n"
+		ImageVersion = _("Last upgrade: ") + about.getImageVersionString()
+		AboutText += ImageVersion + "\n"
+		EnigmaVersion = _("GUI Build: ") + about.getEnigmaVersionString() + "\n"
+		self["EnigmaVersion"] = StaticText(EnigmaVersion)
+		FlashDate = _("Flashed: ") + about.getFlashDateString()
+		self["FlashDate"] = StaticText(FlashDate)
+		AboutText += FlashDate + "\n"
 
 		AboutHeader = _("About") + " " + BoxName
 		self["AboutHeader"] = StaticText(AboutHeader)
 
-		AboutText = BoxName + " - " + ImageType + serial + "\n"
 		GStreamerVersion = about.getGStreamerVersionString().replace("GStreamer", "")
 		self["GStreamerVersion"] = StaticText(GStreamerVersion)
 
 		ffmpegVersion = about.getffmpegVersionString()
 		self["ffmpegVersion"] = StaticText(ffmpegVersion)
 
-		cpu = about.getCPUInfoString()
 		player = None
 
 		if os.path.isfile('/var/lib/opkg/info/enigma2-plugin-systemplugins-servicemp3.list'):
@@ -132,15 +87,6 @@ class About(Screen):
 				player = _("Media player") + ": " + _("Not Installed")
 
 		AboutText += player + "\n"
-
-		#AboutText += _("Hardware: ") + about.getHardwareTypeString() + "\n"
-		#AboutText += _("CPU: ") + about.getCPUInfoString() + "\n"
-		#AboutText += _("Installed: ") + about.getFlashDateString() + "\n"
-		#AboutText += _("Image: ") + about.getImageTypeString() + "\n"
-
-		CPUinfo = _("CPU: ") + cpu
-		self["CPUinfo"] = StaticText(CPUinfo)
-		AboutText += CPUinfo + "\n"
 
 		CPUspeed = _("Speed: ") + about.getCPUSpeedString()
 		self["CPUspeed"] = StaticText(CPUspeed)
@@ -182,19 +128,6 @@ class About(Screen):
 			AboutText += _("DVB drivers: ") + self.realDriverDate() + "\n"
 			#AboutText += _("DVB drivers: ") + about.getDriverInstalledDate() + "\n"
 
-		ImageVersion = _("Last upgrade: ") + about.getImageVersionString()
-		self["ImageVersion"] = StaticText(ImageVersion)
-		AboutText += ImageVersion + "\n"
-
-		EnigmaVersion = _("GUI Build: ") + about.getEnigmaVersionString() + "\n"
-		self["EnigmaVersion"] = StaticText(EnigmaVersion)
-		#AboutText += EnigmaVersion
-
-		#AboutText += _("Enigma (re)starts: %d\n") % config.misc.startCounter.value
-
-		FlashDate = _("Flashed: ") + about.getFlashDateString()
-		self["FlashDate"] = StaticText(FlashDate)
-		AboutText += FlashDate + "\n"
 
 		EnigmaSkin = _('Skin & Resolution: %s (%sx%s)') % (config.skin.primary_skin.value.split('/')[0], getDesktop(0).size().width(), getDesktop(0).size().height())
 		self["EnigmaSkin"] = StaticText(EnigmaSkin)
@@ -206,12 +139,11 @@ class About(Screen):
 		twisted = popen('opkg list-installed  |grep -i python3-twisted-core').read().strip().split(' - ')[1]
 		AboutText += "Python-Twisted: " + str(twisted) + "\n"
 
-		AboutText += "\n"
 		self["TunerHeader"] = StaticText(_("Detected NIMs:"))
-		#AboutText += _("Detected NIMs:") + "\n"
+		AboutText += "\n" + _("Detected NIMs:") + "\n"
 
-		nims = nimmanager.nimList()
-		for count in list(range(len(nims))):
+		nims = nimmanager.nimListCompressed()
+		for count in range(len(nims)):
 			if count < 4:
 				self["Tuner" + str(count)] = StaticText(nims[count])
 			else:
@@ -238,11 +170,8 @@ class About(Screen):
 		self["hddA"] = StaticText(hddinfo)
 		AboutText += hddinfo
 
-		#AboutText += "\n\n" + _("Network Info")
-		#for x in about.GetIPsFromNetworkInterfaces():
-		#	AboutText += "\n" + iNetwork.getFriendlyAdapterDescription(x[0]) + " :" + "/dev/" + x[0] + " " + x[1]
 		AboutText += '\n\n' + _("Uptime") + ": " + about.getBoxUptime()
-		if SystemInfo["HasHDMI-CEC"] and config.hdmicec.enabled.value:
+		if BoxInfo.getItem("HasHDMI-CEC") and config.hdmicec.enabled.value:
 			address = config.hdmicec.fixed_physical_address.value if config.hdmicec.fixed_physical_address.value != "0.0.0.0" else _("not set")
 			AboutText += "\n\n" + _("HDMI-CEC address") + ": " + address
 
@@ -262,7 +191,9 @@ class About(Screen):
 				"info": self.showContactInfo,
 				"yellow": self.showTroubleshoot,
 				"up": self["AboutScrollLabel"].pageUp,
-				"down": self["AboutScrollLabel"].pageDown
+				"down": self["AboutScrollLabel"].pageDown,
+				"left": self["AboutScrollLabel"].pageUp,
+				"right": self["AboutScrollLabel"].pageDown
 			})
 
 	def showTranslationInfo(self):
@@ -905,7 +836,12 @@ class Troubleshoot(Screen):
 		self["AboutScrollLabel"].setText("")
 		self.setTitle("%s - %s" % (_("Troubleshoot"), self.titles[self.commandIndex]))
 		command = self.commands[self.commandIndex]
-		if command.startswith("cat "):
+		if command == "boxinfo":
+			text = ""
+			for item in BoxInfo.getItemsList():
+				text += '%s = %s %s%s' % (item, str(BoxInfo.getItem(item)), type(BoxInfo.getItem(item)), " [immutable]\n" if item in BoxInfo.getEnigmaInfoList() else "\n")
+			self["AboutScrollLabel"].setText(text)
+		elif command.startswith("cat "):
 			try:
 				self["AboutScrollLabel"].setText(open(command[4:], "r").read())
 			except:
@@ -932,8 +868,8 @@ class Troubleshoot(Screen):
 		return [x for x in sorted(glob.glob("/mnt/hdd/*.log"), key=lambda x: os.path.isfile(x) and os.path.getmtime(x))] + (os.path.isfile(home_root) and [home_root] or []) + (os.path.isfile(tmp) and [tmp] or [])
 
 	def updateOptions(self):
-		self.titles = ["dmesg", "ifconfig", "df", "top", "ps", "messages"]
-		self.commands = ["dmesg", "ifconfig", "df -h", "top -n 1", "ps -l", "cat /var/volatile/log/messages"]
+		self.titles = ["dmesg", "ifconfig", "df", "top", "ps", "messages", "enigma info", "BoxInfo"]
+		self.commands = ["dmesg", "ifconfig", "df -h", "top -n 1", "ps -l", "cat /var/volatile/log/messages", "cat /usr/lib/enigma.info", "boxinfo"]
 		install_log = "/home/root/autoinstall.log"
 		if os.path.isfile(install_log):
 				self.titles.append("%s" % install_log)

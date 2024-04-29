@@ -40,6 +40,8 @@ class EPGSelection(Screen):
 		self.serviceChangeCB = serviceChangeCB
 		self.ask_time = -1 #now
 		self["key_red"] = StaticText("")
+		self["key_menu"] = StaticText(_("MENU"))
+		self["key_info"] = StaticText(_("INFO"))
 		self.closeRecursive = False
 		self.saved_title = None
 		self["Service"] = ServiceEvent()
@@ -427,7 +429,7 @@ class EPGSelection(Screen):
 			newEntry = RecordTimerEntry(serviceref, checkOldTimers=True, dirname=preferredTimerPath(), *parseEvent(event))
 			newEntry.justplay = config.recording.timer_default_type.value == "zap"
 			newEntry.always_zap = config.recording.timer_default_type.value == "zap+record"
-			self.session.openWithCallback(self.finishedAdd, TimerEntry, newEntry)
+			self.session.openWithCallback(self.finishedAdd, TimerEntry, newEntry, newEntry=True)
 
 	def finishedEdit(self, answer):
 		if answer[0]:

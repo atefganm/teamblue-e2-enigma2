@@ -1,32 +1,35 @@
 # -*- coding: utf-8 -*-
 # shamelessly copied from pliExpertInfo (Vali, Mirakels, Littlesat)
 
-from enigma import iServiceInformation, iPlayableService
+from enigma import iServiceInformation, iPlayableService, eDVBCI_UI
 from Components.Converter.Converter import Converter
 from Components.Element import cached
 from Components.config import config
+from Components.SystemInfo import BoxInfo
 from Tools.Transponder import ConvertToHumanReadable
 from Tools.GetEcmInfo import GetEcmInfo
 from Components.Converter.Poll import Poll
+from Tools.Directories import pathExists
 from skin import parameters
 
+dvbCIUI = eDVBCI_UI.getInstance()
+
 caid_data = (
-	("0x0100", "0x01ff", "Seca", "S", True),
-	("0x0500", "0x05ff", "Via", "V", True),
-	("0x0600", "0x06ff", "Irdeto", "I", True),
-	("0x0900", "0x09ff", "NDS", "Nd", True),
-	("0x0b00", "0x0bff", "Conax", "Co", True),
-	("0x0d00", "0x0dff", "CryptoW", "Cw", True),
-	("0x0e00", "0x0eff", "PowerVU", "P", False),
-	("0x1000", "0x10FF", "Tandberg", "TB", False),
-	("0x1700", "0x17ff", "Beta", "B", True),
-	("0x1800", "0x18ff", "Nagra", "N", True),
-	("0x2600", "0x2600", "Biss", "Bi", False),
-	("0x2700", "0x2710", "Dre3", "D3", False),
-	("0x4ae0", "0x4ae1", "Dre", "D", False),
-	("0x4aee", "0x4aee", "BulCrypt", "B1", False),
-	("0x5581", "0x5581", "BulCrypt", "B2", False),
-	("0x5601", "0x5604", "Verimatrix", "Vm", False)
+	("0x100", "0x1ff", "Seca", "S", "SECA", True),
+	("0x500", "0x5ff", "Via", "V", "VIA", True),
+	("0x600", "0x6ff", "Irdeto", "I", "IRD", True),
+	("0x900", "0x9ff", "NDS", "Nd", "NDS", True),
+	("0xb00", "0xbff", "Conax", "Co", "CONAX", True),
+	("0xd00", "0xdff", "CryptoW", "Cw", "CRW", True),
+	("0xe00", "0xeff", "PowerVU", "P", "PV", False),
+	("0x1000", "0x10FF", "Tandberg", "TB", "TAND", False),
+	("0x1700", "0x17ff", "Beta", "B", "BETA", True),
+	("0x1800", "0x18ff", "Nagra", "N", "NAGRA", True),
+	("0x2600", "0x2600", "Biss", "Bi", "BiSS", False),
+	("0x2700", "0x2710", "Dre3", "D3", "DRE3", False),
+	("0x4ae0", "0x4ae1", "Dre", "D", "DRE", False),
+	("0x4aee", "0x4aee", "BulCrypt", "B1", "BUL", False),
+	("0x5581", "0x5581", "BulCrypt", "B2", "BUL", False)
 )
 
 # stream type to codec map
@@ -62,6 +65,51 @@ def addspace(text):
 	if text:
 		text += " "
 	return text
+
+def getCryptoInfo(info):
+	ecmdata = GetEcmInfo()
+	if info and info.getInfo(iServiceInformation.sIsCrypted) == 1:
+		data = ecmdata.getEcmData()
+		current_source = data[0]
+		current_caid = data[1]
+		current_provid = data[2]
+		current_ecmpid = data[3]
+	else:
+		current_source = ""
+		current_caid = "0"
+		current_provid = "0"
+		current_ecmpid = "0"
+	return current_source, current_caid, current_provid, current_ecmpid
+
+
+def createCurrentCaidLabel(info, currentCaid=None):
+	if currentCaid:
+		current_caid = currentCaid
+	else:
+		current_caid = getCryptoInfo(info)[1]
+	res = ""
+	decodingCiSlot = -1
+	NUM_CI = BoxInfo.getItem("CommonInterface")
+	if NUM_CI and NUM_CI > 0:
+		if dvbCIUI:
+			for slot in range(NUM_CI):
+				stateDecoding = dvbCIUI.getDecodingState(slot)
+				stateSlot = dvbCIUI.getState(slot)
+				if stateDecoding == 2 and stateSlot not in (-1, 0, 3):
+					decodingCiSlot = slot
+		
+	if not pathExists("/tmp/ecm.info") and decodingCiSlot == -1:
+		return "FTA"
+		
+	if decodingCiSlot > -1 and not pathExists("/tmp/ecm.info"):
+		return "CI%d" % (decodingCiSlot)
+		
+	for caid_entry in caid_data:
+		if int(caid_entry[0], 16) <= int(current_caid, 16) <= int(caid_entry[1], 16):
+			res = caid_entry[4]
+	if decodingCiSlot > -1:
+		return "CI%d + %s" % (decodingCiSlot, res)
+	return res
 
 
 class PliExtraInfo(Poll, Converter):
@@ -138,13 +186,16 @@ class PliExtraInfo(Poll, Converter):
 				except:
 					pass
 
-			if color != "\c%08x" % colors[2] or caid_entry[4]:
+			if color != "\c%08x" % colors[2] or caid_entry[5]:
 				if res:
 					res += " "
 				res += color + caid_entry[3]
 
 		res += "\c%08x" % colors[3] # white (this acts like a color "reset" for following strings
 		return res
+
+	def createCurrentCaidLabel(self, info):
+		return createCurrentCaidLabel(info, self.current_caid)
 
 	def createCryptoSpecial(self, info):
 		caid_name = "FTA"
@@ -315,6 +366,10 @@ class PliExtraInfo(Poll, Converter):
 				return addspace(self.createCryptoBar(info)) + self.createCryptoSpecial(info)
 			else:
 				return addspace(self.createCryptoBar(info)) + addspace(self.current_source) + self.createCryptoSpecial(info)
+
+		if self.type == "CurrentCrypto":
+			self.getCryptoInfo(info)
+			return self.createCurrentCaidLabel(info)
 
 		if self.type == "CryptoBar":
 			self.getCryptoInfo(info)

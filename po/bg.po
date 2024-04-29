@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2 teamBlue\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-27 20:38+0200\n"
+"POT-Creation-Date: 2024-04-24 10:35+0200\n"
 "PO-Revision-Date: 2018-11-12 20:51+0200\n"
 "Last-Translator: Мартин Петков <marto74bg@yahoo.co.uk>\n"
 "Language-Team: Bulgarian\n"
@@ -236,6 +236,10 @@ msgstr ""
 
 #. TRANSLATORS: long date representation short dayname daynum short monthname hour:minute in strftime() format! See 'man strftime'
 msgid "%a %e/%m  %-H:%M"
+msgstr ""
+
+#, python-format
+msgid "%d"
 msgstr ""
 
 #, python-format
@@ -478,7 +482,7 @@ msgid "(activated +%d min)"
 msgstr ""
 
 #, fuzzy
-msgid "(current)"
+msgid "(current image)"
 msgstr "Текущи настройки:"
 
 msgid "(empty)"
@@ -493,6 +497,9 @@ msgstr "(покажи DVD аудио меню)"
 #, fuzzy
 msgid "(unknown)"
 msgstr "непознат"
+
+msgid "* = Restart Required"
+msgstr ""
 
 msgid "* Only available if more than one interface is active."
 msgstr "* На разположение само ако е активен повече от един интерфейс."
@@ -1307,9 +1314,6 @@ msgstr ""
 msgid "Aruba"
 msgstr ""
 
-msgid "As defined by the skin"
-msgstr ""
-
 msgid "Ask user"
 msgstr "Питай потребител"
 
@@ -1853,8 +1857,15 @@ msgstr ""
 msgid "CI (Common Interface) Setup"
 msgstr ""
 
+msgid "CI Boot Delay"
+msgstr ""
+
 msgid "CI assignment"
 msgstr ""
+
+#, fuzzy
+msgid "CI enabled"
+msgstr "разрешен"
 
 #, fuzzy
 msgid "CI slot: "
@@ -2098,6 +2109,10 @@ msgstr "Канал"
 msgid "Channel Info"
 msgstr "Канал"
 
+#, fuzzy
+msgid "Channel Selection"
+msgstr "Изпълнение на команда..."
+
 msgid "Channel button always changes sides"
 msgstr ""
 
@@ -2106,12 +2121,6 @@ msgid "Channel context menu"
 msgstr "Меню списък с канали"
 
 msgid "Channel list type"
-msgstr ""
-
-msgid "Channel list update Eventinfo delay"
-msgstr ""
-
-msgid "Channel list update interval for Eventinfo on cursor moving"
 msgstr ""
 
 msgid "Channel not in services list"
@@ -2895,6 +2904,9 @@ msgstr ""
 msgid "Copy to bouquets"
 msgstr "копиране в букет"
 
+msgid "Copying files"
+msgstr ""
+
 #, fuzzy, python-format
 msgid "Cores: %s"
 msgstr "Скорост на превъртане"
@@ -3236,10 +3248,6 @@ msgstr ""
 msgid "Default movie location"
 msgstr ""
 
-#, fuzzy
-msgid "Default recording type"
-msgstr "Старт запис?"
-
 msgid "Default settings"
 msgstr "Стандартни Настройки"
 
@@ -3330,6 +3338,9 @@ msgstr ""
 msgid "Delay in miliseconds between scrolling characters on display."
 msgstr ""
 
+msgid "Delay when closing a stream relay service before reallocating the tuner for another service. Using '0' is only recommended for boxes with multiple satellite tuners."
+msgstr ""
+
 msgid "Delete"
 msgstr "Изтриване"
 
@@ -3401,13 +3412,14 @@ msgstr "Неуспешно изтриване!"
 msgid "Deleted items"
 msgstr ""
 
+#, fuzzy
+msgid "Deleting files"
+msgstr "Неуспешно изтриване!"
+
 msgid "Denmark"
 msgstr ""
 
 msgid "Depth"
-msgstr ""
-
-msgid "Descramble & record ECM gives the option to descramble afterwards if descrambling on recording failed. 'Don't descramble, record ECM' save a scramble recording that can be descrambled on playback. 'Normal' means descramble the recording and don't record ECM."
 msgstr ""
 
 msgid "Descramble receiving http streams"
@@ -3975,10 +3987,6 @@ msgstr "Тунер конфигурация"
 #, python-format
 msgid "ERROR - failed to scan (%s)!"
 msgstr "Грешка при сканиране (%s)!"
-
-#, python-format
-msgid "ERROR downloading file %s/%s"
-msgstr ""
 
 msgid "East"
 msgstr "Изток"
@@ -5434,6 +5442,9 @@ msgstr ""
 msgid "HDMI-IN Recording settings"
 msgstr "Запис"
 
+msgid "HDMI-In"
+msgstr ""
+
 #, fuzzy
 msgid "HDR10 support"
 msgstr "Не се поддържа"
@@ -5490,6 +5501,9 @@ msgstr "HDD в готовност след"
 msgid "Hardware Accelerated"
 msgstr ""
 
+msgid "Hardware: "
+msgstr ""
+
 msgid "HddMount"
 msgstr ""
 
@@ -5520,13 +5534,13 @@ msgstr ""
 msgid "Hide"
 msgstr ""
 
+msgid "Hide and confirm invalid key message"
+msgstr ""
+
 msgid "Hide channel list in radio mode"
 msgstr ""
 
 msgid "Hide known extensions"
-msgstr ""
-
-msgid "Hide number markers"
 msgstr ""
 
 #, fuzzy
@@ -5782,11 +5796,18 @@ msgstr ""
 msgid "Image creation failed - "
 msgstr ""
 
+msgid "Image revision: "
+msgstr ""
+
 #, python-format
 msgid ""
 "Image to install is invalid\n"
 "%s"
 msgstr ""
+
+#, fuzzy
+msgid "Image: "
+msgstr "Назад"
 
 msgid "ImageWizard"
 msgstr ""
@@ -5961,6 +5982,14 @@ msgstr ""
 
 msgid "Insert"
 msgstr ""
+
+#, fuzzy
+msgid "Insert Service"
+msgstr "Инсталиране"
+
+#, fuzzy
+msgid "Insert entry"
+msgstr "Въведи Таймер"
 
 #, fuzzy
 msgid "Insert line before current line"
@@ -6568,6 +6597,9 @@ msgstr ""
 msgid "MB"
 msgstr ""
 
+msgid "MENU"
+msgstr ""
+
 msgid "MHz"
 msgstr ""
 
@@ -7069,6 +7101,10 @@ msgstr ""
 
 #, fuzzy
 msgid "Moving east..."
+msgstr "Завърти на изток"
+
+#, fuzzy
+msgid "Moving files"
 msgstr "Завърти на изток"
 
 msgid "Moving to position"
@@ -7639,6 +7675,10 @@ msgstr ""
 msgid "Number or SMS style data entry"
 msgstr ""
 
+#, fuzzy
+msgid "OE Version: "
+msgstr "Сигнал: "
+
 msgid "OK"
 msgstr ""
 
@@ -7915,6 +7955,12 @@ msgstr ""
 msgid "PPanel"
 msgstr ""
 
+msgid "PREVIOUS"
+msgstr ""
+
+msgid "PVR"
+msgstr ""
+
 msgid "Package list update"
 msgstr "Ъпдейт на списъка с пакети"
 
@@ -8088,6 +8134,10 @@ msgstr ""
 
 msgid "Pilot"
 msgstr ""
+
+#, fuzzy
+msgid "Pin Userbouquet"
+msgstr "Разреши много букети"
 
 msgid "Pitcairn"
 msgstr ""
@@ -8866,6 +8916,10 @@ msgstr ""
 msgid "Python version: "
 msgstr "Нова версия:"
 
+#, fuzzy
+msgid "Pythonscript"
+msgstr "Описание"
+
 msgid "Qatar"
 msgstr ""
 
@@ -9128,6 +9182,10 @@ msgstr "Канали"
 #, fuzzy
 msgid "Reload blacklists"
 msgstr "Презареди черен/бял списък"
+
+#, fuzzy
+msgid "Reload services/bouquets list"
+msgstr "Канали"
 
 msgid "Reloading EPG Cache..."
 msgstr ""
@@ -10027,6 +10085,10 @@ msgid "Select OPKG source....."
 msgstr "Изберете филм"
 
 #, fuzzy
+msgid "Select Service"
+msgstr "Премахни заглавие"
+
+#, fuzzy
 msgid "Select Software Update"
 msgstr "Актуализация на Софтуера"
 
@@ -10184,7 +10246,15 @@ msgstr ""
 msgid "Select secondary softcam"
 msgstr ""
 
+#, fuzzy
+msgid "Select service name"
+msgstr "Добавете канал..."
+
 msgid "Select service to add..."
+msgstr "Добавете канал..."
+
+#, fuzzy
+msgid "Select service type"
 msgstr "Добавете канал..."
 
 #, fuzzy
@@ -10193,6 +10263,14 @@ msgstr "Избери"
 
 msgid "Select sort method:"
 msgstr ""
+
+#, fuzzy
+msgid "Select stream URL"
+msgstr "Избери"
+
+#, fuzzy
+msgid "Select stream type"
+msgstr "Актуализация на Софтуера"
 
 msgid "Select target folder"
 msgstr ""
@@ -10246,6 +10324,9 @@ msgid "Select the shifted character set"
 msgstr ""
 
 msgid "Select the shifted character set for the next character only"
+msgstr ""
+
+msgid "Select the timer from the fallback tuner by default"
 msgstr ""
 
 msgid "Select the tuner that controls the motorised dish."
@@ -10367,6 +10448,10 @@ msgstr "Сръбски"
 msgid "Serial No"
 msgstr "Сигнал: "
 
+#, fuzzy
+msgid "Serial: "
+msgstr "Сигнал: "
+
 #, fuzzy, python-format
 msgid "Serial: %s"
 msgstr "Сигнал: "
@@ -10384,6 +10469,14 @@ msgstr "Канали"
 
 #, fuzzy
 msgid "Service ID"
+msgstr "Канали"
+
+#, fuzzy
+msgid "Service Name"
+msgstr "Канали"
+
+#, fuzzy
+msgid "Service Type"
 msgstr "Канали"
 
 #, fuzzy
@@ -10417,6 +10510,10 @@ msgstr ""
 msgid "Service info - tuner setting values"
 msgstr ""
 
+#, fuzzy
+msgid "Service info font size"
+msgstr "Канали"
+
 msgid ""
 "Service invalid!\n"
 "(Timeout reading PMT)"
@@ -10427,12 +10524,19 @@ msgstr ""
 msgid "Service name"
 msgstr ""
 
+#, fuzzy
+msgid "Service name font size"
+msgstr "Канали"
+
 msgid ""
 "Service not found!\n"
 "(SID not found in PAT)"
 msgstr ""
 "Не е открит канал!\n"
 "(SID не е открит в PAT)"
+
+msgid "Service number font size"
+msgstr ""
 
 msgid "Service reference"
 msgstr ""
@@ -10761,6 +10865,9 @@ msgstr "прекъсни редактирането на предпочитан�
 msgid "Show directories on first or last in list.(must restart File Commander)"
 msgstr ""
 
+msgid "Show disabled timers (local only)"
+msgstr ""
+
 msgid "Show disclaimer"
 msgstr ""
 
@@ -11087,10 +11194,6 @@ msgstr "Единичен"
 
 msgid "Single EPG"
 msgstr "ЕПГ на канал"
-
-#, fuzzy
-msgid "Single line mode"
-msgstr "Изберете видео режим"
 
 msgid "Single satellite"
 msgstr "Един Сателит"
@@ -11638,6 +11741,17 @@ msgstr "Запазена позиция"
 msgid "Stream"
 msgstr ""
 
+msgid "Stream Relay delay"
+msgstr ""
+
+#, fuzzy
+msgid "Stream Type"
+msgstr "Продължи"
+
+#, fuzzy
+msgid "Stream URL"
+msgstr "Въведете отново новия ПИН"
+
 msgid "Stream request"
 msgstr ""
 
@@ -12113,6 +12227,11 @@ msgid ""
 "Make sure you select a writable directory instead."
 msgstr ""
 
+msgid ""
+"The enigma.info file for the boxinformation is not available or the content is invalid.\n"
+"Press any key to continue?"
+msgstr ""
+
 msgid "The following files were found..."
 msgstr "Следните файлове бяха открити..."
 
@@ -12238,6 +12357,9 @@ msgstr "Има %d достъпни актуализации."
 msgid "There are currently no outstanding actions."
 msgstr ""
 
+msgid "There are no items currently available for this screen."
+msgstr ""
+
 #, fuzzy
 msgid "There are no saved playlists to delete!"
 msgstr "Моля изберете плейлист за изтриване..."
@@ -12260,6 +12382,9 @@ msgstr ""
 "Искате ли да продължите?"
 
 msgid "This DVD RW medium is already formatted - reformatting will erase all content on the disc."
+msgstr ""
+
+msgid "This allows you to change the font size relative to skin size, so 1 increases by 1 point size, and -1 decreases by 1 point size"
 msgstr ""
 
 msgid "This allows you to set the number of digits to 5, if you have more than 9999 channels."
@@ -13055,6 +13180,10 @@ msgstr ""
 msgid "Unpack to current folder"
 msgstr ""
 
+#, fuzzy
+msgid "Unpin Userbouquet"
+msgstr "Разреши много букети"
+
 msgid "Unsupported"
 msgstr "Не се поддържа"
 
@@ -13177,6 +13306,10 @@ msgstr ""
 msgid "Use a gateway"
 msgstr "Използвай шлюз"
 
+#, fuzzy
+msgid "Use alternative skin"
+msgstr "добави алтернативи"
+
 msgid "Use as PiP if possible"
 msgstr ""
 
@@ -13210,6 +13343,14 @@ msgstr ""
 
 msgid "Use power measurement"
 msgstr "Използвай мерител на напрежение"
+
+#, fuzzy
+msgid "Use skin default"
+msgstr "Възстановяване backups"
+
+#, fuzzy
+msgid "Use the alternative screen"
+msgstr "добави алтернативи"
 
 msgid "Use the cursor keys to select an installed image and then Start button."
 msgstr ""
@@ -13731,6 +13872,9 @@ msgstr ""
 msgid "When enabled the timer from the fallback tuner is imported"
 msgstr ""
 
+msgid "When enabled the timer from the fallback tuner is the default timer"
+msgstr ""
+
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
 msgstr ""
 
@@ -13831,9 +13975,6 @@ msgid "When enabled, it will automatically play to the last saved radio service 
 msgstr ""
 
 msgid "When enabled, measure power consumption to detect when the rotor stops turning (when supported by the tuner)."
-msgstr ""
-
-msgid "When enabled, number markers will be hidden."
 msgstr ""
 
 msgid "When enabled, reformat subtitles to match the width of the screen."
@@ -14798,6 +14939,9 @@ msgstr ""
 msgid "extensions"
 msgstr "Управление на пакети"
 
+msgid "extra high"
+msgstr ""
+
 msgid "extra wide"
 msgstr ""
 
@@ -14894,6 +15038,9 @@ msgstr "запиши кадъра като bitmap"
 msgid "green"
 msgstr "зелен"
 
+msgid "half an hour"
+msgstr ""
+
 msgid "handicraft"
 msgstr ""
 
@@ -14908,6 +15055,9 @@ msgid "help..."
 msgstr "помощ..."
 
 msgid "hide"
+msgstr ""
+
+msgid "high"
 msgstr ""
 
 msgid "horizontal"
@@ -15657,6 +15807,10 @@ msgstr "вертикална"
 msgid "violet"
 msgstr ""
 
+#, fuzzy
+msgid "wait for ci..."
+msgstr "изчакай за mmi..."
+
 msgid "wait for mmi..."
 msgstr "изчакай за mmi..."
 
@@ -15746,3 +15900,9 @@ msgstr ""
 
 msgid "zapped"
 msgstr "превключен"
+
+msgid "°E"
+msgstr ""
+
+msgid "°W"
+msgstr ""

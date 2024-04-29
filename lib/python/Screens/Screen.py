@@ -27,6 +27,7 @@ class Screen(dict):
 		self.onExecBegin = []
 		self.onExecEnd = []
 		self.onLayoutFinish = []
+		self.onContentChanged = []
 		self.onShown = []
 		self.onShow = []
 		self.onHide = []
@@ -49,6 +50,7 @@ class Screen(dict):
 		self["ScreenPath"] = StaticText()
 		self.screenPath = ""  # This is the current screen path without the title.
 		self.screenTitle = ""  # This is the current screen title without the path.
+		self.handledWidgets = []
 
 	def __repr__(self):
 		return str(type(self))
@@ -213,6 +215,13 @@ class Screen(dict):
 		self.__callLaterTimer.callback.append(function)
 		self.__callLaterTimer.start(0, True)
 
+	def screenContentChanged(self):
+		for f in self.onContentChanged:
+			if not isinstance(f, type(self.close)):
+				exec(f, globals(), locals())  # Python 3
+			else:
+				f()
+
 	def applySkin(self):
 		# DEBUG: baseRes = (getDesktop(GUI_SKIN_ID).size().width(), getDesktop(GUI_SKIN_ID).size().height())
 		baseRes = (720, 576)  # FIXME: A skin might have set another resolution, which should be the base res.
@@ -252,7 +261,7 @@ class Screen(dict):
 					if depr:
 						print("[Screen] WARNING: OBSOLETE COMPONENT '%s' USED IN SKIN. USE '%s' INSTEAD!" % (key, depr[0]))
 						print("[Screen] OBSOLETE COMPONENT WILL BE REMOVED %s, PLEASE UPDATE!" % depr[1])
-				elif not depr:
+				elif not depr and key not in self.handledWidgets:
 					print("[Screen] Warning: Skin is missing element '%s' in %s." % (key, str(self)))
 		for w in self.additionalWidgets:
 			if not updateonly:

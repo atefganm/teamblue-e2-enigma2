@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2 teamBlue\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-27 20:38+0200\n"
+"POT-Creation-Date: 2024-04-24 10:35+0200\n"
 "PO-Revision-Date: 2018-12-17 02:51+0200\n"
 "Last-Translator: Hazem <moustafagamal@hotmail.com>\n"
 "Language-Team: Arabic <moustafagamal@hotmail.com>\n"
@@ -246,6 +246,10 @@ msgstr ""
 
 #. TRANSLATORS: long date representation short dayname daynum short monthname hour:minute in strftime() format! See 'man strftime'
 msgid "%a %e/%m  %-H:%M"
+msgstr ""
+
+#, python-format
+msgid "%d"
 msgstr ""
 
 #, python-format
@@ -547,7 +551,7 @@ msgid "(activated +%d min)"
 msgstr ""
 
 #, fuzzy
-msgid "(current)"
+msgid "(current image)"
 msgstr "تنشيط التكوين الحالى"
 
 msgid "(empty)"
@@ -562,6 +566,9 @@ msgstr "(شاهد قائمه صوت دى فى دى إختياريه)"
 #, fuzzy
 msgid "(unknown)"
 msgstr "غير معروف"
+
+msgid "* = Restart Required"
+msgstr ""
 
 msgid "* Only available if more than one interface is active."
 msgstr "*متاحه فقط عند وجود أكثر من واحهه نشطه"
@@ -1472,9 +1479,6 @@ msgstr ""
 msgid "Aruba"
 msgstr ""
 
-msgid "As defined by the skin"
-msgstr ""
-
 msgid "Ask user"
 msgstr "أسال المستخدم"
 
@@ -2062,9 +2066,16 @@ msgstr "سى"
 msgid "CI (Common Interface) Setup"
 msgstr "وحده النفاذ المشروط"
 
+msgid "CI Boot Delay"
+msgstr ""
+
 #
 msgid "CI assignment"
 msgstr ""
+
+#, fuzzy
+msgid "CI enabled"
+msgstr "تم النفعيل"
 
 msgid "CI slot: "
 msgstr ""
@@ -2320,6 +2331,11 @@ msgstr "قناه"
 msgid "Channel Info"
 msgstr "قناه"
 
+#
+#, fuzzy
+msgid "Channel Selection"
+msgstr "إختيار القناه"
+
 msgid "Channel button always changes sides"
 msgstr ""
 
@@ -2330,12 +2346,6 @@ msgstr "قائمة لائحة القنوات"
 #, fuzzy
 msgid "Channel list type"
 msgstr "قائمة لائحة القنوات"
-
-msgid "Channel list update Eventinfo delay"
-msgstr ""
-
-msgid "Channel list update interval for Eventinfo on cursor moving"
-msgstr ""
 
 #
 msgid "Channel not in services list"
@@ -3159,6 +3169,10 @@ msgstr ""
 msgid "Copy to bouquets"
 msgstr "نسخ الى الباقات"
 
+#, fuzzy
+msgid "Copying files"
+msgstr "فحص ملفات النظام...."
+
 #, fuzzy, python-format
 msgid "Cores: %s"
 msgstr "سرعة العوده للخلف"
@@ -3529,11 +3543,6 @@ msgstr ""
 msgid "Default movie location"
 msgstr "المكان الافتراضى للفيلم"
 
-#
-#, fuzzy
-msgid "Default recording type"
-msgstr "أبـدأ التسجيل؟"
-
 #, fuzzy
 msgid "Default settings"
 msgstr "الاعدادات الافتراضيه"
@@ -3626,6 +3635,9 @@ msgstr ""
 msgid "Delay in miliseconds between scrolling characters on display."
 msgstr ""
 
+msgid "Delay when closing a stream relay service before reallocating the tuner for another service. Using '0' is only recommended for boxes with multiple satellite tuners."
+msgstr ""
+
 #
 msgid "Delete"
 msgstr "أمسح"
@@ -3703,13 +3715,14 @@ msgstr "حذف الملف"
 msgid "Deleted items"
 msgstr ""
 
+#, fuzzy
+msgid "Deleting files"
+msgstr "حذف الملف"
+
 msgid "Denmark"
 msgstr ""
 
 msgid "Depth"
-msgstr ""
-
-msgid "Descramble & record ECM gives the option to descramble afterwards if descrambling on recording failed. 'Don't descramble, record ECM' save a scramble recording that can be descrambled on playback. 'Normal' means descramble the recording and don't record ECM."
 msgstr ""
 
 msgid "Descramble receiving http streams"
@@ -4327,10 +4340,6 @@ msgstr "تهيئة الموالف"
 #, python-format
 msgid "ERROR - failed to scan (%s)!"
 msgstr "خطأ - فشل البحث (%s)!"
-
-#, python-format
-msgid "ERROR downloading file %s/%s"
-msgstr ""
 
 #
 msgid "East"
@@ -5897,6 +5906,9 @@ msgstr ""
 msgid "HDMI-IN Recording settings"
 msgstr "تسجيل"
 
+msgid "HDMI-In"
+msgstr ""
+
 #, fuzzy
 msgid "HDR10 support"
 msgstr "غير مدعم"
@@ -5959,6 +5971,9 @@ msgstr "القرص الصلب فى وضع الاستعداد بعد"
 msgid "Hardware Accelerated"
 msgstr ""
 
+msgid "Hardware: "
+msgstr ""
+
 msgid "HddMount"
 msgstr ""
 
@@ -5989,13 +6004,13 @@ msgstr ""
 msgid "Hide"
 msgstr ""
 
+msgid "Hide and confirm invalid key message"
+msgstr ""
+
 msgid "Hide channel list in radio mode"
 msgstr ""
 
 msgid "Hide known extensions"
-msgstr ""
-
-msgid "Hide number markers"
 msgstr ""
 
 #, fuzzy
@@ -6257,11 +6272,19 @@ msgstr ""
 msgid "Image creation failed - "
 msgstr ""
 
+#
+msgid "Image revision: "
+msgstr ""
+
 #, python-format
 msgid ""
 "Image to install is invalid\n"
 "%s"
 msgstr ""
+
+#, fuzzy
+msgid "Image: "
+msgstr "خلف"
 
 msgid "ImageWizard"
 msgstr ""
@@ -6454,6 +6477,15 @@ msgstr ""
 
 msgid "Insert"
 msgstr ""
+
+#, fuzzy
+msgid "Insert Service"
+msgstr "جارى التثبيت"
+
+#
+#, fuzzy
+msgid "Insert entry"
+msgstr "إدخال المؤقت"
 
 #, fuzzy
 msgid "Insert line before current line"
@@ -7148,6 +7180,9 @@ msgstr ""
 msgid "MB"
 msgstr "ب"
 
+msgid "MENU"
+msgstr ""
+
 msgid "MHz"
 msgstr ""
 
@@ -7699,6 +7734,10 @@ msgstr ""
 
 #, fuzzy
 msgid "Moving east..."
+msgstr "تحرك شرقا"
+
+#, fuzzy
+msgid "Moving files"
 msgstr "تحرك شرقا"
 
 msgid "Moving to position"
@@ -8318,6 +8357,11 @@ msgid "Number or SMS style data entry"
 msgstr ""
 
 #
+#, fuzzy
+msgid "OE Version: "
+msgstr "الاشاره"
+
+#
 msgid "OK"
 msgstr "موافق"
 
@@ -8622,6 +8666,12 @@ msgstr ""
 msgid "PPanel"
 msgstr ""
 
+msgid "PREVIOUS"
+msgstr ""
+
+msgid "PVR"
+msgstr ""
+
 #
 msgid "Package list update"
 msgstr "تحديث قائمة الباقات"
@@ -8817,6 +8867,11 @@ msgstr "عمود مربع"
 #
 msgid "Pilot"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Pin Userbouquet"
+msgstr "تفعيل باقات متعدده"
 
 msgid "Pitcairn"
 msgstr ""
@@ -9653,6 +9708,11 @@ msgstr ""
 msgid "Python version: "
 msgstr "إصدار جديد:"
 
+#
+#, fuzzy
+msgid "Pythonscript"
+msgstr "الوصـف"
+
 msgid "Qatar"
 msgstr ""
 
@@ -9936,6 +9996,11 @@ msgstr "القنوات/الخدمات"
 #, fuzzy
 msgid "Reload blacklists"
 msgstr "إعادة تحميل القائمه السوداء/البيضاء"
+
+#
+#, fuzzy
+msgid "Reload services/bouquets list"
+msgstr "القنوات/الخدمات"
 
 msgid "Reloading EPG Cache..."
 msgstr ""
@@ -10902,6 +10967,11 @@ msgstr "أختار"
 msgid "Select OPKG source....."
 msgstr "أختار مصدر الترقيه المراد تحريره"
 
+#
+#, fuzzy
+msgid "Select Service"
+msgstr "اختار الفيلم"
+
 #, fuzzy
 msgid "Select Software Update"
 msgstr "ترقية البرنامج التشغيلى"
@@ -11076,7 +11146,16 @@ msgstr ""
 msgid "Select secondary softcam"
 msgstr ""
 
+#
+#, fuzzy
+msgid "Select service name"
+msgstr "بخث عن القنوات"
+
 msgid "Select service to add..."
+msgstr "اختار قناه ليتم إضافتها"
+
+#, fuzzy
+msgid "Select service type"
 msgstr "اختار قناه ليتم إضافتها"
 
 #, fuzzy
@@ -11085,6 +11164,15 @@ msgstr "أختار الموقع"
 
 msgid "Select sort method:"
 msgstr ""
+
+#, fuzzy
+msgid "Select stream URL"
+msgstr "أختار الموقع"
+
+#
+#, fuzzy
+msgid "Select stream type"
+msgstr "اختار الفيلم"
 
 #
 #, fuzzy
@@ -11144,6 +11232,10 @@ msgstr "أختار مسار الفيلم"
 
 msgid "Select the shifted character set for the next character only"
 msgstr ""
+
+#, fuzzy
+msgid "Select the timer from the fallback tuner by default"
+msgstr "أختار مسار الفيلم"
 
 msgid "Select the tuner that controls the motorised dish."
 msgstr ""
@@ -11270,6 +11362,11 @@ msgid "Serial No"
 msgstr "الاشاره"
 
 #
+#, fuzzy
+msgid "Serial: "
+msgstr "الاشاره"
+
+#
 #, fuzzy, python-format
 msgid "Serial: %s"
 msgstr "الاشاره"
@@ -11291,6 +11388,16 @@ msgstr "القنوات/الخدمات"
 #, fuzzy
 msgid "Service ID"
 msgstr "قناه/خدمه"
+
+#
+#, fuzzy
+msgid "Service Name"
+msgstr "بخث عن القنوات"
+
+#
+#, fuzzy
+msgid "Service Type"
+msgstr "بخث عن القنوات"
 
 #, fuzzy
 msgid "Service belongs to a parental protected bouquet"
@@ -11333,6 +11440,11 @@ msgid "Service info - tuner setting values"
 msgstr ""
 
 #
+#, fuzzy
+msgid "Service info font size"
+msgstr "معلومات القناه"
+
+#
 msgid ""
 "Service invalid!\n"
 "(Timeout reading PMT)"
@@ -11344,10 +11456,20 @@ msgid "Service name"
 msgstr "بخث عن القنوات"
 
 #
+#, fuzzy
+msgid "Service name font size"
+msgstr "بخث عن القنوات"
+
+#
 msgid ""
 "Service not found!\n"
 "(SID not found in PAT)"
 msgstr ""
+
+#
+#, fuzzy
+msgid "Service number font size"
+msgstr "العناوين الفرعيه"
 
 msgid "Service reference"
 msgstr ""
@@ -11710,6 +11832,9 @@ msgid "Show directories first"
 msgstr "الغاء تحرير المفضله"
 
 msgid "Show directories on first or last in list.(must restart File Commander)"
+msgstr ""
+
+msgid "Show disabled timers (local only)"
 msgstr ""
 
 #, fuzzy
@@ -12083,10 +12208,6 @@ msgstr "مفرد"
 
 msgid "Single EPG"
 msgstr "دليل برامج واحد"
-
-#, fuzzy
-msgid "Single line mode"
-msgstr "أختار اسلوب الفيديو"
 
 #
 msgid "Single satellite"
@@ -12708,6 +12829,17 @@ msgstr "الوضع المخزن"
 msgid "Stream"
 msgstr ""
 
+msgid "Stream Relay delay"
+msgstr ""
+
+msgid "Stream Type"
+msgstr ""
+
+#
+#, fuzzy
+msgid "Stream URL"
+msgstr "قناه"
+
 msgid "Stream request"
 msgstr ""
 
@@ -13243,6 +13375,11 @@ msgstr ""
 "الدليل %s لا يمكن الكتابه فيه.\n"
 " تأكد من إختيار دليل بديل يمكن الكتابه فيه"
 
+msgid ""
+"The enigma.info file for the boxinformation is not available or the content is invalid.\n"
+"Press any key to continue?"
+msgstr ""
+
 #
 msgid "The following files were found..."
 msgstr "تم العثور على هذه الملفات"
@@ -13379,6 +13516,10 @@ msgid "There are currently no outstanding actions."
 msgstr ""
 
 #, fuzzy
+msgid "There are no items currently available for this screen."
+msgstr "لا يوجد تحديثات متاحه ."
+
+#, fuzzy
 msgid "There are no saved playlists to delete!"
 msgstr "أختار قائمة العرض المراد مسحها..."
 
@@ -13402,6 +13543,9 @@ msgstr ""
 
 #
 msgid "This DVD RW medium is already formatted - reformatting will erase all content on the disc."
+msgstr ""
+
+msgid "This allows you to change the font size relative to skin size, so 1 increases by 1 point size, and -1 decreases by 1 point size"
 msgstr ""
 
 msgid "This allows you to set the number of digits to 5, if you have more than 9999 channels."
@@ -14274,6 +14418,11 @@ msgstr ""
 msgid "Unpack to current folder"
 msgstr "إظهار تفاصيل الحدث"
 
+#
+#, fuzzy
+msgid "Unpin Userbouquet"
+msgstr "تفعيل باقات متعدده"
+
 msgid "Unsupported"
 msgstr "غير مدعم"
 
@@ -14411,6 +14560,10 @@ msgstr ""
 msgid "Use a gateway"
 msgstr ""
 
+#, fuzzy
+msgid "Use alternative skin"
+msgstr "إضافة بدائل"
+
 msgid "Use as PiP if possible"
 msgstr ""
 
@@ -14446,6 +14599,14 @@ msgstr ""
 
 msgid "Use power measurement"
 msgstr "استخدم قـياس الطاقه"
+
+#, fuzzy
+msgid "Use skin default"
+msgstr "إستعادة النسخه الإحتياطيه "
+
+#, fuzzy
+msgid "Use the alternative screen"
+msgstr "تحرير البدائل"
 
 msgid "Use the cursor keys to select an installed image and then Start button."
 msgstr ""
@@ -15021,6 +15182,9 @@ msgstr ""
 msgid "When enabled the timer from the fallback tuner is imported"
 msgstr ""
 
+msgid "When enabled the timer from the fallback tuner is the default timer"
+msgstr ""
+
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
 msgstr ""
 
@@ -15123,9 +15287,6 @@ msgid "When enabled, it will automatically play to the last saved radio service 
 msgstr ""
 
 msgid "When enabled, measure power consumption to detect when the rotor stops turning (when supported by the tuner)."
-msgstr ""
-
-msgid "When enabled, number markers will be hidden."
 msgstr ""
 
 msgid "When enabled, reformat subtitles to match the width of the screen."
@@ -16129,6 +16290,9 @@ msgstr ""
 msgid "extensions"
 msgstr "الاضافات"
 
+msgid "extra high"
+msgstr ""
+
 msgid "extra wide"
 msgstr ""
 
@@ -16232,6 +16396,9 @@ msgstr ""
 msgid "green"
 msgstr "أخضر"
 
+msgid "half an hour"
+msgstr ""
+
 msgid "handicraft"
 msgstr ""
 
@@ -16247,6 +16414,9 @@ msgid "help..."
 msgstr "مساعده..."
 
 msgid "hide"
+msgstr ""
+
+msgid "high"
 msgstr ""
 
 msgid "horizontal"
@@ -17056,6 +17226,11 @@ msgid "violet"
 msgstr ""
 
 #
+#, fuzzy
+msgid "wait for ci..."
+msgstr "mmi إنتظار"
+
+#
 msgid "wait for mmi..."
 msgstr "mmi إنتظار"
 
@@ -17153,3 +17328,9 @@ msgstr ""
 
 msgid "zapped"
 msgstr "تم الانتقال"
+
+msgid "°E"
+msgstr ""
+
+msgid "°W"
+msgstr ""

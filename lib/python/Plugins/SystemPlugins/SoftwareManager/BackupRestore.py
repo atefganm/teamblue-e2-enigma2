@@ -49,7 +49,7 @@ def InitConfig():
 		'/etc/default/crond', '/etc/dropbear/', '/etc/default/dropbear', '/home/', '/etc/samba/', '/etc/fstab', '/etc/inadyn.conf',
 		'/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf',
 		'/etc/wpa_supplicant.wlan0.conf', '/etc/wpa_supplicant.wlan1.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname', '/etc/epgimport/', '/etc/exports',
-		'/etc/enigmalight.conf', '/etc/volume.xml', '/etc/enigma2/ci_auth_slot_0.bin', '/etc/enigma2/ci_auth_slot_1.bin',
+		'/etc/enigmalight.conf', '/etc/volume.xml', '/etc/ciplus/',
 		'/usr/share/enigma2/display/skin_display_usr.xml',
 		'/usr/share/enigma2/display/userskin.png',
 		'/usr/lib/enigma2/python/Plugins/Extensions/SpecialJump/keymap_user.xml',
@@ -390,10 +390,8 @@ class RestoreMenu(Screen):
 
 		cmds = [tarcmd, MANDATORY_RIGHTS, "/etc/init.d/autofs restart", "killall -9 enigma2"]
 		if ret == True:
-			cmds.insert(0, "rm -R /etc/enigma2")
-			self.session.open(Console, title=_("Restoring..."), cmdlist=cmds)
-		else:
-			self.session.open(Console, title=_("Restoring..."), cmdlist=cmds)
+			cmds.insert(0, "rm -Rf /etc/enigma2")
+		self.session.open(Console, title=_("Restoring..."), cmdlist=cmds)
 
 	def deleteFile(self):
 		if not self.exe and self.entry:
@@ -449,14 +447,14 @@ class RestoreScreen(Screen, ConfigListScreen):
 		tarcmd = "tar -C %s -xzvf %s" % (self.image_dir, self.fullbackupfilename)
 		for f in BLACKLISTED:
 				tarcmd = tarcmd + " --exclude " + f.strip("/")
-		restorecmdlist = ["rm -R %setc/enigma2" % self.image_dir, tarcmd, MANDATORY_RIGHTS.replace(' /', ' %s/' % self.image_dir)]
+		restorecmdlist = ["rm -Rf %setc/enigma2" % self.image_dir, tarcmd, MANDATORY_RIGHTS.replace(' /', ' %s/' % self.image_dir)]
 
 		if self.restoreOnBoot:
 			if path.exists("/proc/stb/vmpeg/0/dst_width"):
 				restorecmdlist += ["echo 0 > /proc/stb/vmpeg/0/dst_height", "echo 0 > /proc/stb/vmpeg/0/dst_left", "echo 0 > /proc/stb/vmpeg/0/dst_top", "echo 0 > /proc/stb/vmpeg/0/dst_width"]
 			restorecmdlist.append("/etc/init.d/autofs restart")
 
-		self.session.open(Console, title=_("Restoring..."), cmdlist=restorecmdlist, finishedCallback=self.restoreFinishedCB, closeOnSuccess=True)
+		self.session.open(Console, title=_("Restoring..."), cmdlist=restorecmdlist, finishedCallback=self.restoreFinishedCB)
 
 	def restoreFinishedCB(self, retval=None):
 		ShellCompatibleFunctions.restoreUserDB(image_dir=self.image_dir)

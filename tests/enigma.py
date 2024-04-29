@@ -271,16 +271,13 @@ class eDBoxLCD:
 		eDBoxLCD.instance = self
 
 	def setLCDBrightness(self, value):
-		print("[enigma] eDBoxLCD set brightness to %d" % value)
+		print("[eDBoxLCD] set brightness to %d" % value)
 
 	def setLCDContrast(self, value):
-		print("[enigma] eDBoxLCD set contrast to %d" % value)
-
-	def setLED(self, value):
-		print("[enigma] eDBoxLCD set led button to %d" % value)
+		print("[eDBoxLCD] set contrast to %d" % value)
 
 	def setInverted(self, value):
-		print("[enigma] eDBoxLCD set inverted to %d" % value)
+		print("[eDBoxLCD] set inverted to %d" % value)
 
 
 eDBoxLCD()

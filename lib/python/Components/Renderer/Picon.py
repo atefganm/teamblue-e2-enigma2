@@ -59,26 +59,15 @@ def findPicon(serviceName):
 			pngname = lastPiconPath + serviceName + ext
 			if pathExists(pngname):
 				return pngname
-		else:
-			return ""
-	else:
-		global searchPaths
-		pngname = ""
-		for path in searchPaths:
-			if pathExists(path) and not path.startswith('/media/net') and not path.startswith('/media/autofs'):
-				pngname = path + serviceName + ".png"
+	global searchPaths
+	for path in searchPaths:
+		if pathExists(path):
+			for ext in ('.png', '.svg'):
+				pngname = path + serviceName + ext
 				if pathExists(pngname):
 					lastPiconPath = path
-					break
-			elif pathExists(path):
-				pngname = path + serviceName + ".png"
-				if pathExists(pngname):
-					lastPiconPath = path
-					break
-		if pathExists(pngname):
-			return pngname
-		else:
-			return ""
+					return pngname
+	return ""
 
 
 def getPiconName(serviceRef):
@@ -105,14 +94,12 @@ def getPiconName(serviceRef):
 		fields[2] = '1'
 		pngname = findPicon('_'.join(fields))
 	if not pngname: # picon by channel name
-		name = sanitizeFilename(ServiceReference(serviceRef).getServiceName())
-		name = re.sub('[^a-z0-9]', '', name.replace('&', 'and').replace('+', 'plus').replace('*', 'star').lower())
+		utf8_name = sanitizeFilename(ServiceReference(serviceRef).getServiceName()).lower()
+		name = re.sub("[^a-z0-9]", "", utf8_name.replace("&", "and").replace("+", "plus").replace("*", "star"))
 		if name:
-			pngname = findPicon(name)
-			if not pngname and len(name) > 2 and name.endswith('hd'):
-				pngname = findPicon(name[:-2])
+			pngname = findPicon(name) or findPicon(re.sub("(fhd|uhd|hd|sd|4k)$", "", name).strip()) or findPicon(utf8_name)
 			if not pngname and len(name) > 6:
-				series = re.sub(r's[0-9]*e[0-9]*$', '', name)
+				series = re.sub(r"s[0-9]*e[0-9]*$", "", name)
 				pngname = findPicon(series)
 	return pngname
 

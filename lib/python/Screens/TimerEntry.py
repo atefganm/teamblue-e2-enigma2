@@ -1,39 +1,32 @@
-# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Screens import ChannelSelection
 from ServiceReference import ServiceReference
 from Components.config import config, ConfigSelection, ConfigText, ConfigSubList, ConfigDateTime, ConfigClock, ConfigYesNo
 from Components.ActionMap import NumberActionMap
 from Components.ConfigList import ConfigListScreen
-from Tools.BoundFunction import boundFunction
 from Components.MenuList import MenuList
-from Components.Button import Button
+from Components.Sources.StaticText import StaticText
 from Components.Label import Label
 from Components.NimManager import nimmanager
-from Components.Pixmap import Pixmap
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import BoxInfo
 from Components.UsageConfig import defaultMoviePath
 from Screens.MovieSelection import getPreferredTagEditor
 from Screens.LocationBox import MovieLocationBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
 from Screens.VirtualKeyBoard import VirtualKeyBoard
-from Tools.Alternatives import GetWithAlternative
 from Tools.FallbackTimer import FallbackTimerDirs
 from RecordTimer import AFTEREVENT
 from enigma import eEPGCache, iRecordableServicePtr
 from time import localtime, mktime, time, strftime
 from datetime import datetime
-import urllib.request
-import urllib.parse
-import urllib.error
 
 
 class TimerEntry(ConfigListScreen, Screen):
-	def __init__(self, session, timer, edit=False):
+	def __init__(self, session, timer, newEntry=False):
 		Screen.__init__(self, session)
 		self.timer = timer
-
+		self.newEntry = newEntry
 		self.timer.service_ref_prev = self.timer.service_ref
 		self.timer.begin_prev = self.timer.begin
 		self.timer.end_prev = self.timer.end
@@ -43,12 +36,10 @@ class TimerEntry(ConfigListScreen, Screen):
 		self.entryDate = None
 		self.entryService = None
 
-		self["key_green"] = self["oktext"] = Label(_("OK"))
-		self["key_red"] = self["canceltext"] = Label(_("Cancel"))
-		self["ok"] = Pixmap()
-		self["cancel"] = Pixmap()
-		self["key_yellow"] = Label(_("Timer type"))
-		self["key_blue"] = Label()
+		self["key_red"] = StaticText(_("Cancel"))
+		self["key_green"] = StaticText(_("Save"))
+		self["key_yellow"] = StaticText(_("Timer type"))
+		self["key_blue"] = StaticText("")
 
 		self["actions"] = NumberActionMap(["SetupActions", "GlobalActions", "PiPSetupActions", "ColorActions"],
 		{
@@ -59,6 +50,8 @@ class TimerEntry(ConfigListScreen, Screen):
 			"volumeDown": self.decrementStart,
 			"size+": self.incrementEnd,
 			"size-": self.decrementEnd,
+			"red": self.keyCancel,
+			"green": self.keyGo,
 			"yellow": self.changeTimerType,
 			"blue": self.changeZapWakeupType
 		}, -2)
@@ -111,11 +104,11 @@ class TimerEntry(ConfigListScreen, Screen):
 			repeated = None
 			weekday = int(strftime("%u", localtime(self.timer.begin))) - 1
 			day[weekday] = 1
-		self.timerentry_fallback = ConfigYesNo(default=self.timer.external_prev or config.usage.remote_fallback_external_timer.value and config.usage.remote_fallback.value and not nimmanager.somethingConnected())
+		self.timerentry_fallback = ConfigYesNo(default=self.timer.external_prev or self.newEntry and config.usage.remote_fallback_external_timer.value and config.usage.remote_fallback.value and config.usage.remote_fallback_external_timer_default.value)
 		self.timerentry_justplay = ConfigSelection(choices=[
 			("zap", _("zap")), ("record", _("record")), ("zap+record", _("zap and record"))],
 			default={0: "record", 1: "zap", 2: "zap+record"}[justplay + 2 * always_zap])
-		if SystemInfo["DeepstandbySupport"]:
+		if BoxInfo.getItem("DeepstandbySupport"):
 			shutdownString = _("go to deep standby")
 			choicelist = [("always", _("always")), ("from_standby", _("only from standby")), ("from_deep_standby", _("only from deep standby")), ("never", _("never"))]
 		else:
@@ -220,7 +213,7 @@ class TimerEntry(ConfigListScreen, Screen):
 		self.entryZapWakeup = (_("Wakeup receiver for start timer"), self.timerentry_zapwakeup)
 		if self.timerentry_justplay.value == "zap":
 			self.list.append(self.entryZapWakeup)
-			if SystemInfo["PIPAvailable"]:
+			if BoxInfo.getItem("PIPAvailable"):
 				self.list.append((_("Use as PiP if possible"), self.timerentry_pipzap))
 			self.list.append(self.entryShowEndTime)
 			self["key_blue"].setText(_("Wakeup type"))
@@ -321,7 +314,7 @@ class TimerEntry(ConfigListScreen, Screen):
 				_("Select channel to record from"),
 				currentBouquet=True
 			)
-		elif config.usage.setup_level.index >= 2 and cur == self.dirname:
+		elif cur == self.dirname:
 			menu = [(_("Open select location"), "empty")]
 			if self.timerentry_type.value == "repeated" and self.timerentry_name.value:
 				menu.append((_("Open select location as timer name"), "timername"))
@@ -484,7 +477,7 @@ class TimerEntry(ConfigListScreen, Screen):
 						ref = self.session.nav.getCurrentlyPlayingServiceOrGroup()
 						parent = self.timer.service_ref.ref
 						selection = 0
-						for x in list(range(n)):
+						for x in range(n):
 							i = event.getLinkageService(parent, x)
 							if i.toString() == ref.toString():
 								selection = x
@@ -541,11 +534,8 @@ class TimerEntry(ConfigListScreen, Screen):
 	def saveTimer(self):
 		self.session.nav.RecordTimer.saveTimer()
 
-	def keyCancel(self, answer=True, message=""):
-		if answer:
-			self.close((False,))
-		else:
-			print("[TimerEntry] keyCancel something went wrong with fallback timer", message)
+	def keyCancel(self):
+		self.close((False,))
 
 	def pathSelected(self, res):
 		if res is not None:
@@ -571,10 +561,10 @@ class TimerLog(Screen):
 		self["loglist"] = MenuList(self.list)
 		self["logentry"] = Label()
 
-		self["key_red"] = Button(_("Delete entry"))
-		self["key_green"] = Button()
-		self["key_yellow"] = Button("")
-		self["key_blue"] = Button(_("Clear log"))
+		self["key_red"] = StaticText(_("Delete entry"))
+		self["key_green"] = StaticText("")
+		self["key_yellow"] = StaticText("")
+		self["key_blue"] = StaticText(_("Clear log"))
 
 		self.onShown.append(self.updateText)
 

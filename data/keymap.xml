@@ -298,13 +298,6 @@
 		<key id="KEY_CONTEXT_MENU" mapto="HDMIinLong" flags="l" />
 	</map>
 
-	<map context="InfobarHDMIActions">
-		<key id="KEY_AUX" mapto="HDMIin" flags="b" />
-		<key id="KEY_AUX" mapto="HDMIinLong" flags="l" />
-		<key id="KEY_CONTEXT_MENU" mapto="HDMIin" flags="b" />
-		<key id="KEY_CONTEXT_MENU" mapto="HDMIinLong" flags="l" />
-	</map>
-
 	<map context="MinuteInputActions">
 		<key id="KEY_UP" mapto="up" flags="mr" />
 		<key id="KEY_DOWN" mapto="down" flags="mr" />
@@ -388,19 +381,12 @@
 		<key id="KEY_YELLOW" mapto="audioSelection" flags="b" />
 	</map>
 
-	<map context="InfobarAspectSelectionActions">
-		<key id="KEY_GREEN" mapto="aspectSelection" flags="l" />
-		<key id="KEY_MODE" mapto="aspectSelection" flags="l" />
-		<key id="KEY_MODE" mapto="aspectSelection" flags="b" />
-	</map>
-
 	<map context="InfobarSubtitleSelectionActions">
 		<key id="KEY_SUBTITLE" mapto="subtitleSelection" flags="b" />
 		<key id="KEY_SUBTITLE" mapto="subtitleShowHide" flags="l" />
 	</map>
 
 	<map context="InfobarSubserviceSelectionActions">
-		<key id="KEY_SUBTITLE" mapto="subserviceSelection" flags="b"/>
 		<key id="KEY_GREEN" mapto="subserviceSelection" flags="b" />
 	</map>
 
@@ -613,7 +599,7 @@
 
 	<map context="TvRadioActions">
 		<key id="KEY_TV" mapto="keyTV" flags="b" />
-		<key id="KEY_TV2" mapto="keyTV" flags="b" />
+		<key id="KEY_TV2" mapto="toggleTvRadio" flags="b" />
 		<key id="KEY_RADIO" mapto="keyRadio" flags="b" />
 		<key id="KEY_AUDIO" mapto="audio" flags="b" />
 	</map>
