@@ -20,6 +20,7 @@
 		<item level="1" text="Show screen path" description="This option allows you to show the full screen path leading to the current screen.">config.usage.showScreenPath</item>
 		<item level="1" text="Show menu or plugin numbers" description="This option allows you to show menu and/or plugin number quick links.">config.usage.menu_show_numbers</item>
 		<item level="1" text="Zap mode" requires="ZapMode" description="Configure the way in which the receiver changes channels.">config.misc.zapmode</item>
+		<item level="1" text="Zap mode" description="Configure the way in which your %s %s changes channels.">config.misc.zapmodeDM</item>
 		<item level="2" text="Channel zap delay mode" description="Setup delay mode to zap to channels.">config.usage.numzaptimeoutmode</item>
 		<item level="2" text="Channel zap delay first button" description="User defined delay when you press the first button to zap to the channel.">config.usage.numzaptimeout1</item>
 		<item level="2" text="Channel zap delay another button" description="User defined delay when you press another button to zap to the channel.">config.usage.numzaptimeout2</item>
