@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        gcc: [11]
-        python: ['3.10', '3.11']
+        gcc: [13]
+        python: ['3.11', '3.12']
     steps:
       - name: Install prerequisites
         run: |
@@ -26,7 +26,7 @@ jobs:
           sudo apt-get install build-essential
           sudo apt-get install automake
           sudo apt-get install libtool
-          sudo apt-get install python${{ matrix.python }}-dev
+          sudo apt-get install python3-dev
           sudo apt-get install zlib1g-dev
           sudo apt-get install gettext
           sudo apt-get install swig
@@ -40,11 +40,14 @@ jobs:
           sudo apt-get install libjpeg-turbo8-dev
           sudo apt-get install libgif-dev
 
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
+    - name: Install python ${{ matrix.python }} packages
+      run: |
+        pip3 install six flake8
 
       - name: Build enigma2 dependencies, gcc-${{ matrix.gcc }}
         env:
