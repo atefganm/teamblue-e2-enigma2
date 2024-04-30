@@ -2,7 +2,8 @@
 import errno
 import os
 
-from enigma import eEnv, eGetEnigmaDebugLvl
+from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
+from errno import ENOENT, EXDEV
 from re import compile, split
 from stat import S_IMODE
 from sys import _getframe as getframe
@@ -375,6 +376,72 @@ def fileHas(f, content, mode="r"):
 		_file.close()
 		if content in text:
 			result = True
+	return result
+
+
+def fileReadLine(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False):
+	line = None
+	try:
+		with open(filename, "r") as fd:
+			line = fd.read().strip()
+		msg = "Read"
+	except (IOError, OSError) as err:
+		if err.errno != ENOENT:  # ENOENT - No such file or directory.
+			print("[%s] Error %d: Unable to read a line from file '%s'! (%s)" % (source, err.errno, filename, err.strerror))
+		line = default
+		msg = "Default"
+	if debug or forceDebug:
+		print("[%s] Line %d: %s '%s' from file '%s'." % (source, stack()[1][0].f_lineno, msg, line, filename))
+	return line
+
+
+def fileWriteLine(filename, line, source=DEFAULT_MODULE_NAME, debug=False):
+	try:
+		with open(filename, "w") as fd:
+			fd.write(str(line))
+		msg = "Wrote"
+		result = 1
+	except (IOError, OSError) as err:
+		print("[%s] Error %d: Unable to write a line to file '%s'! (%s)" % (source, err.errno, filename, err.strerror))
+		msg = "Failed to write"
+		result = 0
+	if debug or forceDebug:
+		print("[%s] Line %d: %s '%s' to file '%s'." % (source, stack()[1][0].f_lineno, msg, line, filename))
+	return result
+
+
+def fileReadLines(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False):
+	lines = None
+	try:
+		with open(filename, "r") as fd:
+			lines = fd.read().splitlines()
+		msg = "Read"
+	except (IOError, OSError) as err:
+		if err.errno != ENOENT:  # ENOENT - No such file or directory.
+			print("[%s] Error %d: Unable to read lines from file '%s'! (%s)" % (source, err.errno, filename, err.strerror))
+		lines = default
+		msg = "Default"
+	if debug or forceDebug:
+		length = len(lines) if lines else 0
+		print("[%s] Line %d: %s %d lines from file '%s'." % (source, stack()[1][0].f_lineno, msg, length, filename))
+	return lines
+
+
+def fileWriteLines(filename, lines, source=DEFAULT_MODULE_NAME, debug=False):
+	try:
+		with open(filename, "w") as fd:
+			if isinstance(lines, list):
+				lines.append("")
+				lines = "\n".join(lines)
+			fd.write(lines)
+		msg = "Wrote"
+		result = 1
+	except (IOError, OSError) as err:
+		print("[%s] Error %d: Unable to write %d lines to file '%s'! (%s)" % (source, err.errno, len(lines), filename, err.strerror))
+		msg = "Failed to write"
+		result = 0
+	if debug or forceDebug:
+		print("[%s] Line %d: %s %d lines to file '%s'." % (source, stack()[1][0].f_lineno, msg, len(lines), filename))
 	return result
 
 

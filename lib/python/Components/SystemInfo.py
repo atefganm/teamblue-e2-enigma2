@@ -1,8 +1,15 @@
 import re
 from hashlib import md5
 from ast import literal_eval
+from os import R_OK, access, listdir, walk
+from os.path import exists as fileAccess, isdir, isfile, join as pathjoin
+from re import findall
+from subprocess import PIPE, Popen
 from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
-from Tools.Directories import SCOPE_PLUGINS, SCOPE_SKIN, fileCheck, fileExists, fileHas, pathExists, resolveFilename, isPluginInstalled
+
+from Components.About import getChipSetString
+from Components.RcModel import rc_model
+from Tools.Directories import SCOPE_PLUGINS, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, fileExists, fileHas, fileReadLine, pathExists, isPluginInstalled
 from boxbranding import getBoxType, getMachineBuild, getBrandOEM, getMachineMtdRoot
 
 
@@ -101,31 +108,53 @@ class BoxInformation:
 
 BoxInfo = BoxInformation()
 
+ARCHITECTURE = BoxInfo.getItem("architecture")
+BRAND = BoxInfo.getItem("brand")
+MODEL = BoxInfo.getItem("model")
+SOC_FAMILY = BoxInfo.getItem("socfamily")
+DISPLAYTYPE = BoxInfo.getItem("displaytype")
+MTDROOTFS = BoxInfo.getItem("mtdrootfs")
 DISPLAYMODEL = BoxInfo.getItem("displaymodel")
 DISPLAYBRAND = BoxInfo.getItem("displaybrand")
+MACHINEBUILD = BoxInfo.getItem("machinebuild")
 
 def getBoxDisplayName():  # This function returns a tuple like ("BRANDNAME", "BOXNAME")
 	return (DISPLAYBRAND, DISPLAYMODEL)
 
+def getRCFile(ext):
+	filename = resolveFilename(SCOPE_SKIN, pathjoin("hardware", "%s.%s" % (BoxInfo.getItem("rcname"), ext)))
+	if not isfile(filename):
+		filename = resolveFilename(SCOPE_SKIN, pathjoin("hardware", "dmm1.%s" % ext))
+	return filename
+
+def setRCFile(source):
+	if source == "hardware":
+		SystemInfo["RCImage"] = getRCFile("png")
+		SystemInfo["RCMapping"] = getRCFile("xml")
+	else:
+		SystemInfo["RCImage"] = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", SystemInfo["rc_model"], "rc.png"))
+		SystemInfo["RCMapping"] = resolveFilename(SCOPE_SKIN, pathjoin("rc_models", SystemInfo["rc_model"], "rcpositions.xml"))
+	if not (isfile(SystemInfo["RCImage"]) and isfile(SystemInfo["RCMapping"])):
+		SystemInfo["rc_default"] = True
+
 # Parse the boot commandline.
 #
-with open("/proc/cmdline", "r") as fd:
-	cmdline = fd.read()
-cmdline = {k: v.strip('"') for k, v in re.findall(r'(\S+)=(".*?"|\S+)', cmdline)}
+cmdline = fileReadLine("/proc/cmdline", source=MODULE_NAME)
+cmdline = {k: v.strip('"') for k, v in findall(r'(\S+)=(".*?"|\S+)', cmdline)}
 
 
 def getNumVideoDecoders():
-	numVideoDecoders = 0
-	while fileExists("/dev/dvb/adapter0/video%d" % numVideoDecoders, "f"):
-		numVideoDecoders += 1
-	return numVideoDecoders
+	number_of_video_decoders = 0
+	while fileExists("/dev/dvb/adapter0/video%d" % (number_of_video_decoders), 'f'):
+		number_of_video_decoders += 1
+	return number_of_video_decoders
 
 
 def countFrontpanelLEDs():
-	numLeds = fileExists("/proc/stb/fp/led_set_pattern") and 1 or 0
-	while fileExists("/proc/stb/fp/led%d_pattern" % numLeds):
-		numLeds += 1
-	return numLeds
+	number_of_leds = fileExists("/proc/stb/fp/led_set_pattern") and 1 or 0
+	while fileExists("/proc/stb/fp/led%d_pattern" % number_of_leds):
+		number_of_leds += 1
+	return number_of_leds
 
 
 def getHasTuners():
@@ -142,6 +171,29 @@ def getBootdevice():
 	while dev and not fileExists("/sys/block/%s" % dev):
 		dev = dev[:-1]
 	return dev
+
+model = getBoxType()
+
+def getModuleLayout():
+	modulePath = BoxInfo.getItem("enigmamodule")
+	if modulePath:
+		process = Popen(("/sbin/modprobe", "--dump-modversions", modulePath), stdout=PIPE, stderr=PIPE, universal_newlines=True)
+		stdout, stderr = process.communicate()
+		if process.returncode == 0:
+			for detail in stdout.split("\n"):
+				if "module_layout" in detail:
+					return detail.split("\t")[0]
+	return None
+
+
+BoxInfo.setItem("DebugLevel", eGetEnigmaDebugLvl())
+BoxInfo.setItem("InDebugMode", eGetEnigmaDebugLvl() >= 4)
+BoxInfo.setItem("ModuleLayout", getModuleLayout(), immutable=True)
+
+
+model = HardwareInfo().get_device_model()
+
+SystemInfo["InDebugMode"] = eGetEnigmaDebugLvl() >= 4
 
 #This line makes the new BoxInfo backwards compatible with SystemInfo without duplicating the dictionary.
 SystemInfo = BoxInfo.boxInfo
