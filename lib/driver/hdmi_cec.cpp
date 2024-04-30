@@ -10,7 +10,7 @@
 #include <lib/base/nconfig.h>
 #include <lib/driver/input_fake.h>
 #include <lib/driver/hdmi_cec.h>
-#include <lib/driver/avswitch.h>
+#include <lib/driver/avcontrol.h>
 /* NOTE: this header will move to linux uapi, once the cec framework is out of staging */
 #include <lib/driver/linux-uapi-cec.h>
 
@@ -175,8 +175,6 @@ eHdmiCEC *eHdmiCEC::getInstance()
 void eHdmiCEC::reportPhysicalAddress()
 {
 	struct cec_message txmessage;
-	memset(&txmessage, 0, sizeof(txmessage));
-
 	txmessage.address = 0x0f; /* broadcast */
 	txmessage.data[0] = 0x84; /* report address */
 	txmessage.data[1] = physicalAddress[0];
@@ -317,8 +315,9 @@ int eHdmiCEC::getDeviceType()
 bool eHdmiCEC::getActiveStatus()
 {
 	bool active = true;
-	eAVSwitch *avswitch = eAVSwitch::getInstance();
-	if (avswitch) active = avswitch->isActive();
+	eAVControl *avc = eAVControl::getInstance();
+	if (avc)
+		active = avc->isEncoderActive();
 	return active;
 }
 
@@ -507,6 +506,12 @@ long eHdmiCEC::translateKey(unsigned char code)
 			break;
 		case 0x0d:
 			key = 0xae;
+			break;
+		case 0x4c:
+			key = 0x193;
+			break;
+		case 0x4b:
+			key = 0x192;
 			break;
 		case 0x72:
 			key = 0x18e;

@@ -124,12 +124,8 @@ class StandbyScreen(Screen):
 			del self.session.pip
 		self.session.pipshown = False
 
-		if BoxInfo.getItem("ScartSwitch"):
-			self.avswitch.setInput("SCART")
-		else:
-			self.avswitch.setInput("AUX")
-		if os.path.exists("/proc/stb/hdmi/output"):
-			open("/proc/stb/hdmi/output", "w").write("off")
+		#set input to vcr scart
+		self.avswitch.setInput("off")
 
 		gotoShutdownTime = int(config.usage.standby_to_shutdown_timer.value)
 		if gotoShutdownTime:
@@ -167,7 +163,7 @@ class StandbyScreen(Screen):
 		globalActionMap.setEnabled(True)
 		if RecordTimer.RecordTimerEntry.receiveRecordEvents:
 			RecordTimer.RecordTimerEntry.stopTryQuitMainloop()
-		self.avswitch.setInput("ENCODER")
+		self.avswitch.setInput("encoder")
 		self.leaveMute()
 		if os.path.exists("/proc/stb/hdmi/output"):
 			open("/proc/stb/hdmi/output", "w").write("on")
