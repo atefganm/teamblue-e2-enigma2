@@ -40,14 +40,11 @@ jobs:
           sudo apt-get install libjpeg-turbo8-dev
           sudo apt-get install libgif-dev
 
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python }}
+      - uses: actions/checkout@v3
 
-    - name: Install python ${{ matrix.python }} packages
-      run: |
-        pip3 install six flake8
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
 
       - name: Build enigma2 dependencies, gcc-${{ matrix.gcc }}
         env:
