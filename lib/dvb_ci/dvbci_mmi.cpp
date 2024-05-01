@@ -28,20 +28,19 @@ eDVBCIMMISession::~eDVBCIMMISession()
 {
 	slot->setMMIManager(NULL);
 	if (is_mmi_active)
-		/* emit */ eDVBCI_UI::getInstance()->m_messagepump.send(eDVBCIInterfaces::Message(eDVBCIInterfaces::Message::mmiSessionDestroyed, slot->getSlotID()));
+		eDVBCI_UI::getInstance()->mmiSessionDestroyed(slot->getSlotID());
 }
 
 int eDVBCIMMISession::receivedAPDU(const unsigned char *tag, const void *data, int len)
 {
-	eTraceNoNewLineStart("[CI%d MMI] SESSION(%d)/MMI %02x %02x %02x: ", slot->getSlotID(), session_nb, tag[0], tag[1],tag[2]);
+	eTraceNoNewLineStart("[CI MMI] SESSION(%d)/MMI %02x %02x %02x: ", session_nb, tag[0], tag[1],tag[2]);
 	for (int i=0; i<len; i++)
 		eTraceNoNewLineStart("%02x ", ((const unsigned char*)data)[i]);
 	eTraceNoNewLineStart("\n");
 
 	if ((tag[0]==0x9f) && (tag[1]==0x88))
 	{
-		/* emit */ eDVBCI_UI::getInstance()->m_messagepump.send(eDVBCIInterfaces::Message(eDVBCIInterfaces::Message::mmiDataReceived, slot->getSlotID(), tag, (unsigned char*) data, len));
-		if (tag[2] == 0x01)
+		if (eDVBCI_UI::getInstance()->processMMIData(slot->getSlotID(), tag, data, len) == 1)
 		{
 			state=stateDisplayReply;
 			return 1;
@@ -88,7 +87,7 @@ int eDVBCIMMISession::doAction()
 
 int eDVBCIMMISession::stopMMI()
 {
-	eDebug("[CI%d MMI] eDVBCIMMISession::stopMMI()", slot->getSlotID());
+	eDebug("[CI MMI] eDVBCIMMISession::stopMMI()");
 
 	unsigned char tag[]={0x9f, 0x88, 0x00};
 	unsigned char data[]={0x00};
@@ -99,7 +98,7 @@ int eDVBCIMMISession::stopMMI()
 
 int eDVBCIMMISession::answerText(int answer)
 {
-	eDebug("[CI%d MMI] eDVBCIMMISession::answerText(%d)", slot->getSlotID(), answer);
+	eDebug("[CI MMI] eDVBCIMMISession::answerText(%d)",answer);
 
 	unsigned char tag[]={0x9f, 0x88, 0x0B};
 	unsigned char data[]={0x00};
@@ -112,7 +111,7 @@ int eDVBCIMMISession::answerText(int answer)
 int eDVBCIMMISession::answerEnq(char *answer)
 {
 	unsigned int len = strlen(answer);
-	eDebug("[CI%d MMI] eDVBCIMMISession::answerEnq(%d bytes)", slot->getSlotID(), len);
+	eDebug("[CI MMI] eDVBCIMMISession::answerEnq(%d bytes)", len);
 
 	unsigned char data[len+1];
 	data[0] = 0x01; // answer ok
@@ -126,7 +125,7 @@ int eDVBCIMMISession::answerEnq(char *answer)
 
 int eDVBCIMMISession::cancelEnq()
 {
-	eDebug("[CI%d MMI] eDVBCIMMISession::cancelEnq()", slot->getSlotID());
+	eDebug("[CI MMI] eDVBCIMMISession::cancelEnq()");
 
 	unsigned char tag[]={0x9f, 0x88, 0x08};
 	unsigned char data[]={0x00}; // canceled
