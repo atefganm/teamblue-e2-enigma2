@@ -56,7 +56,6 @@ void gRC::lock()
 	pthread_mutex_lock(&mutex);
 #endif
 }
-
 void gRC::unlock()
 {
 #ifndef SYNC_PAINT
