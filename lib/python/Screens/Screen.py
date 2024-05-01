@@ -27,7 +27,6 @@ class Screen(dict):
 		self.onExecBegin = []
 		self.onExecEnd = []
 		self.onLayoutFinish = []
-		self.onContentChanged = []
 		self.onShown = []
 		self.onShow = []
 		self.onHide = []
@@ -214,13 +213,6 @@ class Screen(dict):
 		self.__callLaterTimer = eTimer()
 		self.__callLaterTimer.callback.append(function)
 		self.__callLaterTimer.start(0, True)
-
-	def screenContentChanged(self):
-		for f in self.onContentChanged:
-			if not isinstance(f, type(self.close)):
-				exec(f, globals(), locals())  # Python 3
-			else:
-				f()
 
 	def applySkin(self):
 		# DEBUG: baseRes = (getDesktop(GUI_SKIN_ID).size().width(), getDesktop(GUI_SKIN_ID).size().height())

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2 teamBlue\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-24 10:35+0200\n"
+"POT-Creation-Date: 2024-01-12 11:21+0100\n"
 "PO-Revision-Date: 2019-02-13 20:52+0200\n"
 "Last-Translator: jamu\n"
 "Language-Team: BoxFreak/jamu\n"
@@ -509,7 +509,7 @@ msgstr ""
 
 #
 #, fuzzy
-msgid "(current image)"
+msgid "(current)"
 msgstr "Aktivoi nykyiset asetukset"
 
 #
@@ -528,9 +528,6 @@ msgstr "(näytä  DVD-äänen lisävalikko)"
 #, fuzzy
 msgid "(unknown)"
 msgstr "tuntematon"
-
-msgid "* = Restart Required"
-msgstr ""
 
 #
 msgid "* Only available if more than one interface is active."
@@ -2111,17 +2108,9 @@ msgstr "C"
 msgid "CI (Common Interface) Setup"
 msgstr "CI-liitäntä/CAM"
 
-msgid "CI Boot Delay"
-msgstr ""
-
 #
 msgid "CI assignment"
 msgstr "CI-määritys"
-
-#
-#, fuzzy
-msgid "CI enabled"
-msgstr "Päällä"
 
 #
 #, fuzzy
@@ -3291,10 +3280,6 @@ msgstr ""
 msgid "Copy to bouquets"
 msgstr "kopioi suosikkilistalle"
 
-#, fuzzy
-msgid "Copying files"
-msgstr "%d tiedosto"
-
 #
 #, fuzzy, python-format
 msgid "Cores: %s"
@@ -3873,11 +3858,6 @@ msgstr "Poista tiedosto"
 
 msgid "Deleted items"
 msgstr "Poistetut kohteet"
-
-#
-#, fuzzy
-msgid "Deleting files"
-msgstr "Poista tiedosto"
 
 msgid "Denmark"
 msgstr ""
@@ -4552,6 +4532,10 @@ msgstr "Virittimien asetukset"
 #, python-format
 msgid "ERROR - failed to scan (%s)!"
 msgstr "VIRHE - haku epäonnistui (%s)!"
+
+#, python-format
+msgid "ERROR downloading file %s/%s"
+msgstr ""
 
 #
 msgid "East"
@@ -6196,9 +6180,6 @@ msgstr ""
 msgid "HDMI-IN Recording settings"
 msgstr "Tallennus"
 
-msgid "HDMI-In"
-msgstr ""
-
 #, fuzzy
 msgid "HDR10 support"
 msgstr "ei tuettu"
@@ -6297,9 +6278,6 @@ msgid "Hidden network"
 msgstr "Piilotettu verkko"
 
 msgid "Hide"
-msgstr ""
-
-msgid "Hide and confirm invalid key message"
 msgstr ""
 
 msgid "Hide channel list in radio mode"
@@ -6803,17 +6781,6 @@ msgstr "Syöttölaitteet"
 
 msgid "Insert"
 msgstr ""
-
-#
-#, fuzzy
-msgid "Insert Service"
-msgstr "Asennetaan"
-
-#
-#  Ajastusikkunan otsikkopalkin teksti
-#, fuzzy
-msgid "Insert entry"
-msgstr "Ajastettava ohjelma"
 
 #
 #, fuzzy
@@ -8086,11 +8053,6 @@ msgstr "Kääntyy"
 msgid "Moving east..."
 msgstr "Kääntyy itään ..."
 
-#
-#, fuzzy
-msgid "Moving files"
-msgstr "Liikuta itään"
-
 msgid "Moving to position"
 msgstr "Kääntyy sijaintiin"
 
@@ -9288,11 +9250,6 @@ msgstr "Pillarbox"
 
 msgid "Pilot"
 msgstr "Pilot"
-
-#
-#, fuzzy
-msgid "Pin Userbouquet"
-msgstr "Salli useiden suosikkilistojen luonti ja käyttö"
 
 msgid "Pitcairn"
 msgstr ""
@@ -10548,11 +10505,6 @@ msgstr "Kanavat"
 msgid "Reload blacklists"
 msgstr "Lataa esto-/sallilistat uudestaan"
 
-#
-#, fuzzy
-msgid "Reload services/bouquets list"
-msgstr "Kanavat"
-
 #, fuzzy
 msgid "Reloading EPG Cache..."
 msgstr "Ladataan suosikkeja ja kanavia uudelleen..."
@@ -11598,11 +11550,6 @@ msgstr "Valitse päivityslähde"
 
 #
 #, fuzzy
-msgid "Select Service"
-msgstr "Valitse tallenne"
-
-#
-#, fuzzy
 msgid "Select Software Update"
 msgstr "Ohjelmiston päivitys"
 
@@ -11789,17 +11736,8 @@ msgstr ""
 msgid "Select secondary softcam"
 msgstr ""
 
-#, fuzzy
-msgid "Select service name"
-msgstr "Kanavan nimi"
-
 #
 msgid "Select service to add..."
-msgstr "Valitse lisättävä kanava..."
-
-#
-#, fuzzy
-msgid "Select service type"
 msgstr "Valitse lisättävä kanava..."
 
 #
@@ -11809,16 +11747,6 @@ msgstr "Valitse sijainti"
 
 msgid "Select sort method:"
 msgstr ""
-
-#
-#, fuzzy
-msgid "Select stream URL"
-msgstr "Valitse sijainti"
-
-#
-#, fuzzy
-msgid "Select stream type"
-msgstr "Valitse viritin"
 
 #
 msgid "Select target folder"
@@ -11879,11 +11807,6 @@ msgstr "Valitse tallennehakemisto"
 
 msgid "Select the shifted character set for the next character only"
 msgstr ""
-
-#
-#, fuzzy
-msgid "Select the timer from the fallback tuner by default"
-msgstr "Valitse tallennehakemisto"
 
 msgid "Select the tuner that controls the motorised dish."
 msgstr ""
@@ -12050,14 +11973,6 @@ msgstr "Kanavat"
 #, fuzzy
 msgid "Service ID"
 msgstr "Kanava"
-
-#, fuzzy
-msgid "Service Name"
-msgstr "Kanavan nimi"
-
-#, fuzzy
-msgid "Service Type"
-msgstr "Kanavan nimi"
 
 #
 #, fuzzy
@@ -13534,14 +13449,6 @@ msgstr "Streamin pyyntö"
 msgid "Stream Relay delay"
 msgstr "Ei viivettä"
 
-#, fuzzy
-msgid "Stream Type"
-msgstr "Streamin pyyntö"
-
-#, fuzzy
-msgid "Stream URL"
-msgstr "Streamin pyyntö"
-
 msgid "Stream request"
 msgstr "Streamin pyyntö"
 
@@ -14229,10 +14136,6 @@ msgstr "Vähintään %d päivitystä saatavilla."
 
 msgid "There are currently no outstanding actions."
 msgstr "Ei suorittamattomia tehtäviä."
-
-#, fuzzy
-msgid "There are no items currently available for this screen."
-msgstr "Päivityksiä ei ole saatavilla."
 
 #
 #, fuzzy
@@ -15174,11 +15077,6 @@ msgid "Unpack to current folder"
 msgstr "Näytä ohjelman tarkemmat tiedot"
 
 #
-#, fuzzy
-msgid "Unpin Userbouquet"
-msgstr "Salli useiden suosikkilistojen luonti ja käyttö"
-
-#
 msgid "Unsupported"
 msgstr "Ei tuettu"
 
@@ -15314,11 +15212,6 @@ msgstr ""
 msgid "Use a gateway"
 msgstr "Käytä yhdyskäytävää"
 
-#
-#, fuzzy
-msgid "Use alternative skin"
-msgstr "Vaihtoehtoisten kanavien lisäys"
-
 msgid "Use as PiP if possible"
 msgstr ""
 
@@ -15360,11 +15253,6 @@ msgstr "Käytä virran mittausta"
 #, fuzzy
 msgid "Use skin default"
 msgstr "Luettelon tyyli: Vakio"
-
-#
-#, fuzzy
-msgid "Use the alternative screen"
-msgstr "Vaihtoehtoisten kanavien lisäys ja poisto"
 
 msgid "Use the cursor keys to select an installed image and then Start button."
 msgstr ""
@@ -16007,9 +15895,6 @@ msgid "When enabled the receiver will automatically wake from standby when the T
 msgstr "Kun päällä, vastaanotin käyttää kanavalle aiemmin valitsemaasi ääniraitaa automaattisesti."
 
 msgid "When enabled the timer from the fallback tuner is imported"
-msgstr ""
-
-msgid "When enabled the timer from the fallback tuner is the default timer"
 msgstr ""
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -17215,9 +17100,6 @@ msgstr "kokeellinen elokuva/video"
 msgid "extensions"
 msgstr " lisäosaa."
 
-msgid "extra high"
-msgstr ""
-
 msgid "extra wide"
 msgstr ""
 
@@ -17330,9 +17212,6 @@ msgstr "tallenna tämä ruutu kuvatiedostoksi"
 msgid "green"
 msgstr "Vihreä"
 
-msgid "half an hour"
-msgstr ""
-
 msgid "handicraft"
 msgstr "käsityö"
 
@@ -17351,9 +17230,6 @@ msgid "help..."
 msgstr "apua..."
 
 msgid "hide"
-msgstr ""
-
-msgid "high"
 msgstr ""
 
 #
@@ -18241,11 +18117,6 @@ msgstr "vertikaali"
 
 msgid "violet"
 msgstr ""
-
-#
-#, fuzzy
-msgid "wait for ci..."
-msgstr "Odotetaan mmi:tä..."
 
 #
 msgid "wait for mmi..."

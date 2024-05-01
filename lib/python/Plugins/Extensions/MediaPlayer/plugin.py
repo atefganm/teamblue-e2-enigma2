@@ -8,7 +8,7 @@ from Screens.MessageBox import MessageBox
 from Screens.InputBox import InputBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.InfoBar import InfoBar
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarScreenSaver, InfoBarAudioSelection, InfoBarCueSheetSupport, InfoBarNotifications, InfoBarSubtitleSupport, InfoBarAspectSelection
+from Screens.InfoBarGenerics import InfoBarSeek, InfoBarScreenSaver, InfoBarAudioSelection, InfoBarCueSheetSupport, InfoBarNotifications, InfoBarSubtitleSupport
 from Components.ActionMap import NumberActionMap, HelpableActionMap, eActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap, MultiPixmap
@@ -100,7 +100,7 @@ class MediaPlayerInfoBar(Screen):
 		self.skinName = "MoviePlayer"
 
 
-class MediaPlayer(Screen, InfoBarBase, InfoBarScreenSaver, InfoBarSeek, InfoBarAudioSelection, InfoBarCueSheetSupport, InfoBarNotifications, InfoBarSubtitleSupport, HelpableScreen, InfoBarAspectSelection):
+class MediaPlayer(Screen, InfoBarBase, InfoBarScreenSaver, InfoBarSeek, InfoBarAudioSelection, InfoBarCueSheetSupport, InfoBarNotifications, InfoBarSubtitleSupport, HelpableScreen):
 	ALLOW_SUSPEND = True
 	ENABLE_RESUME_SUPPORT = True
 	FLAG_CENTER_DVB_SUBS = 2048
@@ -109,7 +109,6 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarScreenSaver, InfoBarSeek, InfoBarA
 	def __init__(self, session, args=None):
 		Screen.__init__(self, session)
 		InfoBarAudioSelection.__init__(self)
-		InfoBarAspectSelection.__init__(self)
 		InfoBarCueSheetSupport.__init__(self, actionmap="MediaPlayerCueSheetActions")
 		InfoBarNotifications.__init__(self)
 		InfoBarBase.__init__(self)
@@ -131,8 +130,6 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarScreenSaver, InfoBarSeek, InfoBarA
 
 		# 'None' is magic to start at the list of mountpoints
 		defaultDir = config.mediaplayer.defaultDir.getValue()
-		if defaultDir is not None and not os.path.isdir(defaultDir):
-			defaultDir = None
 		self.filelist = FileList(defaultDir, matchingPattern="(?i)^.*\.(dts|mp3|wav|wave|wv|oga|ogg|flac|m4a|mp2|m2a|wma|ac3|mka|aac|ape|alac|mpg|vob|m4v|mkv|avi|divx|dat|flv|mp4|mov|wmv|asf|3gp|3g2|mpeg|mpe|rm|rmvb|ogm|ogv|m2ts|mts|ts|m3u|e2pls|pls|amr|au|mid|pva|wtv)", useServiceRef=True, additionalExtensions="4098:m3u 4098:e2pls 4098:pls")
 		self["filelist"] = self.filelist
 

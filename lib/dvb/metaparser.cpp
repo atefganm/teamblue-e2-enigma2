@@ -131,8 +131,7 @@ int eDVBMetaParser::parseMeta(const std::string &tsname)
 			}
 			break;
 		case 9:
-			// This is not nice but the fastest way to 'fix' the 'records not playable'-bug
-			//m_scrambled = atoi(line);
+			m_scrambled = atoi(line);
 			break;
 		default:
 			break;

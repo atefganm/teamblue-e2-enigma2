@@ -16,7 +16,7 @@ DEFAULT_SKIN = "GigabluePaxV2/skin.xml"
 # DEFAULT_SKIN = BoxInfo.getItem("HasFullHDSkinSupport") and "PLi-FullNightHD/skin.xml" or "PLi-HD/skin.xml"  # SD hardware is no longer supported by the default skin.
 EMERGENCY_SKIN = "skin_default/skin.xml"
 EMERGENCY_NAME = "Stone II"
-DEFAULT_DISPLAY_SKIN = "skin_default/skin_display.xml"
+DEFAULT_DISPLAY_SKIN = "lcd_skin/skin_lcd_default.xml" if isfile(resolveFilename(SCOPE_SKIN, "display/lcd_skin/skin_lcd_default.xml")) else "skin_default/skin_display.xml"
 DEFAULT_CLOCK_SKIN = "lcd_skin/clock_lcd_analog.xml"
 USER_SKIN = "skin_user.xml"
 USER_SKIN_TEMPLATE = "skin_user_%s.xml"
@@ -827,10 +827,10 @@ def loadSingleSkinData(desktop, screenID, domSkin, pathSkin, scope=SCOPE_CURRENT
 				parameters["PartnerBoxE2TimerIconRepeat"] = applySkinFactor(510, 30, 20, 20)
 				parameters["PartnerBoxE2TimerState"] = applySkinFactor(150, 50, 150, 20)
 				parameters["PartnerBoxE2TimerTime"] = applySkinFactor(0, 50, 150, 20)
-				parameters["PartnerBoxEntryListName"] = applySkinFactor(5, 0, 150, 20)
-				parameters["PartnerBoxEntryListIP"] = applySkinFactor(120, 0, 150, 20)
-				parameters["PartnerBoxEntryListPort"] = applySkinFactor(270, 0, 100, 20)
-				parameters["PartnerBoxEntryListType"] = applySkinFactor(410, 0, 100, 20)
+				parameters["PartnerBoxEntryListName"] = applySkinFactor(5, 0, 150, 25)
+				parameters["PartnerBoxEntryListIP"] = applySkinFactor(120, 0, 150, 25)
+				parameters["PartnerBoxEntryListPort"] = applySkinFactor(270, 0, 100, 25)
+				parameters["PartnerBoxEntryListType"] = applySkinFactor(410, 0, 100, 25)
 				parameters["PartnerBoxTimerName"] = applySkinFactor(0, 30, 20)
 				parameters["PartnerBoxTimerServicename"] = applySkinFactor(0, 0, 30)
 				parameters["SHOUTcastListItem"] = applySkinFactor(20, 18, 22, 69, 20, 23, 43, 22)
@@ -1247,11 +1247,10 @@ def readSkin(screen, skin, names, desktop):
 					raise SkinError("For connection '%s' a renderer must be defined with a 'render=' attribute" % wconnection)
 			for converter in widget.findall("convert"):
 				ctype = converter.get("type")
-				nostrip = converter.get("nostrip") and converter.get("nostrip").lower() in ("1", "enabled", "nostrip", "on", "true", "yes")
 				assert ctype, "[Skin] The 'convert' tag needs a 'type' attribute!"
 				# print("[Skin] DEBUG: Converter='%s'." % ctype)
 				try:
-					parms = converter.text if nostrip else converter.text.strip()
+					parms = converter.text.strip()
 				except Exception:
 					parms = ""
 				# print("[Skin] DEBUG: Params='%s'." % parms)
@@ -1309,8 +1308,6 @@ def readSkin(screen, skin, names, desktop):
 			raise SkinError("Applet failed to compile: '%s'" % str(err))
 		if widgetType == "onLayoutFinish":
 			screen.onLayoutFinish.append(code)
-		elif widgetType == "onContentChanged":
-			screen.onContentChanged.append(code)
 		else:
 			raise SkinError("Applet type '%s' is unknown" % widgetType)
 

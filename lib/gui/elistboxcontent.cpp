@@ -1035,6 +1035,8 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 	eListboxStyle *local_style = 0;
 	eRect sel_clip(m_selection_clip);
 	bool cursorValid = this->cursorValid();
+	gRGB border_color;
+	int border_size = 0;
 	bool isverticallb = true;
 
 	if (sel_clip.valid())
@@ -1044,6 +1046,8 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 	if (m_listbox)
 	{
 		local_style = m_listbox->getLocalStyle();
+		border_size = local_style->m_border_size;
+		border_color = local_style->m_border_color;
 		isverticallb = m_listbox->getOrientation() == 1;
 	}
 
@@ -1175,7 +1179,7 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 							pfnt = PyTuple_GET_ITEM(item, 5),
 							pflags = PyTuple_GET_ITEM(item, 6),
 							pstring = PyTuple_GET_ITEM(item, 7),
-							pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, pborderWidth, pborderColor, pCornerRadius, pCornerEdges, pTextBorderWidth, pTextBorderColor;
+							pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, pborderWidth, pborderColor, pCornerRadius, pCornerEdges;
 
 				if (!(px && py && pwidth && pheight && pfnt && pflags && pstring))
 				{
@@ -1210,12 +1214,6 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				if (size > 15)
 					pCornerEdges = PyTuple_GET_ITEM(item, 15);
 
-				if (size > 16)
-					pTextBorderWidth = PyTuple_GET_ITEM(item, 16);
-
-				if (size > 17)
-					pTextBorderColor = lookupColor(PyTuple_GET_ITEM(item, 17), data);
-
 				if (PyLong_Check(pstring) && data) /* if the string is in fact a number, it refers to the 'data' list. */
 					pstring = PyTuple_GetItem(data, PyLong_AsLong(pstring));
 
@@ -1231,7 +1229,6 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				int flags = PyLong_AsLong(pflags);
 				int fnt = PyLong_AsLong(pfnt);
 				int bwidth = pborderWidth ? PyLong_AsLong(pborderWidth) : 0;
-				int btwidth = pTextBorderWidth ? PyLong_AsLong(pTextBorderWidth) : 0;
 
 				int cornerRadius = pCornerRadius ? PyLong_AsLong(pCornerRadius) : 0;
 				int cornerEdges = pCornerEdges ? PyLong_AsLong(pCornerEdges) : 0;
@@ -1265,9 +1262,8 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 					}
 				}
 
-				unsigned int textBColor = pTextBorderColor ? PyLong_AsUnsignedLongMask(pTextBorderColor) : 0x000000;
 				painter.setFont(m_font[fnt]);
-				painter.renderText(rect, string, flags, gRGB(textBColor), btwidth);
+				painter.renderText(rect, string, flags, border_color, border_size);
 				painter.clippop();
 
 				// draw border

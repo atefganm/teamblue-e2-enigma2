@@ -399,15 +399,9 @@ const char *getE2Rev()
 	return E2REV;
 }
 
-
 const char *getGStreamerVersionString()
 {
 	return gst_version_string();
-}
-
-const char *getBoxType()
-{
-	return BOXTYPE;
 }
 
 #include <malloc.h>

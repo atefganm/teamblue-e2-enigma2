@@ -1485,7 +1485,7 @@ class GraphMultiEPG(Screen, HelpableScreen):
 			newEntry = RecordTimerEntry(serviceref, checkOldTimers=True, dirname=preferredTimerPath(), *parseEvent(event))
 			newEntry.justplay = config.recording.timer_default_type.value == "zap"
 			newEntry.always_zap = config.recording.timer_default_type.value == "zap+record"
-			self.session.openWithCallback(self.finishedTimerAdd, TimerEntry, newEntry, newEntry=True)
+			self.session.openWithCallback(self.finishedTimerAdd, TimerEntry, newEntry)
 
 	def finishedEdit(self, answer=None):
 		if answer[0]:

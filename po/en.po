@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2 teamBlue\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-24 10:35+0200\n"
+"POT-Creation-Date: 2024-01-12 11:21+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: satdreamgr\n"
 "Language-Team: \n"
@@ -468,7 +468,7 @@ msgstr ""
 msgid "(activated +%d min)"
 msgstr ""
 
-msgid "(current image)"
+msgid "(current)"
 msgstr ""
 
 msgid "(empty)"
@@ -481,9 +481,6 @@ msgid "(show optional DVD audio menu)"
 msgstr ""
 
 msgid "(unknown)"
-msgstr ""
-
-msgid "* = Restart Required"
 msgstr ""
 
 msgid "* Only available if more than one interface is active."
@@ -1739,13 +1736,7 @@ msgstr ""
 msgid "CI (Common Interface) Setup"
 msgstr ""
 
-msgid "CI Boot Delay"
-msgstr ""
-
 msgid "CI assignment"
-msgstr ""
-
-msgid "CI enabled"
 msgstr ""
 
 msgid "CI slot: "
@@ -2746,9 +2737,6 @@ msgstr ""
 msgid "Copy to bouquets"
 msgstr ""
 
-msgid "Copying files"
-msgstr ""
-
 #, python-format
 msgid "Cores: %s"
 msgstr ""
@@ -3217,9 +3205,6 @@ msgid "Deleted image"
 msgstr ""
 
 msgid "Deleted items"
-msgstr ""
-
-msgid "Deleting files"
 msgstr ""
 
 msgid "Denmark"
@@ -3744,6 +3729,10 @@ msgstr ""
 
 #, python-format
 msgid "ERROR - failed to scan (%s)!"
+msgstr ""
+
+#, python-format
+msgid "ERROR downloading file %s/%s"
 msgstr ""
 
 msgid "East"
@@ -5099,9 +5088,6 @@ msgstr ""
 msgid "HDMI-IN Recording settings"
 msgstr "Adjust 3D settings"
 
-msgid "HDMI-In"
-msgstr ""
-
 msgid "HDR10 support"
 msgstr ""
 
@@ -5179,9 +5165,6 @@ msgid "Hidden network"
 msgstr ""
 
 msgid "Hide"
-msgstr ""
-
-msgid "Hide and confirm invalid key message"
 msgstr ""
 
 msgid "Hide channel list in radio mode"
@@ -5602,13 +5585,6 @@ msgid "Input devices"
 msgstr ""
 
 msgid "Insert"
-msgstr ""
-
-#, fuzzy
-msgid "Insert Service"
-msgstr "Enter the service PIN"
-
-msgid "Insert entry"
 msgstr ""
 
 msgid "Insert line before current line"
@@ -6657,9 +6633,6 @@ msgstr ""
 msgid "Moving east..."
 msgstr ""
 
-msgid "Moving files"
-msgstr ""
-
 msgid "Moving to position"
 msgstr ""
 
@@ -7608,9 +7581,6 @@ msgid "Pillarbox"
 msgstr ""
 
 msgid "Pilot"
-msgstr ""
-
-msgid "Pin Userbouquet"
 msgstr ""
 
 msgid "Pitcairn"
@@ -8570,9 +8540,6 @@ msgstr ""
 msgid "Reload blacklists"
 msgstr ""
 
-msgid "Reload services/bouquets list"
-msgstr ""
-
 msgid "Reloading EPG Cache..."
 msgstr ""
 
@@ -9396,9 +9363,6 @@ msgstr ""
 msgid "Select OPKG source....."
 msgstr ""
 
-msgid "Select Service"
-msgstr ""
-
 msgid "Select Software Update"
 msgstr ""
 
@@ -9538,25 +9502,13 @@ msgstr ""
 msgid "Select secondary softcam"
 msgstr ""
 
-msgid "Select service name"
-msgstr ""
-
 msgid "Select service to add..."
-msgstr ""
-
-msgid "Select service type"
 msgstr ""
 
 msgid "Select slot"
 msgstr ""
 
 msgid "Select sort method:"
-msgstr ""
-
-msgid "Select stream URL"
-msgstr ""
-
-msgid "Select stream type"
 msgstr ""
 
 msgid "Select target folder"
@@ -9611,9 +9563,6 @@ msgid "Select the shifted character set"
 msgstr ""
 
 msgid "Select the shifted character set for the next character only"
-msgstr ""
-
-msgid "Select the timer from the fallback tuner by default"
 msgstr ""
 
 msgid "Select the tuner that controls the motorised dish."
@@ -9741,12 +9690,6 @@ msgid "Service & PIDs"
 msgstr ""
 
 msgid "Service ID"
-msgstr ""
-
-msgid "Service Name"
-msgstr ""
-
-msgid "Service Type"
 msgstr ""
 
 msgid "Service belongs to a parental protected bouquet"
@@ -10925,13 +10868,6 @@ msgstr ""
 msgid "Stream Relay delay"
 msgstr ""
 
-msgid "Stream Type"
-msgstr ""
-
-#, fuzzy
-msgid "Stream URL"
-msgstr "Changelog"
-
 msgid "Stream request"
 msgstr ""
 
@@ -11492,9 +11428,6 @@ msgid "There are at least %d updates available."
 msgstr "There are at least %d updates available."
 
 msgid "There are currently no outstanding actions."
-msgstr ""
-
-msgid "There are no items currently available for this screen."
 msgstr ""
 
 msgid "There are no saved playlists to delete!"
@@ -12282,9 +12215,6 @@ msgstr ""
 msgid "Unpack to current folder"
 msgstr ""
 
-msgid "Unpin Userbouquet"
-msgstr ""
-
 msgid "Unsupported"
 msgstr ""
 
@@ -12402,10 +12332,6 @@ msgstr ""
 msgid "Use a gateway"
 msgstr ""
 
-#, fuzzy
-msgid "Use alternative skin"
-msgstr "Show tag menu"
-
 msgid "Use as PiP if possible"
 msgstr ""
 
@@ -12441,10 +12367,6 @@ msgstr ""
 
 msgid "Use skin default"
 msgstr ""
-
-#, fuzzy
-msgid "Use the alternative screen"
-msgstr "Show tag menu"
 
 msgid "Use the cursor keys to select an installed image and then Start button."
 msgstr ""
@@ -12938,9 +12860,6 @@ msgid "When enabled the receiver will automatically wake from standby when the T
 msgstr ""
 
 msgid "When enabled the timer from the fallback tuner is imported"
-msgstr ""
-
-msgid "When enabled the timer from the fallback tuner is the default timer"
 msgstr ""
 
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
@@ -13975,9 +13894,6 @@ msgstr ""
 msgid "extensions"
 msgstr ""
 
-msgid "extra high"
-msgstr ""
-
 msgid "extra wide"
 msgstr ""
 
@@ -14068,9 +13984,6 @@ msgstr ""
 msgid "green"
 msgstr ""
 
-msgid "half an hour"
-msgstr ""
-
 msgid "handicraft"
 msgstr ""
 
@@ -14084,9 +13997,6 @@ msgid "help..."
 msgstr ""
 
 msgid "hide"
-msgstr ""
-
-msgid "high"
 msgstr ""
 
 msgid "horizontal"
@@ -14795,9 +14705,6 @@ msgid "vertical"
 msgstr ""
 
 msgid "violet"
-msgstr ""
-
-msgid "wait for ci..."
 msgstr ""
 
 msgid "wait for mmi..."

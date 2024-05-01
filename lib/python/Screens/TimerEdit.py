@@ -339,7 +339,7 @@ class TimerEditList(Screen):
 		self.addTimer(timer)
 
 	def addTimer(self, timer):
-		self.session.openWithCallback(self.finishedAdd, TimerEntry, timer, newEntry=True)
+		self.session.openWithCallback(self.finishedAdd, TimerEntry, timer)
 
 	def finishedEdit(self, answer):
 		print("[TimerEditList] finished edit")

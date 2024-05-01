@@ -25,7 +25,7 @@ class Scart(Screen):
 
 		if not self.msgVisible:
 			self.msgVisible = True
-			self.avswitch.setInput("scart")
+			self.avswitch.setInput("SCART")
 			if not self.session.in_exec:
 				self.notificationVisible = True
 				Tools.Notifications.AddNotificationWithCallback(self.MsgBoxClosed, MessageBox, _("If you see this, something is wrong with\nyour scart connection. Press OK to return."), MessageBox.TYPE_ERROR, msgBoxID="scart_msgbox")
@@ -41,10 +41,10 @@ class Scart(Screen):
 			if self.msgBox:
 				self.msgBox.close() # ... MsgBoxClosed -> switchToTV again..
 				return
-			self.avswitch.setInput("encoder")
+			self.avswitch.setInput("ENCODER")
 			self.msgVisible = False
 		if self.notificationVisible:
-			self.avswitch.setInput("encoder")
+			self.avswitch.setInput("ENCODER")
 			self.notificationVisible = False
 			for notification in Tools.Notifications.current_notifications:
 				try:
