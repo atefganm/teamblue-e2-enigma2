@@ -60,6 +60,16 @@ jobs:
           make
           sudo make install
           popd
+          echo "installing libsigc++-3"
+          pushd .
+          cd /tmp
+          git clone --depth 1 https://github.com/TwolDE2/libsigc--3.0.git
+          cd libsigc--3.0
+          autoreconf -i
+          ./configure
+          make
+          sudo make install
+          popd
           echo "installing tuxbox"
           pushd .
           cd /tmp
@@ -75,15 +85,6 @@ jobs:
           make
           sudo make install
           popd
-          echo installing libsigc++3
-          cd /tmp
-          git clone --depth 1 https://github.com/libsigcplusplus/libsigcplusplus.git
-          cd libsigcplusplus
-          ./autogen.sh
-          make
-          sudo make install
-          popd
-      - name: Build enigma2
         env:
           CC: "gcc-${{ matrix.gcc }}"
           CXX: "g++-${{ matrix.gcc }}"
