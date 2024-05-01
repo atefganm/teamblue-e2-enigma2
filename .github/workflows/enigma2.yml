@@ -4,7 +4,7 @@ on:
   push:
     branches: [ 7.3-dev-sigc3 ]
   pull_request:
-    branches: [ 7.3-dev ]
+    branches: [ 7.3-dev-sigc3 ]
 
 jobs:
   build:
