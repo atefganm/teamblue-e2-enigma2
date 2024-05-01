@@ -40,7 +40,7 @@ from Screens.Hotkey import InfoBarHotkey, hotkeyActionMap, hotkey
 profile("ChannelSelection.py 4")
 from Screens.PictureInPicture import PictureInPicture
 from Screens.RdsDisplay import RassInteractive
-from ServiceReference import ServiceReference
+from ServiceReference import ServiceReference, hdmiInServiceRef
 from Tools.BoundFunction import boundFunction
 import Tools.Notifications
 from Tools.Alternatives import GetWithAlternative
@@ -352,7 +352,7 @@ class ChannelContextMenu(Screen):
 						append_when_current_valid(current, menu, (_("Unpin Userbouquet"), self.toggleBouquet), level=2)
 					else:
 						append_when_current_valid(current, menu, (_("Pin Userbouquet"), self.toggleBouquet), level=2)
-				append_when_current_valid(current, menu, (_("Reload services/bouquets list"), self.reloadServicesBouquets), level=2)
+				append_when_current_valid(current, menu, (_("Reload services/bouquets list"), self.reloadServices), level=2)
 		if self.inBouquet: # current list is editable?
 			if csel.bouquet_mark_edit == OFF:
 				if csel.movemode:
@@ -365,6 +365,8 @@ class ChannelContextMenu(Screen):
 				if not csel.entry_marked and not self.inBouquetRootList and current_root and not (current_root.flags & eServiceReference.isGroup):
 					if current.type != -1:
 						menu.append(ChoiceEntryComponent("dummy", (_("Add marker"), self.showMarkerInputBox)))
+					if SystemInfo["HasHDMIin"]:
+						append_when_current_valid(current, menu, (_("Add HDMI IN to bouquet"), self.showHDMIInInputBox))
 					if not csel.movemode:
 						if haveBouquets:
 							append_when_current_valid(current, menu, (_("Enable bouquet edit"), self.bouquetMarkStart), level=0)
@@ -686,6 +688,14 @@ class ChannelContextMenu(Screen):
 
 	def copyCurrentToBouquetList(self):
 		self.csel.copyCurrentToBouquetList()
+		self.close()
+
+	def showHDMIInInputBox(self):
+		self.session.openWithCallback(self.hdmiInputCallback, VirtualKeyBoard, title=_("Please enter a name for the HDMI-IN"), text="HDMI-IN", maxSize=False, visible_width=56, type=Input.TEXT)
+
+	def hdmiInputCallback(self, marker):
+		if marker is not None:
+			self.csel.addHDMIIn(marker)
 		self.close()
 
 	def showMarkerInputBox(self):
@@ -1087,6 +1097,16 @@ class ChannelSelectionEdit:
 				mutableList.flushChanges()
 				self.servicelist.addService(serviceref, True)
 				self.servicelist.resetRoot()
+
+	def addHDMIIn(self, name):
+		current = self.servicelist.getCurrent()
+		mutableList = self.getMutableList()
+		ref = hdmiInServiceRef()
+		ref.setName(name)
+		if mutableList and current and current.valid():
+			if not mutableList.addService(ref, current):
+				self.servicelist.addService(ref, True)
+				mutableList.flushChanges()
 
 	def addMarker(self, name):
 		current = self.servicelist.getCurrent()

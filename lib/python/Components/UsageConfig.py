@@ -100,6 +100,8 @@ def InitUsageConfig():
 	for i in list(range(1, 12)):
 		choicelist.append((str(i), ngettext("%d second", "%d seconds", i) % i))
 	config.usage.infobar_timeout = ConfigSelection(default="5", choices=choicelist)
+	config.usage.show_infobar_do_dimming = ConfigYesNo(default = True)
+	config.usage.show_infobar_dimming_speed = ConfigSelectionNumber(min = 1, max = 40, stepwidth = 1, default = 40, wraparound = True)
 	config.usage.show_infobar_do_dimming = ConfigYesNo(default=False)
 	config.usage.show_infobar_dimming_speed = ConfigSelectionNumber(min=1, max=20, stepwidth=1, default=3, wraparound=True)
 	config.usage.show_infobar_on_zap = ConfigYesNo(default=True)
@@ -107,6 +109,7 @@ def InitUsageConfig():
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default=False)
 	config.usage.show_second_infobar = ConfigSelection(default="0", choices=[("", _("None"))] + choicelist + [("EPG", _("EPG"))])
 	config.usage.show_simple_second_infobar = ConfigYesNo(default=False)
+	config.usage.show_infobar_adds = ConfigYesNo(default=False)
 	config.usage.infobar_frontend_source = ConfigSelection(default="settings", choices=[("settings", _("Settings")), ("tuner", _("Tuner"))])
 	config.usage.oldstyle_zap_controls = ConfigYesNo(default=False)
 	config.usage.oldstyle_channel_select_controls = ConfigYesNo(default=False)
@@ -196,12 +199,12 @@ def InitUsageConfig():
 
 	config.usage.poweroff_enabled = ConfigYesNo(default=False)
 	config.usage.poweroff_force = ConfigYesNo(default=False)
-	config.usage.poweroff_nextday = ConfigClock(default=((6 * 60 + 0) * 60))
+	config.usage.poweroff_nextday = ConfigClock(default = ((6 * 60 + 0) * 60))
 	config.usage.poweroff_day = ConfigSubDict()
 	config.usage.poweroff_time = ConfigSubDict()
 	for i in range(7):
 		config.usage.poweroff_day[i] = ConfigEnableDisable(default=False)
-		config.usage.poweroff_time[i] = ConfigClock(default=((1 * 60 + 0) * 60))
+		config.usage.poweroff_time[i] = ConfigClock(default = ((1 * 60 + 0) * 60))
 
 	choicelist = [("0", _("Disabled")), ("1800", _("Standby in ") + _("half an hour"))]
 	for i in range(3600, 21601, 3600):
@@ -274,6 +277,35 @@ def InitUsageConfig():
 		("5", "DVB-T/-S/-C"),
 		("127", _("No priority"))])
 
+	config.usage.frontled_color = ConfigSelection(default="2", choices=[
+		("0", _("Off")),
+		("1", _("Blue")),
+		("2", _("Red")),
+		("3", _("Blinking blue")),
+		("4", _("Blinking red"))
+	])
+	config.usage.frontledrec_color = ConfigSelection(default="3", choices=[
+		("0", _("Off")),
+		("1", _("Blue")),
+		("2", _("Red")),
+		("3", _("Blinking blue")),
+		("4", _("Blinking red"))
+	])
+	config.usage.frontledstdby_color = ConfigSelection(default="0", choices=[
+		("0", _("Off")),
+		("1", _("Blue")),
+		("2", _("Red")),
+		("3", _("Blinking blue")),
+		("4", _("Blinking red"))
+	])
+	config.usage.frontledrecstdby_color = ConfigSelection(default="3", choices=[
+		("0", _("Off")),
+		("1", _("Blue")),
+		("2", _("Red")),
+		("3", _("Blinking blue")),
+		("4", _("Blinking red"))
+	])
+
 	def remote_fallback_changed(configElement):
 		if configElement.value:
 			configElement.value = "%s%s" % (not configElement.value.startswith("http://") and "http://" or "", configElement.value)
@@ -298,6 +330,7 @@ def InitUsageConfig():
 	config.usage.remote_fallback_nok = ConfigYesNo(default=False)
 	config.usage.remote_fallback_extension_menu = ConfigYesNo(default=False)
 	config.usage.remote_fallback_external_timer = ConfigYesNo(default=False)
+	config.usage.remote_fallback_external_timer_default = ConfigYesNo(default=True)
 	config.usage.remote_fallback_openwebif_customize = ConfigYesNo(default=False)
 	config.usage.remote_fallback_openwebif_userid = ConfigText(default="root")
 	config.usage.remote_fallback_openwebif_password = ConfigPassword(default="default")
@@ -348,6 +381,11 @@ def InitUsageConfig():
 		choicelist.append(("%d" % i, "%d ms" % i))
 	config.usage.numzaptimeout1 = ConfigSelection(default="3000", choices=choicelist)
 	config.usage.numzaptimeout2 = ConfigSelection(default="1000", choices=choicelist)
+
+	config.usage.frontled_color = ConfigSelection(default = "2", choices = [("0", _("Off")), ("1", _("Blue")), ("2", _("Red")), ("3", _("Blinking blue")), ("4", _("Blinking red"))])
+	config.usage.frontledrec_color = ConfigSelection(default = "3", choices = [("0", _("Off")), ("1", _("Blue")), ("2", _("Red")), ("3", _("Blinking blue")), ("4", _("Blinking red"))])
+	config.usage.frontledstdby_color = ConfigSelection(default = "0", choices = [("0", _("Off")), ("1", _("Blue")), ("2", _("Red")), ("3", _("Blinking blue")), ("4", _("Blinking red"))])
+	config.usage.frontledrecstdby_color = ConfigSelection(default = "3", choices = [("0", _("Off")), ("1", _("Blue")), ("2", _("Red")), ("3", _("Blinking blue")), ("4", _("Blinking red"))])
 
 	def SpinnerOnOffChanged(configElement):
 		setSpinnerOnOff(int(configElement.value))
@@ -461,6 +499,7 @@ def InitUsageConfig():
 		config.usage.LcdLiveTVMode = ConfigSelection(default="0", choices=[str(x) for x in range(0, 9)])
 		config.usage.LcdLiveTVMode.addNotifier(setLcdLiveTVMode)
 
+	config.usage.multiboot_order = ConfigYesNo(default=True)
 	if BoxInfo.getItem("LcdLiveDecoder"):
 		def setLcdLiveDecoder(configElement):
 			open(BoxInfo.getItem("LcdLiveDecoder"), "w").write(configElement.value)
@@ -468,6 +507,8 @@ def InitUsageConfig():
 		config.usage.LcdLiveDecoder.addNotifier(setLcdLiveDecoder)
 
 	config.usage.boolean_graphic = ConfigSelection(default="true", choices={"false": _("no"), "true": _("yes"), "only_bool": _("yes, but not in multi selections")})
+
+	config.osd.alpha_teletext = ConfigSelectionNumber(default=255, stepwidth=1, min=0, max=255, wraparound=False)
 
 	config.epg = ConfigSubsection()
 	config.epg.eit = ConfigYesNo(default=True)
@@ -651,6 +692,12 @@ def InitUsageConfig():
 			("mute", _("Black screen")), ("hold", _("Hold screen")), ("mutetilllock", _("Black screen till locked")), ("holdtilllock", _("Hold till locked"))])
 		config.misc.zapmode.addNotifier(setZapmode, immediate_feedback=False)
 
+	if not BoxInfo.getItem("ZapMode") and exists("/proc/stb/info/model"):
+		def setZapmodeDM(el):
+			print('[UsageConfig] >>> zapmodeDM')
+		config.misc.zapmodeDM = ConfigSelection(default="black", choices=[("black", _("Black screen")), ("hold", _("Hold screen"))])
+		config.misc.zapmodeDM.addNotifier(setZapmodeDM, immediate_feedback = False)
+
 	if BoxInfo.getItem("VFD_scroll_repeats"):
 		def scroll_repeats(el):
 			open(BoxInfo.getItem("VFD_scroll_repeats"), "w").write(el.value)
@@ -749,6 +796,18 @@ def InitUsageConfig():
 			open("/proc/stb/video/disable_10bit", "w").write("on" if configElement.value else "off")
 		config.av.allow_10bit = ConfigYesNo(default=False)
 		config.av.allow_10bit.addNotifier(setDisable10Bit)
+
+	if BoxInfo.getItem("CanSyncMode"):
+		def setSyncMode(configElement):
+			print("[UsageConfig] Read /proc/stb/video/sync_mode")
+			with open("/proc/stb/video/sync_mode", "w") as fd:
+				fd.write(configElement.value)
+		config.av.sync_mode = ConfigSelection(default="slow", choices={
+			"slow": _("Slow motion"),
+			"hold": _("Hold first frame"),
+			"black": _("Black screen")
+		})
+		config.av.sync_mode.addNotifier(setSyncMode)
 
 	config.subtitles = ConfigSubsection()
 	config.subtitles.show = ConfigYesNo(default=True)

@@ -12,6 +12,7 @@ import eBaseImpl
 enigma.eTimer = eBaseImpl.eTimer
 enigma.eSocketNotifier = eBaseImpl.eSocketNotifier
 enigma.eConsoleAppContainer = eConsoleImpl.eConsoleAppContainer
+from Components.SystemInfo import SystemInfo
 
 from traceback import print_exc
 
@@ -418,26 +419,29 @@ from Screens.Scart import Scart
 
 class AutoScartControl:
 	def __init__(self, session):
-		self.force = False
-		self.current_vcr_sb = enigma.eAVSwitch.getInstance().getVCRSlowBlanking()
-		if self.current_vcr_sb and config.av.vcrswitch.value:
-			self.scartDialog = session.instantiateDialog(Scart, True)
-		else:
-			self.scartDialog = session.instantiateDialog(Scart, False)
-		config.av.vcrswitch.addNotifier(self.recheckVCRSb)
-		enigma.eAVSwitch.getInstance().vcr_sb_notifier.get().append(self.VCRSbChanged)
+		self.hasScart = SystemInfo["HasScart"]
+		if self.hasScart:
+			self.force = False
+			self.current_vcr_sb = enigma.eAVControl.getInstance().getVCRSlowBlanking()
+			if self.current_vcr_sb and config.av.vcrswitch.value:
+				self.scartDialog = session.instantiateDialog(Scart, True)
+			else:
+				self.scartDialog = session.instantiateDialog(Scart, False)
+			config.av.vcrswitch.addNotifier(self.recheckVCRSb)
+			enigma.eAVControl.getInstance().vcr_sb_notifier.get().append(self.VCRSbChanged)
 
 	def recheckVCRSb(self, configElement):
 		self.VCRSbChanged(self.current_vcr_sb)
 
 	def VCRSbChanged(self, value):
-		#print("[StartEnigma] vcr sb changed to", value)
-		self.current_vcr_sb = value
-		if config.av.vcrswitch.value or value > 2:
-			if value:
-				self.scartDialog.showMessageBox()
-			else:
-				self.scartDialog.switchToTV()
+		if self.hasScart:
+			# print("[StartEnigma] VCR SB changed to '%s'." % value)
+			self.current_vcr_sb = value
+			if config.av.vcrswitch.value or value > 2:
+				if value:
+					self.scartDialog.showMessageBox()
+				else:
+					self.scartDialog.switchToTV()
 
 
 profile("Load:CI")
@@ -644,6 +648,8 @@ Components.Network.waitForNetwork()
 profile("LCD")
 import Components.Lcd
 Components.Lcd.InitLcd()
+
+enigma.eAVControl.getInstance().disableHDMIIn()
 
 profile("EpgCacheSched")
 import Components.EpgLoadSave
