@@ -8,13 +8,12 @@
 */
 
 // for debugging use:
-// #define SYNC_PAINT
+//#define SYNC_PAINT
 #undef SYNC_PAINT
 
 #include <pthread.h>
 #include <stack>
 #include <list>
-#include <vector>
 
 #include <string>
 #include <lib/base/elock.h>
@@ -36,12 +35,8 @@ struct gOpcode
 		renderPara,
 		setFont,
 
-		fill,
-		fillRegion,
-		clear,
+		fill, fillRegion, clear,
 		blit,
-		gradient,
-		rectangle,
 
 		setPalette,
 		mergePalette,
@@ -54,15 +49,9 @@ struct gOpcode
 		setBackgroundColorRGB,
 		setForegroundColorRGB,
 
-		setGradient,
-		setRadius,
-		setBorder,
-
 		setOffset,
 
-		setClip,
-		addClip,
-		popClip,
+		setClip, addClip, popClip,
 
 		flush,
 
@@ -70,20 +59,11 @@ struct gOpcode
 		flip,
 		notify,
 
-		enableSpinner,
-		disableSpinner,
-		incrementSpinner,
+		enableSpinner, disableSpinner, incrementSpinner,
 
 		shutdown,
 
 		setCompositing,
-		sendShow,
-		sendHide,
-#ifdef USE_LIBVUGLES2
-		sendShowItem,
-		setFlush,
-		setView,
-#endif
 	} opcode;
 
 	gDC *dc;
@@ -106,9 +86,6 @@ struct gOpcode
 			int flags;
 			int border;
 			gRGB bordercolor;
-			int markedpos;
-			int scrollpos;
-			int *offset;
 		} *renderText;
 
 		struct prenderPara
@@ -134,31 +111,6 @@ struct gOpcode
 			eRect position;
 			eRect clip;
 		} *blit;
-
-		struct pgradient
-		{
-			std::vector<gRGB> colors;
-			uint8_t orientation;
-			bool alphablend;
-			int fullSize;
-		} *gradient;
-
-		struct pradius
-		{
-			int radius;
-			uint8_t edges;
-		} *radius;
-
-		struct pborder
-		{
-			gRGB color;
-			int width;
-		} *border;
-
-		struct prectangle
-		{
-			eRect area;
-		} *rectangle;
 
 		struct pmergePalette
 		{
@@ -192,37 +144,13 @@ struct gOpcode
 		} *setOffset;
 
 		gCompositingData *setCompositing;
-
-		struct psetShowHideInfo
-		{
-			ePoint point;
-			eSize size;
-		} *setShowHideInfo;
-#ifdef USE_LIBVUGLES2
-		struct psetShowItemInfo
-		{
-			long dir;
-			ePoint point;
-			eSize size;
-		} *setShowItemInfo;
-
-		struct psetFlush
-		{
-			bool enable;
-		} *setFlush;
-
-		struct psetViewInfo
-		{
-			eSize size;
-		} *setViewInfo;
-#endif
 	} parm;
 };
 
 #define MAXSIZE 2048
 
-/* gRC is the singleton which controls the fifo and dispatches commands */
-class gRC : public iObject, public sigc::trackable
+		/* gRC is the singleton which controls the fifo and dispatches commands */
+class gRC: public iObject, public sigc::trackable
 {
 	DECLARE_REF(gRC);
 	friend class gPainter;
@@ -253,7 +181,6 @@ class gRC : public iObject, public sigc::trackable
 	ePtr<gCompositingData> m_compositing;
 
 	int m_prev_idle_count;
-
 public:
 	gRC();
 	virtual ~gRC();
@@ -273,7 +200,7 @@ public:
 	static gRC *getInstance();
 };
 
-/* gPainter is the user frontend, which in turn sends commands through gRC */
+	/* gPainter is the user frontend, which in turn sends commands through gRC */
 class gPainter
 {
 	ePtr<gDC> m_dc;
@@ -283,9 +210,8 @@ class gPainter
 	gOpcode *beginptr;
 	void begin(const eRect &rect);
 	void end();
-
 public:
-	gPainter(gDC *dc, eRect rect = eRect());
+	gPainter(gDC *dc, eRect rect=eRect());
 	virtual ~gPainter();
 
 	void setBackgroundColor(const gColor &color);
@@ -294,32 +220,26 @@ public:
 	void setBackgroundColor(const gRGB &color);
 	void setForegroundColor(const gRGB &color);
 
-	void setBorder(const gRGB &borderColor, int width);
-	void setGradient(const std::vector<gRGB> &colors, uint8_t orientation, bool alphablend, int fullSize = 0);
-	void setRadius(int radius, uint8_t edges);
-
 	void setFont(gFont *font);
-	/* flags only THESE: */
+		/* flags only THESE: */
 	enum
 	{
-		// todo, make mask. you cannot align both right AND center AND block ;)
-		RT_HALIGN_BIDI = 0, /* default */
+			// todo, make mask. you cannot align both right AND center AND block ;)
+		RT_HALIGN_BIDI = 0,  /* default */
 		RT_HALIGN_LEFT = 1,
 		RT_HALIGN_RIGHT = 2,
 		RT_HALIGN_CENTER = 4,
 		RT_HALIGN_BLOCK = 8,
 
-		RT_VALIGN_TOP = 0, /* default */
+		RT_VALIGN_TOP = 0,  /* default */
 		RT_VALIGN_CENTER = 16,
 		RT_VALIGN_BOTTOM = 32,
 
-		RT_WRAP = 64,
-		RT_ELLIPSIS = 128,
-		RT_BLEND = 256
+		RT_WRAP = 64
 	};
-	void renderText(const eRect &position, const std::string &string, int flags = 0, gRGB bordercolor = gRGB(), int border = 0, int markedpos = -1, int *offset = 0);
+	void renderText(const eRect &position, const std::string &string, int flags=0, gRGB bordercolor=gRGB(), int border=0);
 
-	void renderPara(eTextPara *para, ePoint offset = ePoint(0, 0));
+	void renderPara(eTextPara *para, ePoint offset=ePoint(0, 0));
 
 	void fill(const eRect &area);
 	void fill(const gRegion &area);
@@ -339,20 +259,11 @@ public:
 		BT_VALIGN_BOTTOM = 128
 	};
 
-	enum
-	{
-		GRADIENT_OFF = 0,
-		GRADIENT_VERTICAL = 1,
-		GRADIENT_HORIZONTAL = 2
-	};
-
 	void blitScale(gPixmap *pixmap, const eRect &pos, const eRect &clip=eRect(), int flags=0, int aflags = BT_SCALE);
 	void blit(gPixmap *pixmap, ePoint pos, const eRect &clip=eRect(), int flags=0);
 	void blit(gPixmap *pixmap, const eRect &pos, const eRect &clip=eRect(), int flags=0);
 
-	void drawRectangle(const eRect &area);
-
-	void setPalette(gRGB *colors, int start = 0, int len = 256);
+	void setPalette(gRGB *colors, int start=0, int len=256);
 	void setPalette(gPixmap *source);
 	void mergePalette(gPixmap *target);
 
@@ -372,19 +283,11 @@ public:
 	void setCompositing(gCompositingData *comp);
 
 	void flush();
-	void sendShow(ePoint point, eSize size);
-	void sendHide(ePoint point, eSize size);
-#ifdef USE_LIBVUGLES2
-	void sendShowItem(long dir, ePoint point, eSize size);
-	void setFlush(bool val);
-	void setView(eSize size);
-#endif
 };
 
-class gDC : public iObject
+class gDC: public iObject
 {
 	DECLARE_REF(gDC);
-
 protected:
 	ePtr<gPixmap> m_pixmap;
 
@@ -393,17 +296,6 @@ protected:
 	ePtr<gFont> m_current_font;
 	ePoint m_current_offset;
 
-	std::vector<gRGB> m_gradient_colors;
-	uint8_t m_gradient_orientation;
-	bool m_gradient_alphablend;
-	int m_gradient_fullSize;
-
-	int m_radius;
-	uint8_t m_radius_edges;
-
-	gRGB m_border_color;
-	int m_border_width;
-
 	std::stack<gRegion> m_clip_stack;
 	gRegion m_current_clip;
 
@@ -411,18 +303,13 @@ protected:
 	ePtr<gPixmap> *m_spinner_pic;
 	eRect m_spinner_pos;
 	int m_spinner_num, m_spinner_i;
-
 public:
 	virtual void exec(const gOpcode *opcode);
 	gDC(gPixmap *pixmap);
 	gDC();
 	virtual ~gDC();
 	gRegion &getClip() { return m_current_clip; }
-	int getPixmap(ePtr<gPixmap> &pm)
-	{
-		pm = m_pixmap;
-		return 0;
-	}
+	int getPixmap(ePtr<gPixmap> &pm) { pm = m_pixmap; return 0; }
 	gRGB getRGB(gColor col);
 	virtual eSize size() { return m_pixmap->size(); }
 	virtual int islocked() const { return 0; }

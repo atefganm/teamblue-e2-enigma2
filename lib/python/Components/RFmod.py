@@ -1,6 +1,6 @@
 from Components.config import config, ConfigSelection, ConfigSubsection, ConfigOnOff, ConfigSlider, ConfigNothing
 from enigma import eRFmod
-from Components.SystemInfo import BoxInfo
+from Components.SystemInfo import SystemInfo
 
 # CHECK ME.
 RFMOD_CHANNEL_MIN = 21
@@ -32,7 +32,7 @@ class RFmod:
 
 def InitRFmod():
 	detected = eRFmod.getInstance().detected()
-	BoxInfo.setItem("RfModulator", detected)
+	SystemInfo["RfModulator"] = detected
 	config.rfmod = ConfigSubsection()
 	if detected:
 		config.rfmod.enable = ConfigOnOff(default=False)

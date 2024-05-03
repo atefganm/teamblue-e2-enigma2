@@ -15,20 +15,15 @@ to generate HTML."""
 		Source.__init__(self)
 		self.__list = list
 		self.onSelectionChanged = []
-		self.onListUpdated = []
 		self.item_height = item_height
 		self.fonts = fonts
 		self.disable_callbacks = False
 		self.enableWrapAround = enableWrapAround
-		self.__current = None
-		self.__index = None
-		self.connectedGuiElement = None
-		self.__style = "default"  # Style might be an optional string which can be used to define different visualisations in the skin.
+		self.__style = "default" # style might be an optional string which can be used to define different visualisations in the skin
 
 	def setList(self, list):
 		self.__list = list
 		self.changed((self.CHANGED_ALL,))
-		self.listUpdated()
 
 	list = property(lambda self: self.__list, setList)
 
@@ -42,13 +37,6 @@ to generate HTML."""
 
 	def count(self):
 		return len(self.__list)
-
-	def setConnectedGuiElement(self, guiElement):
-		self.connectedGuiElement = guiElement
-		index = guiElement.instance.getCurrentIndex()
-		self.__current = self.list[index]
-		self.__index = index
-		self.changed((self.CHANGED_ALL,))
 
 	def selectionChanged(self, index):
 		if self.disable_callbacks:
@@ -64,27 +52,21 @@ to generate HTML."""
 
 	@cached
 	def getCurrent(self):
-		if self.master:
-			if hasattr(self.master, "current"):
-				return self.master.current
-		return self.__current
+		return self.master is not None and self.master.current
 
 	current = property(getCurrent)
 
 	def setIndex(self, index):
 		if self.master is not None:
-			if hasattr(self.master, "index"):
-				self.master.index = index
-			else:
-				self.__index = index
+			self.master.index = index
 			self.selectionChanged(index)
-		if self.connectedGuiElement is not None:
-			self.connectedGuiElement.moveSelection(index)
-
 
 	@cached
 	def getIndex(self):
-		return self.master.index if self.master is not None and hasattr(self.master, "index") else self.__index
+		if self.master is not None:
+			return self.master.index
+		else:
+			return 0
 
 	setCurrentIndex = setIndex
 
@@ -116,10 +98,6 @@ to generate HTML."""
 			self.changed((self.CHANGED_SPECIFIC, "style"))
 
 	style = property(getStyle, setStyle)
-
-	def listUpdated(self):
-		for x in self.onListUpdated:
-			x()
 
 	def updateList(self, list):
 		"""Changes the list without changing the selection or emitting changed Events"""

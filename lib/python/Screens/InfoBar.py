@@ -6,8 +6,6 @@ import Screens.MovieSelection
 
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
-from Components.Label import Label
-from Components.Pixmap import MultiPixmap
 
 profile("LOAD:enigma")
 import enigma
@@ -192,15 +190,6 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 				"right": self.right
 			}, prio=-2)
 
-		self["InstantExtensionsActions"] = HelpableActionMap(self, ["InfobarExtensions"],
-			{
-				"extensions": (self.showExtensionSelection, _("Show extensions...")),
-			}, 1) # lower priority
-
-		self["state"] = Label()
-		self["speed"] = Label()
-		self["statusicon"] = MultiPixmap()
-
 		self.allowPiP = True
 
 		for x in HelpableScreen, InfoBarShowHide, InfoBarMenu, InfoBarLongKeyDetection, \
@@ -209,7 +198,7 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 				InfoBarServiceNotifications, InfoBarPVRState, InfoBarCueSheetSupport, \
 				InfoBarMoviePlayerSummarySupport, InfoBarSubtitleSupport, \
 				InfoBarTeletextPlugin, InfoBarServiceErrorPopupSupport, InfoBarExtensions, \
-				InfoBarPlugins, InfoBarPiP, InfoBarHotkey, InfoBarJobman:
+				InfoBarPlugins, InfoBarPiP, InfoBarHotkey:
 			x.__init__(self)
 
 		self.servicelist = slist
@@ -537,8 +526,6 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, InfoBarMenu, InfoBarSeek, InfoBa
 
 	def movieSelected(self, service):
 		if service is not None:
-			if self.cur_service and self.cur_service != service:
-				setResumePoint(self.session)
 			self.cur_service = service
 			self.is_closing = False
 			self.session.nav.playService(service)

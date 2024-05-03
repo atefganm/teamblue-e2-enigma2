@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Screens.Screen import Screen
 from Screens.Setup import getConfigMenuItem, Setup
 from Screens.InputBox import PinInput
@@ -7,11 +6,11 @@ from Screens.ChoiceBox import ChoiceBox
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.ActionMap import NumberActionMap
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, ConfigSubsection, ConfigNothing, ConfigSelection, ConfigYesNo
+from Components.config import config, ConfigSubsection, ConfigNothing, ConfigSelection, ConfigOnOff, ConfigYesNo
 from Components.Label import Label
 from Components.Sources.List import List
 from Components.Sources.Boolean import Boolean
-from Components.SystemInfo import BoxInfo
+from Components.SystemInfo import SystemInfo
 from Components.VolumeControl import VolumeControl
 from Components.UsageConfig import originalAudioTracks, visuallyImpairedCommentary
 from Components.Converter.ServiceInfo import StdAudioDesc
@@ -100,26 +99,30 @@ class AudioSelection(ConfigListScreen, Screen):
 			service = self.session.nav.getCurrentService()
 			self.audioTracks = audio = service and service.audioTracks()
 			track_num = audio and audio.getNumberOfTracks() or 0
-			if BoxInfo.getItem("CanDownmixAC3") and track_num > 0 and config.usage.setup_level.index >= 1:
+			if SystemInfo["CanDownmixAC3"] and track_num > 0 and config.usage.setup_level.index >= 1:
 				downmix_ac3_value = config.av.downmix_ac3.value
 				if downmix_ac3_value in ("downmix", "passthrough"):
-					choice_list = [
-						("downmix", _("Downmix")),
-						("passthrough", _("Passthrough"))
-					]
-					self.settings.downmix = ConfigSelection(choices=choice_list, default=downmix_ac3_value)
+					self.settings.downmix = ConfigSelection(choices=[("downmix", _("Downmix")), ("passthrough", _("Passthrough"))], default=downmix_ac3_value)
 					self.settings.downmix.addNotifier(self.changeAC3Downmix, initial_call=False)
 					extra_text = " - AC3"
-					if BoxInfo.getItem("CanDownmixDTS"):
+					if SystemInfo["CanDownmixDTS"]:
 						extra_text += ",DTS"
-					if BoxInfo.getItem("CanDownmixAAC"):
+					if SystemInfo["CanDownmixAAC"]:
 						extra_text += ",AAC"
 					conflist.append((_("Multi channel downmix") + extra_text, self.settings.downmix))
 					self["key_red"].setBoolean(True)
-					is_downmix = True
 			if not is_downmix:
 				conflist.append(('',))
 				self["key_red"].setBoolean(False)
+
+				if SystemInfo["DreamBoxAudio"]:
+					choice_list = [("downmix", _("Downmix")), ("passthrough", _("Passthrough")), ("multichannel", _("convert to multi-channel PCM")), ("hdmi_best", _("use best / controlled by HDMI"))]
+					self.settings.downmix_ac3 = ConfigSelection(choices=choice_list, default=config.av.downmix_ac3.value)
+				else:
+					self.settings.downmix_ac3 = ConfigOnOff(default=config.av.downmix_ac3.value)
+				self.settings.downmix_ac3.addNotifier(self.changeAC3Downmix, initial_call=False)
+				conflist.append((_("AC3 downmix"), self.settings.downmix_ac3, None))
+				self["key_red"].setBoolean(True)
 
 			if track_num > 0:
 				self.audioChannel = service.audioChannel()
@@ -127,7 +130,7 @@ class AudioSelection(ConfigListScreen, Screen):
 					choicelist = [("0", _("left")), ("1", _("stereo")), ("2", _("right"))]
 					self.settings.channelmode = ConfigSelection(choices=choicelist, default=str(self.audioChannel.getCurrentChannel()))
 					self.settings.channelmode.addNotifier(self.changeMode, initial_call=False)
-					conflist.append((_("Channel"), self.settings.channelmode))
+					conflist.append((_("Audio channel"), self.settings.channelmode))
 					self["key_green"].setBoolean(True)
 				else:
 					conflist.append(('',))
@@ -175,19 +178,19 @@ class AudioSelection(ConfigListScreen, Screen):
 				self["key_yellow"].setBoolean(False)
 				conflist.append(('',))
 
-			if BoxInfo.getItem("Has3DSurround"):
+			if SystemInfo["Has3DSurround"]:
 				choice_list = [("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))]
 				self.settings.surround_3d = ConfigSelection(choices=choice_list, default=config.av.surround_3d.value)
 				self.settings.surround_3d.addNotifier(self.change3DSurround, initial_call=False)
 				conflist.append((_("3D Surround"), self.settings.surround_3d, None))
 
-			if BoxInfo.getItem("Has3DSpeaker") and config.av.surround_3d.value != "none":
+			if SystemInfo["Has3DSpeaker"] and config.av.surround_3d.value != "none":
 				choice_list = [("center", _("center")), ("wide", _("wide")), ("extrawide", _("extra wide"))]
 				self.settings.surround_3d_speaker = ConfigSelection(choices=choice_list, default=config.av.surround_3d_speaker.value)
 				self.settings.surround_3d_speaker.addNotifier(self.change3DSurroundSpeaker, initial_call=False)
 				conflist.append((_("3D Surround Speaker Position"), self.settings.surround_3d_speaker, None))
 
-			if BoxInfo.getItem("HasAutoVolume"):
+			if SystemInfo["HasAutoVolume"]:
 				choice_list = [("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))]
 				self.settings.autovolume = ConfigSelection(choices=choice_list, default=config.av.autovolume.value)
 				self.settings.autovolume.addNotifier(self.changeAutoVolume, initial_call=False)
@@ -245,12 +248,6 @@ class AudioSelection(ConfigListScreen, Screen):
 				except:
 					language = ""
 
-				languagetype = ""
-				if language and len(x) == 6 and x[5]:
-					languagetype = x[5].split()
-					if languagetype and len(languagetype) == 2:
-						language = "%s (%s)" % (language, languagetype[1])
-
 				if x[0] == 0:
 					description = "DVB"
 					number = "%x" % (x[1])
@@ -296,6 +293,16 @@ class AudioSelection(ConfigListScreen, Screen):
 			subtitlelist.append(self.selectedSubtitle)
 		return subtitlelist
 
+	def changeAC3Downmix(self, configElement):
+		config.av.downmix_ac3.value = configElement.value
+		config.av.downmix_ac3.save()
+		if SystemInfo["CanDownmixDTS"]:
+			config.av.downmix_dts.value = configElement.value
+			config.av.downmix_dts.save()
+		if SystemInfo["CanDownmixAAC"]:
+			config.av.downmix_aac.value = configElement.value
+			config.av.downmix_aac.save()
+
 	def change3DSurround(self, surround_3d):
 		if surround_3d.value:
 			config.av.surround_3d.value = surround_3d.value
@@ -312,11 +319,17 @@ class AudioSelection(ConfigListScreen, Screen):
 		config.av.autovolume.save()
 
 	def changeAC3Downmix(self, downmix):
-		config.av.downmix_ac3.setValue(downmix.value)
-		if BoxInfo.getItem("HasMultichannelPCM"):
-			config.av.multichannel_pcm.setValue(False)
-		config.av.downmix_ac3.save()
-		if BoxInfo.getItem("HasMultichannelPCM"):
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.downmix_ac3.setValue(downmix.value)
+		else:
+			if downmix.value:
+				config.av.downmix_ac3.setValue(True)
+				if SystemInfo["HasMultichannelPCM"]:
+					config.av.multichannel_pcm.setValue(False)
+			else:
+				config.av.downmix_ac3.setValue(False)
+
+		if SystemInfo["HasMultichannelPCM"]:
 			config.av.multichannel_pcm.save()
 		self.fillList()
 
@@ -326,15 +339,24 @@ class AudioSelection(ConfigListScreen, Screen):
 		config.av.btaudio.save()
 
 	def changePCMMultichannel(self, multichan):
-		if multichan.value:
+		if SystemInfo["DreamBoxAudio"]:
 			config.av.multichannel_pcm.setValue(multichan.value)
 		else:
-			config.av.multichannel_pcm.setValue(False)
+			if multichan.value:
+				config.av.multichannel_pcm.setValue(True)
+			else:
+				config.av.multichannel_pcm.setValue(False)
 		config.av.multichannel_pcm.save()
 		self.fillList()
 
 	def changeAACDownmix(self, downmix):
-		config.av.downmix_aac.setValue(downmix.value)
+		if SystemInfo["DreamBoxAudio"]:
+			config.av.downmix_aac.setValue(downmix.value)
+		else:
+			if downmix.value:
+				config.av.downmix_aac.setValue(True)
+			else:
+				config.av.downmix_aac.setValue(False)
 		config.av.downmix_aac.save()
 
 	def changeAACDownmixPlus(self, downmix):
@@ -363,6 +385,14 @@ class AudioSelection(ConfigListScreen, Screen):
 		else:
 			config.av.downmix_dts.setValue(False)
 		config.av.downmix_dts.save()
+
+	def setAC3plusTranscode(self, transcode):
+		config.av.transcode_ac3plus.setValue(transcode)
+		config.av.transcode_ac3plus.save()
+
+	def setAACTranscode(self, transcode):
+		config.av.transcode_aac.setValue(transcode)
+		config.av.transcode_aac.save()
 
 	def changeMode(self, mode):
 		if mode is not None and self.audioChannel:
@@ -514,8 +544,8 @@ class SubtitleSelection(AudioSelection):
 class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 	skin = """
 	<screen position="50,50" size="480,305" title="Subtitle settings" backgroundColor="#7f000000" flags="wfNoBorder">
-		<widget name="config" position="5,5" size="470,275" font="Regular;18" zPosition="1" transparent="1" selectionPixmap="buttons/sel.png" verticalAlignment="center" />
-		<widget name="videofps" position="5,280" size="470,20" backgroundColor="secondBG" transparent="1" zPosition="1" font="Regular;16" verticalAlignment="center" horizontalAlignment="left" foregroundColor="blue"/>
+		<widget name="config" position="5,5" size="470,275" font="Regular;18" zPosition="1" transparent="1" selectionPixmap="buttons/sel.png" valign="center" />
+		<widget name="videofps" position="5,280" size="470,20" backgroundColor="secondBG" transparent="1" zPosition="1" font="Regular;16" valign="center" halign="left" foregroundColor="blue"/>
 	</screen>"""
 
 	FLAG_CENTER_DVB_SUBS = 2048
@@ -526,8 +556,6 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 		self.infobar = infobar or self.session.infobar
 		self.wait = eTimer()
 		self.wait.timeout.get().append(self.resyncSubtitles)
-		self.resume = eTimer()
-		self.resume.timeout.get().append(self.resyncSubtitlesResume)
 		self.service = self.session.nav.getCurrentlyPlayingServiceReference()
 		servicepath = self.service and self.service.getPath()
 		if servicepath and servicepath.startswith("/") and self.service.toString().startswith("1:"):
@@ -554,8 +582,8 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 			menu = [
 				getConfigMenuItem("config.subtitles.ttx_subtitle_colors"),
 				getConfigMenuItem("config.subtitles.ttx_subtitle_original_position"),
-				getConfigMenuItem("config.subtitles.ttx_subtitle_position"),
 				getConfigMenuItem("config.subtitles.subtitle_fontsize"),
+				getConfigMenuItem("config.subtitles.subtitle_position"),
 				getConfigMenuItem("config.subtitles.subtitle_rewrap"),
 				getConfigMenuItem("config.subtitles.subtitle_borderwidth"),
 				getConfigMenuItem("config.subtitles.showbackground"),
@@ -563,7 +591,7 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 				getConfigMenuItem("config.subtitles.subtitle_bad_timing_delay"),
 				getConfigMenuItem("config.subtitles.subtitle_noPTSrecordingdelay"),
 			]
-		else: 		# pango
+		else: # pango
 			menu = [
 				getConfigMenuItem("config.subtitles.pango_subtitles_delay"),
 				getConfigMenuItem("config.subtitles.pango_subtitle_colors"),
@@ -608,9 +636,6 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 
 	def resyncSubtitles(self):
 		self.infobar.setSeekState(self.infobar.SEEK_STATE_PAUSE)
-		self.resume.start(100, True)
-
-	def resyncSubtitlesResume(self):
 		self.infobar.setSeekState(self.infobar.SEEK_STATE_PLAY)
 
 	def getFps(self):

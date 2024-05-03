@@ -86,6 +86,8 @@ class ImportChannels:
 	def ImportGetFilelist(self, remote=False, *files):
 		result = []
 		for _file in files:
+			# determine the type of bouquet file
+			_type = 1 if _file.endswith('.tv') else 2
 			# read the contents of the file
 			try:
 				if remote:
@@ -93,7 +95,8 @@ class ImportChannels:
 						content = self.getUrl("%s/file?file=%s/%s" % (self.url, e2path, quote(_file))).readlines()
 					except Exception as e:
 						print("[Import Channels] Exception: %s" % str(e))
-						continue
+						self.ImportChannelsDone(False, _("ERROR downloading file %s/%s") % (e2path, _file))
+						return
 				else:
 					with open('%s/%s' % (e2path, _file), 'r') as f:
 						content = f.readlines()
@@ -104,12 +107,12 @@ class ImportChannels:
 
 			# check the contents for more bouquet files
 			for line in content:
-#				print ("[Import Channels] %s" % line)
-				# check if it contains another bouquet reference, first tv type then radio type
-				r = re.match('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "(.*)" ORDER BY bouquet', line) or re.match('#SERVICE 1:7:2:0:0:0:0:0:0:0:FROM BOUQUET "(.*)" ORDER BY bouquet', line)
+				# check if it contains another bouquet reference
+				r = re.match('#SERVICE 1:7:%d:0:0:0:0:0:0:0:FROM BOUQUET "(.*)" ORDER BY bouquet' % _type, line)
 				if r:
 					# recurse
 					result.extend(self.ImportGetFilelist(remote, r.group(1)))
+
 			# add add the file itself
 			result.append(_file)
 
@@ -183,11 +186,8 @@ class ImportChannels:
 
 			print("[Import Channels] Removing old local files...")
 			for _file in files:
-#				print("- Removing %s..." % _file)
-				try:
-					os.remove(os.path.join(e2path, _file))
-				except OSError:
-				    print("[Import Channels] File %s did not exist" % _file)
+				print("- Removing %s..." % _file)
+				os.remove(os.path.join(e2path, _file))
 
 			print("[Import Channels] Updating files...")
 			files = [x for x in os.listdir(self.tmp_dir)]

@@ -9,11 +9,15 @@ from Tools.HardwareInfo import HardwareInfo
 from builtins import round
 
 from boxbranding import getBoxType, getMachineBuild, getImageType, getImageVersion
-from Components.SystemInfo import BoxInfo
 from sys import maxsize, modules, version_info
 from Tools.Directories import fileReadLine
 
 MODULE_NAME = __name__.split(".")[-1]
+
+
+def getModelString():
+	model = getBoxType()
+	return model
 
 
 def getVersionString():
@@ -40,22 +44,16 @@ def getFlashDateString():
 		return _("unknown")
 
 
-def returndate(date):
-    return "%s-%s-%s" % (date[:4], date[4:6], date[6:8])
-
-def getBuildDateString():
-	return returndate(BoxInfo.getItem("compiledate"))
-
-
-def getUpdateDateString():
-	build = BoxInfo.getItem("compiledate")
-	if build and build.isdigit():
-		return "%s-%s-%s" % (build[:4], build[4:6], build[6:])
-	return _("Unknown")
-
-
 def getEnigmaVersionString():
-	return str(BoxInfo.getItem("imageversion"))
+	# import enigma
+	# enigma_version = enigma.getEnigmaVersionString()
+	# if len(enigma_version) > 11:
+	# 	enigma_version = enigma_version[:10] + " " + enigma_version[11:]
+	from boxbranding import getImageVersion
+	enigma_version = getImageVersion()
+	if '-(no branch)' in enigma_version:
+		enigma_version = enigma_version[:-12]
+	return enigma_version
 
 
 def getGStreamerVersionString():
@@ -77,7 +75,10 @@ def getffmpegVersionString():
 
 
 def getKernelVersionString():
-	return BoxInfo.getItem("kernel")
+	try:
+		return open("/proc/version", "r").read().split(' ', 4)[2].split('-', 2)[0]
+	except:
+		return _("unknown")
 
 
 def getChipSetString():
@@ -155,11 +156,12 @@ def getHardwareTypeString():
 
 
 def getImageTypeString():
-	return "%s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imageversion").title())
-
-
-def getOEVersionString():
-	return BoxInfo.getItem("oe").title()
+	#try:
+	#       image_type = open("/etc/issue").readlines()[-2].strip()[:-6]
+	#       return image_type.capitalize()
+	#except:
+	#       return _("undefined")
+	return "%s %s" % (getImageVersion(), getImageType())
 
 
 def getCPUInfoString():

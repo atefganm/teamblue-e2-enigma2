@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-24 10:35+0200\n"
+"POT-Creation-Date: 2023-10-27 20:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -223,10 +223,6 @@ msgstr ""
 
 #. TRANSLATORS: long date representation short dayname daynum short monthname hour:minute in strftime() format! See 'man strftime'
 msgid "%a %e/%m  %-H:%M"
-msgstr ""
-
-#, python-format
-msgid "%d"
 msgstr ""
 
 #, python-format
@@ -467,7 +463,7 @@ msgstr ""
 msgid "(activated +%d min)"
 msgstr ""
 
-msgid "(current image)"
+msgid "(current)"
 msgstr ""
 
 msgid "(empty)"
@@ -480,9 +476,6 @@ msgid "(show optional DVD audio menu)"
 msgstr ""
 
 msgid "(unknown)"
-msgstr ""
-
-msgid "* = Restart Required"
 msgstr ""
 
 msgid "* Only available if more than one interface is active."
@@ -1163,6 +1156,9 @@ msgstr ""
 msgid "Aruba"
 msgstr ""
 
+msgid "As defined by the skin"
+msgstr ""
+
 msgid "Ask user"
 msgstr ""
 
@@ -1586,13 +1582,7 @@ msgstr ""
 msgid "CI (Common Interface) Setup"
 msgstr ""
 
-msgid "CI Boot Delay"
-msgstr ""
-
 msgid "CI assignment"
-msgstr ""
-
-msgid "CI enabled"
 msgstr ""
 
 msgid "CI slot: "
@@ -2261,9 +2251,6 @@ msgstr ""
 msgid "Copy to bouquets"
 msgstr ""
 
-msgid "Copying files"
-msgstr ""
-
 #, python-format
 msgid "Cores: %s"
 msgstr ""
@@ -2663,9 +2650,6 @@ msgid "Deleted image"
 msgstr ""
 
 msgid "Deleted items"
-msgstr ""
-
-msgid "Deleting files"
 msgstr ""
 
 msgid "Denmark"
@@ -3117,6 +3101,10 @@ msgstr ""
 
 #, python-format
 msgid "ERROR - failed to scan (%s)!"
+msgstr ""
+
+#, python-format
+msgid "ERROR downloading file %s/%s"
 msgstr ""
 
 msgid "East"
@@ -4260,9 +4248,6 @@ msgstr ""
 msgid "HDMI-IN Actions"
 msgstr ""
 
-msgid "HDMI-In"
-msgstr ""
-
 msgid "HDR10 support"
 msgstr ""
 
@@ -4296,9 +4281,6 @@ msgstr ""
 msgid "Hardware Accelerated"
 msgstr ""
 
-msgid "Hardware: "
-msgstr ""
-
 #, python-format
 msgid "Heads: %s (max) %s (current)"
 msgstr ""
@@ -4319,9 +4301,6 @@ msgid "Hidden network"
 msgstr ""
 
 msgid "Hide"
-msgstr ""
-
-msgid "Hide and confirm invalid key message"
 msgstr ""
 
 msgid "Hide known extensions"
@@ -4528,16 +4507,10 @@ msgstr ""
 msgid "Image creation failed - "
 msgstr ""
 
-msgid "Image revision: "
-msgstr ""
-
 #, python-format
 msgid ""
 "Image to install is invalid\n"
 "%s"
-msgstr ""
-
-msgid "Image: "
 msgstr ""
 
 msgid "ImageWizard"
@@ -4654,12 +4627,6 @@ msgid "Input device setup"
 msgstr ""
 
 msgid "Insert"
-msgstr ""
-
-msgid "Insert Service"
-msgstr ""
-
-msgid "Insert entry"
 msgstr ""
 
 msgid "Insert line before current line"
@@ -5179,9 +5146,6 @@ msgstr ""
 msgid "MB"
 msgstr ""
 
-msgid "MENU"
-msgstr ""
-
 msgid "MHz"
 msgstr ""
 
@@ -5593,9 +5557,6 @@ msgid "Moving"
 msgstr ""
 
 msgid "Moving east..."
-msgstr ""
-
-msgid "Moving files"
 msgstr ""
 
 msgid "Moving to position"
@@ -6051,9 +6012,6 @@ msgstr ""
 msgid "Number or SMS style data entry"
 msgstr ""
 
-msgid "OE Version: "
-msgstr ""
-
 msgid "OK"
 msgstr ""
 
@@ -6282,12 +6240,6 @@ msgstr ""
 msgid "PPanel"
 msgstr ""
 
-msgid "PREVIOUS"
-msgstr ""
-
-msgid "PVR"
-msgstr ""
-
 msgid "Package list update"
 msgstr ""
 
@@ -6435,9 +6387,6 @@ msgid "Pillarbox"
 msgstr ""
 
 msgid "Pilot"
-msgstr ""
-
-msgid "Pin Userbouquet"
 msgstr ""
 
 msgid "Pitcairn"
@@ -7013,9 +6962,6 @@ msgstr ""
 msgid "Python version: "
 msgstr ""
 
-msgid "Pythonscript"
-msgstr ""
-
 msgid "Qatar"
 msgstr ""
 
@@ -7233,9 +7179,6 @@ msgid "Reload Services"
 msgstr ""
 
 msgid "Reload blacklists"
-msgstr ""
-
-msgid "Reload services/bouquets list"
 msgstr ""
 
 msgid "Reloading EPG Cache..."
@@ -7974,9 +7917,6 @@ msgstr ""
 msgid "Select Fast DiSEqC if your aerial system supports this. If you are unsure select 'no'."
 msgstr ""
 
-msgid "Select Service"
-msgstr ""
-
 msgid "Select Software Update"
 msgstr ""
 
@@ -8086,25 +8026,13 @@ msgstr ""
 msgid "Select secondary softcam"
 msgstr ""
 
-msgid "Select service name"
-msgstr ""
-
 msgid "Select service to add..."
-msgstr ""
-
-msgid "Select service type"
 msgstr ""
 
 msgid "Select slot"
 msgstr ""
 
 msgid "Select sort method:"
-msgstr ""
-
-msgid "Select stream URL"
-msgstr ""
-
-msgid "Select stream type"
 msgstr ""
 
 msgid "Select target folder"
@@ -8159,9 +8087,6 @@ msgid "Select the shifted character set"
 msgstr ""
 
 msgid "Select the shifted character set for the next character only"
-msgstr ""
-
-msgid "Select the timer from the fallback tuner by default"
 msgstr ""
 
 msgid "Select the tuner that controls the motorised dish."
@@ -8256,9 +8181,6 @@ msgstr ""
 msgid "Serial No"
 msgstr ""
 
-msgid "Serial: "
-msgstr ""
-
 #, python-format
 msgid "Serial: %s"
 msgstr ""
@@ -8270,12 +8192,6 @@ msgid "Service & PIDs"
 msgstr ""
 
 msgid "Service ID"
-msgstr ""
-
-msgid "Service Name"
-msgstr ""
-
-msgid "Service Type"
 msgstr ""
 
 msgid "Service belongs to a parental protected bouquet"
@@ -8558,9 +8474,6 @@ msgstr ""
 msgid "Show directories first"
 msgstr ""
 
-msgid "Show disabled timers (local only)"
-msgstr ""
-
 msgid "Show disclaimer"
 msgstr ""
 
@@ -8770,6 +8683,9 @@ msgid "Single"
 msgstr ""
 
 msgid "Single EPG"
+msgstr ""
+
+msgid "Single line mode"
 msgstr ""
 
 msgid "Single satellite"
@@ -9243,12 +9159,6 @@ msgstr ""
 msgid "Stream"
 msgstr ""
 
-msgid "Stream Type"
-msgstr ""
-
-msgid "Stream URL"
-msgstr ""
-
 msgid "Stream request"
 msgstr ""
 
@@ -9597,11 +9507,6 @@ msgid ""
 "Make sure you select a writable directory instead."
 msgstr ""
 
-msgid ""
-"The enigma.info file for the boxinformation is not available or the content is invalid.\n"
-"Press any key to continue?"
-msgstr ""
-
 msgid "The following files were found..."
 msgstr ""
 
@@ -9692,9 +9597,6 @@ msgid "There are at least %d updates available."
 msgstr ""
 
 msgid "There are currently no outstanding actions."
-msgstr ""
-
-msgid "There are no items currently available for this screen."
 msgstr ""
 
 msgid "There are no saved playlists to delete!"
@@ -10408,9 +10310,6 @@ msgstr ""
 msgid "Unpack to current folder"
 msgstr ""
 
-msgid "Unpin Userbouquet"
-msgstr ""
-
 msgid "Unsupported"
 msgstr ""
 
@@ -10501,9 +10400,6 @@ msgstr ""
 msgid "Use a gateway"
 msgstr ""
 
-msgid "Use alternative skin"
-msgstr ""
-
 msgid "Use as PiP if possible"
 msgstr ""
 
@@ -10529,12 +10425,6 @@ msgid "Use official channel numbering"
 msgstr ""
 
 msgid "Use power measurement"
-msgstr ""
-
-msgid "Use skin default"
-msgstr ""
-
-msgid "Use the alternative screen"
 msgstr ""
 
 msgid "Use the cursor keys to select an installed image and then Start button."
@@ -10925,9 +10815,6 @@ msgid "When enabled the receiver will automatically wake from standby when the T
 msgstr ""
 
 msgid "When enabled the timer from the fallback tuner is imported"
-msgstr ""
-
-msgid "When enabled the timer from the fallback tuner is the default timer"
 msgstr ""
 
 msgid "When enabled you can customize the OpenWebIf settings for the fallback tuner"
@@ -11692,9 +11579,6 @@ msgstr ""
 msgid "extensions"
 msgstr ""
 
-msgid "extra high"
-msgstr ""
-
 msgid "extra wide"
 msgstr ""
 
@@ -11785,9 +11669,6 @@ msgstr ""
 msgid "green"
 msgstr ""
 
-msgid "half an hour"
-msgstr ""
-
 msgid "handicraft"
 msgstr ""
 
@@ -11801,9 +11682,6 @@ msgid "help..."
 msgstr ""
 
 msgid "hide"
-msgstr ""
-
-msgid "high"
 msgstr ""
 
 msgid "horizontal"
@@ -12511,9 +12389,6 @@ msgstr ""
 msgid "violet"
 msgstr ""
 
-msgid "wait for ci..."
-msgstr ""
-
 msgid "wait for mmi..."
 msgstr ""
 
@@ -12599,12 +12474,6 @@ msgid "zap and record"
 msgstr ""
 
 msgid "zapped"
-msgstr ""
-
-msgid "°E"
-msgstr ""
-
-msgid "°W"
 msgstr ""
 
 msgid "C"
@@ -12901,7 +12770,10 @@ msgstr ""
 msgid "Change bouquets in quickzap"
 msgstr ""
 
-msgid "Channel Selection"
+msgid "Channel list update Eventinfo delay"
+msgstr ""
+
+msgid "Channel list update interval for Eventinfo on cursor moving"
 msgstr ""
 
 msgid "Channel zap delay another button"
@@ -13216,6 +13088,9 @@ msgstr ""
 msgid "Deep Standby LED"
 msgstr ""
 
+msgid "Default recording type"
+msgstr ""
+
 msgid "Default timer type"
 msgstr ""
 
@@ -13234,7 +13109,7 @@ msgstr ""
 msgid "Delay in miliseconds between scrolling characters on display."
 msgstr ""
 
-msgid "Delay when closing a stream relay service before reallocating the tuner for another service. Using '0' is only recommended for boxes with multiple satellite tuners."
+msgid "Descramble & record ECM gives the option to descramble afterwards if descrambling on recording failed. 'Don't descramble, record ECM' save a scramble recording that can be descrambled on playback. 'Normal' means descramble the recording and don't record ECM."
 msgstr ""
 
 msgid "Descramble receiving http streams"
@@ -13397,6 +13272,9 @@ msgid "Height"
 msgstr ""
 
 msgid "Hide channel list in radio mode"
+msgstr ""
+
+msgid "Hide number markers"
 msgstr ""
 
 msgid "Hide zap errors"
@@ -13684,15 +13562,6 @@ msgstr ""
 msgid "Select timezone in the area or region."
 msgstr ""
 
-msgid "Service info font size"
-msgstr ""
-
-msgid "Service name font size"
-msgstr ""
-
-msgid "Service number font size"
-msgstr ""
-
 msgid "Set CI assignment for detection of available services."
 msgstr ""
 
@@ -13846,9 +13715,6 @@ msgstr ""
 msgid "Startup to Standby"
 msgstr ""
 
-msgid "Stream Relay delay"
-msgstr ""
-
 msgid "Subtitle alignment"
 msgstr ""
 
@@ -13925,9 +13791,6 @@ msgid "The stored EPG data will be read every (hours)"
 msgstr ""
 
 msgid "The width of the picture. The input will be scaled to match this value."
-msgstr ""
-
-msgid "This allows you to change the font size relative to skin size, so 1 increases by 1 point size, and -1 decreases by 1 point size"
 msgstr ""
 
 msgid "This allows you to set the number of digits to 5, if you have more than 9999 channels."
@@ -14114,6 +13977,9 @@ msgid "When enabled, it will automatically play to the last saved radio service 
 msgstr ""
 
 msgid "When enabled, measure power consumption to detect when the rotor stops turning (when supported by the tuner)."
+msgstr ""
+
+msgid "When enabled, number markers will be hidden."
 msgstr ""
 
 msgid "When enabled, reformat subtitles to match the width of the screen."

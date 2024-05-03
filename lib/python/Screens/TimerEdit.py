@@ -1,7 +1,8 @@
 from Components.ActionMap import ActionMap
-from Components.Sources.StaticText import StaticText
+from Components.Button import Button
 from Components.Label import Label
 from Components.config import config
+from Components.Sources.StaticText import StaticText
 from Components.Sources.ServiceEvent import ServiceEvent
 from Components.TimerList import TimerList
 from Components.TimerSanityCheck import TimerSanityCheck
@@ -21,7 +22,6 @@ from ServiceReference import ServiceReference
 from enigma import eServiceReference, eEPGCache
 import functools
 
-
 class TimerEditList(Screen):
 	EMPTY = 0
 	ENABLE = 1
@@ -33,8 +33,8 @@ class TimerEditList(Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
 
-		list = []
-		self.list = list
+		_list = []
+		self.list = _list
 		self.url = None
 		self["timerlist"] = TimerList(list)
 		self["Service"] = ServiceEvent()
@@ -43,14 +43,13 @@ class TimerEditList(Screen):
 		self.key_yellow_choice = self.EMPTY
 		self.key_blue_choice = self.EMPTY
 
-		self["key_red"] = StaticText("")
-		self["key_green"] = StaticText(_("Add"))
-		self["key_yellow"] = StaticText("")
-		self["key_blue"] = StaticText("")
-		self["key_menu"] = StaticText(_("MENU"))
-		self["key_info"] = StaticText(_("INFO"))
+		self["key_red"] = Button(" ")
+		self["key_green"] = Button(_("Add"))
+		self["key_yellow"] = Button(" ")
+		self["key_blue"] = Button(" ")
+		self["key_info"] = StaticText(" ")
 
-		self["description"] = Label("")
+		self["description"] = Label(" ")
 
 		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions", "ShortcutActions", "TimerEditActions"],
 			{
@@ -128,18 +127,17 @@ class TimerEditList(Screen):
 				else:
 					if stateRunning:
 						if t.isRunning() and t.repeated:
-							list = (
+							_list = (
 								(_("Stop current event but not coming events"), "stoponlycurrent"),
 								(_("Stop current event and disable coming events"), "stopall"),
 								(_("Don't stop current event but disable coming events"), "stoponlycoming")
 							)
-							self.session.openWithCallback(boundFunction(self.runningEventCallback, t), ChoiceBox, title=_("A repeating event is currently recording. What would you like to do?"), list=list)
+							self.session.openWithCallback(boundFunction(self.runningEventCallback, t), ChoiceBox, title=_("A repeating event is currently recording. What would you like to do?"), list=_list)
 							timer_changed = False
 					else:
 						t.disable()
 				if timer_changed:
 					self.session.nav.RecordTimer.timeChanged(t)
-					self.session.nav.RecordTimer.saveTimer()
 			self.refill()
 
 	def runningEventCallback(self, t, result):
@@ -154,7 +152,6 @@ class TimerEditList(Screen):
 				findNextRunningEvent = True
 				t.disable()
 			self.session.nav.RecordTimer.timeChanged(t)
-			self.session.nav.RecordTimer.saveTimer()
 			t.findRunningEvent = findNextRunningEvent
 			self.refill()
 
@@ -203,7 +200,7 @@ class TimerEditList(Screen):
 			if cur.disabled and (self.key_yellow_choice != self.ENABLE):
 				if stateRunning and cur.repeated and not cur.justplay:
 					self.removeAction("yellow")
-					self["key_yellow"].setText("")
+					self["key_yellow"].setText(" ")
 					self.key_yellow_choice = self.EMPTY
 				else:
 					self["actions"].actions.update({"yellow": self.toggleDisabledState})
@@ -211,21 +208,21 @@ class TimerEditList(Screen):
 					self.key_yellow_choice = self.ENABLE
 			elif stateRunning and (not cur.repeated or cur.state == 1) and (self.key_yellow_choice != self.EMPTY):
 				self.removeAction("yellow")
-				self["key_yellow"].setText("")
+				self["key_yellow"].setText(" ")
 				self.key_yellow_choice = self.EMPTY
 			elif (not stateRunning or cur.repeated and cur.isRunning()) and not cur.disabled and (self.key_yellow_choice != self.DISABLE):
 				self["actions"].actions.update({"yellow": self.toggleDisabledState})
 				self["key_yellow"].setText(_("Disable"))
 				self.key_yellow_choice = self.DISABLE
 		else:
-			self["description"].setText("")
+			self["description"].setText(" ")
 			if self.key_red_choice != self.EMPTY:
 				self.removeAction("red")
-				self["key_red"].setText("")
+				self["key_red"].setText(" ")
 				self.key_red_choice = self.EMPTY
 			if self.key_yellow_choice != self.EMPTY:
 				self.removeAction("yellow")
-				self["key_yellow"].setText("")
+				self["key_yellow"].setText(" ")
 				self.key_yellow_choice = self.EMPTY
 
 		showCleanup = True
@@ -241,7 +238,7 @@ class TimerEditList(Screen):
 			self.key_blue_choice = self.CLEANUP
 		elif (not showCleanup) and (self.key_blue_choice != self.EMPTY):
 			self.removeAction("blue")
-			self["key_blue"].setText("")
+			self["key_blue"].setText(" ")
 			self.key_blue_choice = self.EMPTY
 
 	def fillTimerList(self):
@@ -261,8 +258,8 @@ class TimerEditList(Screen):
 		if config.usage.timerlist_finished_timer_position.index: #end of list
 			self.list.sort(key=functools.cmp_to_key(eol_compare))
 		else:
-			self.list.sort(key=lambda x: x[0].begin)
-		self["timerlist"].setList(self.list)
+			sorted(self.list, key=lambda x: x[0].begin)
+		self["timerlist"].l.setList(self.list)
 		self.updateState()
 
 	def showLog(self):
@@ -339,7 +336,7 @@ class TimerEditList(Screen):
 		self.addTimer(timer)
 
 	def addTimer(self, timer):
-		self.session.openWithCallback(self.finishedAdd, TimerEntry, timer, newEntry=True)
+		self.session.openWithCallback(self.finishedAdd, TimerEntry, timer)
 
 	def finishedEdit(self, answer):
 		print("[TimerEditList] finished edit")
@@ -427,10 +424,10 @@ class TimerSanityConflict(Screen):
 
 		self["timerlist"] = TimerList(self.list)
 
-		self["key_red"] = StaticText(_("Cancel"))
-		self["key_green"] = StaticText("")
-		self["key_yellow"] = StaticText("")
-		self["key_blue"] = StaticText("")
+		self["key_red"] = Button(_("Cancel"))
+		self["key_green"] = Button("")
+		self["key_yellow"] = Button("")
+		self["key_blue"] = Button("")
 
 		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions", "ShortcutActions", "TimerEditActions", "MenuActions"],
 			{
@@ -471,7 +468,7 @@ class TimerSanityConflict(Screen):
 
 	def toggleTimer(self):
 		selected_timer = self["timerlist"].getCurrent()
-		if selected_timer and self["key_yellow"].getText() != "" and not selected_timer.isRunning():
+		if selected_timer and self["key_yellow"].getText() != " " and not selected_timer.isRunning():
 			selected_timer.disabled = not selected_timer.disabled
 			if not selected_timer.disabled:
 				if not self.isResolvedConflict(selected_timer):
@@ -486,8 +483,8 @@ class TimerSanityConflict(Screen):
 			selected_timer = self["timerlist"].getCurrent()
 			if selected_timer and selected_timer.conflict_detection:
 				if config.usage.show_timer_conflict_warning.value:
-					list = [(_("yes"), True), (_("no"), False), (_("yes") + " " + _("and never ask this again"), "never")]
-					self.session.openWithCallback(self.ignoreConflictConfirm, MessageBox, _("Warning!\nThis is an option for advanced users.\nReally disable timer conflict detection?"), list=list)
+					_list = [(_("yes"), True), (_("no"), False), (_("yes") + " " + _("and never ask this again"), "never")]
+					self.session.openWithCallback(self.ignoreConflictConfirm, MessageBox, _("Warning!\nThis is an option for advanced users.\nReally disable timer conflict detection?"), list=_list)
 				else:
 					self.ignoreConflictConfirm(True)
 
@@ -575,14 +572,14 @@ class TimerSanityConflict(Screen):
 			if selected_timer.disabled:
 				self["key_yellow"].setText(_("Enable"))
 			elif selected_timer.isRunning() and not selected_timer.repeated:
-				self["key_yellow"].setText("")
+				self["key_yellow"].setText(" ")
 			elif not selected_timer.isRunning() or selected_timer.repeated:
 				self["key_yellow"].setText(_("Disable"))
 			if selected_timer.conflict_detection:
 				self["key_blue"].setText(_("Ignore conflict"))
 			else:
-				self["key_blue"].setText("")
+				self["key_blue"].setText(" ")
 		else:
-			self["key_green"].setText("")
-			self["key_yellow"].setText("")
-			self["key_blue"].setText("")
+			self["key_green"].setText(" ")
+			self["key_yellow"].setText(" ")
+			self["key_blue"].setText(" ")

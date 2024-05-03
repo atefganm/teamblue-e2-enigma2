@@ -5,8 +5,4 @@ dist_install_DATA = \
 	CurrentService.png \
 	OtherEvent.png \
 	RecordingEvent.png \
-	SelectedEvent.png \
-	BorderBottom.png \
-	BorderTop.png \
-	BorderLeft.png \
-	BorderRight.png
+	SelectedEvent.png

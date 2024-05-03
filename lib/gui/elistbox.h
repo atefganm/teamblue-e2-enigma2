@@ -62,7 +62,7 @@ protected:
 #ifndef SWIG
 struct eListboxStyle
 {
-	ePtr<gPixmap> m_background, m_selection, m_selection_large;
+	ePtr<gPixmap> m_background, m_selection;
 	int m_transparent_background;
 	int m_border_set;
 	gRGB m_background_color, m_background_color_selected,
@@ -89,16 +89,6 @@ struct eListboxStyle
 	int m_valign, m_halign, m_border_size, m_sliderborder_size, m_scrollbarsliderborder_size;
 	ePtr<gFont> m_font, m_secondfont;
 	ePoint m_text_offset;
-	int m_itemCornerRadius[2];
-	int m_itemCornerRadiusEdges[2];
-	int cornerRadius(int mode)
-	{
-		return m_itemCornerRadius[mode];
-	}
-	int cornerRadiusEdges(int mode)
-	{
-		return m_itemCornerRadiusEdges[mode];
-	}
 };
 #endif
 
@@ -166,7 +156,6 @@ public:
 	void setBorderWidth(int size);
 	void setBackgroundPicture(ePtr<gPixmap> &pixmap);
 	void setSelectionPicture(ePtr<gPixmap> &pixmap);
-	void setSelectionPictureLarge(ePtr<gPixmap> &pixmap);
 	void setSelectionBorderHidden();
 
 	void setSliderPicture(ePtr<gPixmap> &pm);
@@ -188,20 +177,6 @@ public:
 	int getScrollbarWidth() { return m_scrollbar_width; }
 	int getScrollbarHeight() { return m_scrollbar_height; }
 	int getMaxItemTextWidth() { return m_content->getMaxItemTextWidth(); }
-
-	void setItemCornerRadius(int radius, int edges);
-	void setItemCornerRadiusSelected(int radius, int edges);
-
-	static void setDefaultItemRadius(int radius, int radiusEdges)
-	{
-		defaultItemRadius[0] = radius;
-		defaultItemRadiusEdges[0] = radiusEdges;
-	}
-	static void setDefaultItemRadiusSelected(int radius, int radiusEdges)
-	{
-		defaultItemRadius[1] = radius;
-		defaultItemRadiusEdges[1] = radiusEdges;
-	}
 
 #ifndef SWIG
 	struct eListboxStyle *getLocalStyle(void);
@@ -234,7 +209,6 @@ private:
 	int m_orientation;
 	int m_items_per_page;
 	int m_selection_enabled;
-	void setItemCornerRadiusInternal(int radius, int edges, int index);
 
 	bool m_native_keys_bound;
 
@@ -242,8 +216,6 @@ private:
 	eSlider *m_scrollbar;
 	eListboxStyle m_style;
 	ePtr<gPixmap> m_scrollbarpixmap, m_scrollbarbackgroundpixmap;
-	static int defaultItemRadius[2];
-	static int defaultItemRadiusEdges[2];
 #endif
 };
 

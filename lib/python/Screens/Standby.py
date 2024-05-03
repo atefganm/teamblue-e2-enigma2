@@ -9,12 +9,12 @@ from Components.config import config
 from Components.AVSwitch import AVSwitch
 from Components.Console import Console
 from Components.ImportChannels import ImportChannels
-from Components.SystemInfo import BoxInfo
+from Components.SystemInfo import SystemInfo
 from Components.Sources.StreamService import StreamServiceList
 from boxbranding import getMachineBrand, getMachineName, getBoxType
 from Components.Task import job_manager
 from Tools.Directories import mediafilesInUse
-from Tools import Notifications
+from Tools.Notifications import AddNotification
 from time import time, localtime
 from GlobalActions import globalActionMap
 from enigma import eDVBVolumecontrol, eTimer, eDVBLocalTimeHandler, eServiceReference, eStreamServer, quitMainloop, iRecordableService
@@ -33,21 +33,12 @@ QUIT_RESTART = 3
 QUIT_UPGRADE_FP = 4
 QUIT_ERROR_RESTART = 5
 QUIT_DEBUG_RESTART = 6
+QUIT_MANUFACTURER_RESET = 7
 QUIT_MAINT = 16
 QUIT_UPGRADE_PROGRAM = 42
 QUIT_IMAGE_RESTORE = 43
-GB_ENTER_WOL = 44
-QUIT_RRECVERY_MODE = 45
-
-
-def setLCDModeMinitTV(value):
-	try:
-		f = open("/proc/stb/lcd/mode", "w")
-		f.write(value)
-		f.close()
-	except:
-		pass
-
+QUIT_RRECVERY_MODE = 44
+GB_ENTER_WOL = 45
 
 def isInfoBarInstance():
 	global infoBarInstance
@@ -65,11 +56,14 @@ def checkTimeshiftRunning():
 
 class StandbyScreen(Screen):
 	def __init__(self, session, StandbyCounterIncrease=True):
-		Screen.__init__(self, session)
 		self.skinName = "Standby"
+		Screen.__init__(self, session)
 		self.avswitch = AVSwitch()
 
 		print("[Standby] enter standby")
+
+		if os.path.exists("/usr/script/standby_enter.sh"):
+			Console().ePopen("/usr/script/standby_enter.sh")
 
 		self["actions"] = ActionMap(["StandbyActions"],
 		{
@@ -91,10 +85,6 @@ class StandbyScreen(Screen):
 		self.timeHandler = None
 
 		self.setMute()
-
-		# set LCDminiTV off
-		if BoxInfo.getItem("Display") and BoxInfo.getItem("LCDMiniTV"):
-			setLCDModeMinitTV("0")
 
 		self.paused_service = self.paused_action = False
 
@@ -124,8 +114,10 @@ class StandbyScreen(Screen):
 			del self.session.pip
 		self.session.pipshown = False
 
-		#set input to vcr scart
-		self.avswitch.setInput("off")
+		if SystemInfo["ScartSwitch"]:
+			self.avswitch.setInput("SCART")
+		else:
+			self.avswitch.setInput("AUX")
 
 		gotoShutdownTime = int(config.usage.standby_to_shutdown_timer.value)
 		if gotoShutdownTime:
@@ -163,10 +155,10 @@ class StandbyScreen(Screen):
 		globalActionMap.setEnabled(True)
 		if RecordTimer.RecordTimerEntry.receiveRecordEvents:
 			RecordTimer.RecordTimerEntry.stopTryQuitMainloop()
-		self.avswitch.setInput("encoder")
+		self.avswitch.setInput("ENCODER")
 		self.leaveMute()
-		if os.path.exists("/proc/stb/hdmi/output"):
-			open("/proc/stb/hdmi/output", "w").write("on")
+		if os.path.exists("/usr/script/standby_leave.sh"):
+			Console().ePopen("/usr/script/standby_leave.sh")
 		if config.usage.remote_fallback_import_standby.value:
 			ImportChannels()
 
@@ -242,7 +234,7 @@ class Standby(StandbyScreen):
 			self.onClose.append(self.goStandby)
 
 	def goStandby(self):
-		Notifications.AddNotification(StandbyScreen, self.StandbyCounterIncrease)
+		AddNotification(StandbyScreen, self.StandbyCounterIncrease)
 
 
 class StandbySummary(Screen):
@@ -364,7 +356,7 @@ class TryQuitMainloop(MessageBox):
 				if not inStandby:
 					if os.path.exists("/usr/script/standby_enter.sh"):
 						Console().ePopen("/usr/script/standby_enter.sh")
-					if BoxInfo.getItem("HasHDMI-CEC") and config.hdmicec.enabled.value and ((config.hdmicec.control_tv_standby.value and config.hdmicec.next_boxes_detect.value) or config.hdmicec.handle_deepstandby_events.value != "no"):
+					if SystemInfo["HasHDMI-CEC"] and config.hdmicec.enabled.value and ((config.hdmicec.control_tv_standby.value and config.hdmicec.next_boxes_detect.value) or config.hdmicec.handle_deepstandby_events.value != "no"):
 						if config.hdmicec.control_tv_standby.value and config.hdmicec.next_boxes_detect.value:
 							import Components.HdmiCec
 							Components.HdmiCec.hdmi_cec.secondBoxActive()

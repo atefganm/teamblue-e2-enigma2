@@ -1,5 +1,4 @@
 from os import listdir, open as os_open, close as os_close, write as os_write, O_RDWR, O_NONBLOCK
-from Components.SystemInfo import BoxInfo
 from fcntl import ioctl
 from boxbranding import getBoxType, getBrandOEM
 import struct
@@ -205,7 +204,7 @@ config.plugins.remotecontroltype.rctype = ConfigInteger(default=0)
 
 class RcTypeControl:
 	def __init__(self):
-		if BoxInfo.getItem("RcTypeChangable") and pathExists('/proc/stb/info/boxtype'):
+		if pathExists('/proc/stb/ir/rc/type') and getBrandOEM() not in ('gigablue', 'odin', 'ini', 'entwopia', 'tripledot'):
 			self.isSupported = True
 
 			if config.plugins.remotecontroltype.rctype.value != 0:

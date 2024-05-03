@@ -26,8 +26,7 @@ class MessageBox(Screen):
 		self["text"] = Label(text)
 		self["Text"] = StaticText(text)
 		self["selectedChoice"] = StaticText()
-
-		self["key_help"] = StaticText(_("HELP"))
+		self["title_sep"] = Label("")
 
 		self.text = text
 		self.close_on_any_key = close_on_any_key

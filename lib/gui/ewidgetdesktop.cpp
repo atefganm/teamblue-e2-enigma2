@@ -59,7 +59,7 @@ int eWidgetDesktop::movedWidget(eWidget *root)
 	return 0; /* native move ok */
 }
 
-void eWidgetDesktop::calcWidgetClipRegion(eWidget *widget, gRegion &parent_visible, bool parent)
+void eWidgetDesktop::calcWidgetClipRegion(eWidget *widget, gRegion &parent_visible)
 {
 		/* start with our clip region, clipped with the parent's */
 	if (widget->m_vis & eWidget::wVisShow)
@@ -68,7 +68,7 @@ void eWidgetDesktop::calcWidgetClipRegion(eWidget *widget, gRegion &parent_visib
 		widget->m_visible_region.moveBy(widget->position());
 		widget->m_visible_region &= parent_visible; // in parent space!
 
-		if (!widget->isTransparent() && (widget->m_cornerRadius == 0 || parent))
+		if (!widget->isTransparent())
 				/* remove everything this widget will contain from parent's visible list, unless widget is transparent. */
 			parent_visible -= widget->m_visible_region; // will remove child regions too!
 
@@ -87,7 +87,7 @@ void eWidgetDesktop::calcWidgetClipRegion(eWidget *widget, gRegion &parent_visib
 		if (i != widget->m_childs.end())
 		{
 			if (i->m_vis & eWidget::wVisShow)
-				calcWidgetClipRegion(*i, widget->m_visible_region, false);
+				calcWidgetClipRegion(*i, widget->m_visible_region);
 			else
 				clearVisibility(*i);
 		}

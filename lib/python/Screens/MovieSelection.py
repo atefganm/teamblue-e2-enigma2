@@ -37,7 +37,6 @@ from enigma import eServiceReference, eServiceCenter, eTimer, eSize, iPlayableSe
 import os
 import time
 from time import localtime, strftime
-from skin import findSkinScreen
 import pickle
 
 config.movielist = ConfigSubsection()
@@ -55,7 +54,6 @@ config.movielist.hide_extensions = ConfigYesNo(default=False)
 config.movielist.stop_service = ConfigYesNo(default=True)
 config.movielist.add_bookmark = ConfigYesNo(default=True)
 config.movielist.show_underlines = ConfigYesNo(default=False)
-config.movielist.useslim = ConfigYesNo(default=False)
 
 userDefinedButtons = None
 last_selected_dest = []
@@ -290,8 +288,6 @@ class MovieBrowserConfiguration(ConfigListScreen, Screen):
 			(_("Automatic bookmarks"), config.movielist.add_bookmark, _("If enabled, bookmarks will be updated with the new location when you move or copy a recording.")),
 			(_("Show underline characters in filenames"), config.movielist.show_underlines, _("If disabled, underline characters in file and directory names are not shown and are replaced with spaces.")),
 			]
-		if findSkinScreen('MovieSelectionSlim'):
-			configList.insert(3, (_("Use alternative skin"), config.movielist.useslim, _("Use the alternative screen")))
 		for btn in ('red', 'green', 'yellow', 'blue', 'TV', 'Radio', 'Text', 'F1', 'F2', 'F3'):
 			configList.append((_(btn), userDefinedButtons[btn]))
 		ConfigListScreen.__init__(self, configList, session=session, on_change=self.changedEntry)
@@ -329,7 +325,6 @@ class MovieBrowserConfiguration(ConfigListScreen, Screen):
 			config.movielist.moviesort.save()
 			config.movielist.listtype.save()
 			config.movielist.description.save()
-			config.movielist.useslim.save()
 			config.usage.on_movie_eof.save()
 		self.close(True)
 
@@ -519,12 +514,6 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 
 	def __init__(self, session, selectedmovie=None, timeshiftEnabled=False):
 		Screen.__init__(self, session)
-
-		if config.movielist.useslim.value:
-			self.skinName = ["MovieSelectionSlim", "MovieSelection"]
-		else:
-			self.skinName = "MovieSelection"
-
 		HelpableScreen.__init__(self)
 		if not timeshiftEnabled:
 			InfoBarBase.__init__(self) # For ServiceEventTracker
@@ -589,8 +578,6 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		self["key_green"] = StaticText("")
 		self["key_yellow"] = StaticText("")
 		self["key_blue"] = StaticText("")
-		self["key_menu"] = StaticText(_("MENU"))
-		self["key_info"] = StaticText(_("INFO"))
 		self["movie_off"] = MultiPixmap()
 		self["movie_off"].hide()
 		self["movie_sort"] = MultiPixmap()

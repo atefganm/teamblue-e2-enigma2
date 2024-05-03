@@ -122,7 +122,9 @@ eDVBResourceManager::eDVBResourceManager()
 	if (fd >= 0)
 		close(fd);
 
-	if (!strncmp(tmp, "dm8000\n", rd))
+	if (!strncmp(tmp, "dm7025\n", rd))
+		m_boxtype = DM7025;
+	else if (!strncmp(tmp, "dm8000\n", rd))
 		m_boxtype = DM8000;
 	else if (!strncmp(tmp, "dm800\n", rd))
 		m_boxtype = DM800;
@@ -144,12 +146,6 @@ eDVBResourceManager::eDVBResourceManager()
 		m_boxtype = DM900;
 	else if (!strncmp(tmp, "dm920\n", rd))
 		m_boxtype = DM920;
-	else if (!strncmp(tmp, "one\n", rd))
-		m_boxtype = DREAMONE;
-	else if (!strncmp(tmp, "two\n", rd))
-		m_boxtype = DREAMTWO;
-	else if (!strncmp(tmp, "seven\n", rd))
-		m_boxtype = DREAMSEVEN;
 	else if (!strncmp(tmp, "Gigablue\n", rd))
 		m_boxtype = GIGABLUE;
 	else if (!strncmp(tmp, "gb800solo\n", rd))
@@ -190,10 +186,26 @@ eDVBResourceManager::eDVBResourceManager()
 		m_boxtype = GIGABLUE;
 	else if (!strncmp(tmp, "gbx34k\n", rd))
 		m_boxtype = GIGABLUE;
+	else if (!strncmp(tmp, "ebox5000\n", rd))
+		m_boxtype = DM800;
+	else if (!strncmp(tmp, "ebox5100\n", rd))
+		m_boxtype = DM800;
+	else if (!strncmp(tmp, "eboxlumi\n", rd))
+		m_boxtype = DM800;
+	else if (!strncmp(tmp, "ebox7358\n", rd))
+		m_boxtype = DM800SE;
+	else if (!strncmp(tmp, "wetekplay\n", rd))
+		m_boxtype = WETEKPLAY;
+	else if (!strncmp(tmp, "wetekplay2\n", rd))
+		m_boxtype = WETEKPLAY2;
+	else if (!strncmp(tmp, "wetekhub\n", rd))
+		m_boxtype = WETEKHUB;
 	else {
 		eDebug("[eDVBResourceManager] boxtype detection via /proc/stb/info not possible... use fallback via demux count!");
 		if (m_demux.size() == 3)
 			m_boxtype = DM800;
+		else if (m_demux.size() < 5)
+			m_boxtype = DM7025;
 		else
 			m_boxtype = DM8000;
 	}
@@ -1955,7 +1967,7 @@ static size_t diff_upto(off_t high, off_t low, size_t max)
 }
 
 	/* remember, this gets called from another thread. */
-void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off_t &start, size_t &size, int blocksize, int &sof)
+void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off_t &start, size_t &size, int blocksize)
 {
 	unsigned int max = align(1024*1024*1024, blocksize);
 	current_offset = align(current_offset, blocksize);
@@ -2143,7 +2155,7 @@ void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off
 				{
 					eDebug("[eDVBChannel] reached SOF");
 					m_skipmode_m = 0;
-					sof = 1;
+					m_pvr_thread->sendEvent(eFilePushThread::evtUser);
 				}
 			}
 			else
@@ -2162,11 +2174,11 @@ void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off
 		}
 	}
 
-	if ((current_offset < 0) && (m_skipmode_m < 0))
+	if ((current_offset < -m_skipmode_m) && (m_skipmode_m < 0))
 	{
 		eDebug("[eDVBChannel] reached SOF");
 		m_skipmode_m = 0;
-		sof = 1;
+		m_pvr_thread->sendEvent(eFilePushThread::evtUser);
 	}
 
 	start = current_offset;

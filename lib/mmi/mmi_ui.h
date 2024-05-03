@@ -12,11 +12,9 @@ struct slot_ui_data
 {
 	std::string appName;
 	int state;
-	int decoding_state;
 	ePyObject mmiScreen;
 	int mmiTuplePos;
 	int mmiScreenReady;
-	int isError10;
 };
 #endif
 
@@ -30,9 +28,7 @@ protected:
 	virtual ~eMMI_UI();
 public:
 	int getState(int slot);
-	int getDecodingState(int slot);
 	void setState(int slot, int state);
-	void setDecodingState(int slot, int state);
 	std::string getAppName(int slot);
 	void setAppName(int slot, const char *name);
 #ifndef SWIG
@@ -46,7 +42,6 @@ public:
 	virtual int getMMIState(int slot)=0;
 #endif
 	int availableMMI(int slot);
-	int isError10(int slot);
 	PyObject *getMMIScreen(int slot);
 #ifndef SWIG
 	int processMMIData(int slot, const unsigned char *tag, const void *data, int len);
@@ -55,7 +50,6 @@ public:
 	int mmiScreenBegin(int slot, int listmenu);
 	int mmiScreenAddText(int slot, int type, char *value);
 	int mmiScreenFinish(int slot);
-	int mmiScreenError10(int slot);
 	void mmiSessionDestroyed(int slot);
 #endif
 };

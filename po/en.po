@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2 teamBlue\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-24 10:35+0200\n"
+"POT-Creation-Date: 2023-10-27 20:38+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: satdreamgr\n"
 "Language-Team: \n"
@@ -224,10 +224,6 @@ msgstr ""
 
 #. TRANSLATORS: long date representation short dayname daynum short monthname hour:minute in strftime() format! See 'man strftime'
 msgid "%a %e/%m  %-H:%M"
-msgstr ""
-
-#, python-format
-msgid "%d"
 msgstr ""
 
 #, python-format
@@ -468,7 +464,7 @@ msgstr ""
 msgid "(activated +%d min)"
 msgstr ""
 
-msgid "(current image)"
+msgid "(current)"
 msgstr ""
 
 msgid "(empty)"
@@ -481,9 +477,6 @@ msgid "(show optional DVD audio menu)"
 msgstr ""
 
 msgid "(unknown)"
-msgstr ""
-
-msgid "* = Restart Required"
 msgstr ""
 
 msgid "* Only available if more than one interface is active."
@@ -1235,6 +1228,9 @@ msgstr ""
 msgid "Aruba"
 msgstr ""
 
+msgid "As defined by the skin"
+msgstr ""
+
 msgid "Ask user"
 msgstr ""
 
@@ -1739,13 +1735,7 @@ msgstr ""
 msgid "CI (Common Interface) Setup"
 msgstr ""
 
-msgid "CI Boot Delay"
-msgstr ""
-
 msgid "CI assignment"
-msgstr ""
-
-msgid "CI enabled"
 msgstr ""
 
 msgid "CI slot: "
@@ -1981,10 +1971,6 @@ msgstr ""
 msgid "Channel Info"
 msgstr ""
 
-#, fuzzy
-msgid "Channel Selection"
-msgstr "Positioner setup"
-
 msgid "Channel button always changes sides"
 msgstr ""
 
@@ -1992,6 +1978,12 @@ msgid "Channel context menu"
 msgstr ""
 
 msgid "Channel list type"
+msgstr ""
+
+msgid "Channel list update Eventinfo delay"
+msgstr ""
+
+msgid "Channel list update interval for Eventinfo on cursor moving"
 msgstr ""
 
 msgid "Channel not in services list"
@@ -2746,9 +2738,6 @@ msgstr ""
 msgid "Copy to bouquets"
 msgstr ""
 
-msgid "Copying files"
-msgstr ""
-
 #, python-format
 msgid "Cores: %s"
 msgstr ""
@@ -3065,6 +3054,9 @@ msgstr ""
 msgid "Default movie location"
 msgstr ""
 
+msgid "Default recording type"
+msgstr ""
+
 msgid "Default settings"
 msgstr ""
 
@@ -3152,9 +3144,6 @@ msgstr ""
 msgid "Delay in miliseconds between scrolling characters on display."
 msgstr ""
 
-msgid "Delay when closing a stream relay service before reallocating the tuner for another service. Using '0' is only recommended for boxes with multiple satellite tuners."
-msgstr ""
-
 msgid "Delete"
 msgstr ""
 
@@ -3219,13 +3208,13 @@ msgstr ""
 msgid "Deleted items"
 msgstr ""
 
-msgid "Deleting files"
-msgstr ""
-
 msgid "Denmark"
 msgstr ""
 
 msgid "Depth"
+msgstr ""
+
+msgid "Descramble & record ECM gives the option to descramble afterwards if descrambling on recording failed. 'Don't descramble, record ECM' save a scramble recording that can be descrambled on playback. 'Normal' means descramble the recording and don't record ECM."
 msgstr ""
 
 msgid "Descramble receiving http streams"
@@ -3744,6 +3733,10 @@ msgstr ""
 
 #, python-format
 msgid "ERROR - failed to scan (%s)!"
+msgstr ""
+
+#, python-format
+msgid "ERROR downloading file %s/%s"
 msgstr ""
 
 msgid "East"
@@ -5099,9 +5092,6 @@ msgstr ""
 msgid "HDMI-IN Recording settings"
 msgstr "Adjust 3D settings"
 
-msgid "HDMI-In"
-msgstr ""
-
 msgid "HDR10 support"
 msgstr ""
 
@@ -5150,9 +5140,6 @@ msgstr ""
 msgid "Hardware Accelerated"
 msgstr ""
 
-msgid "Hardware: "
-msgstr ""
-
 msgid "HddMount"
 msgstr ""
 
@@ -5181,13 +5168,13 @@ msgstr ""
 msgid "Hide"
 msgstr ""
 
-msgid "Hide and confirm invalid key message"
-msgstr ""
-
 msgid "Hide channel list in radio mode"
 msgstr ""
 
 msgid "Hide known extensions"
+msgstr ""
+
+msgid "Hide number markers"
 msgstr ""
 
 msgid "Hide parentel locked services"
@@ -5425,16 +5412,10 @@ msgstr ""
 msgid "Image creation failed - "
 msgstr ""
 
-msgid "Image revision: "
-msgstr ""
-
 #, python-format
 msgid ""
 "Image to install is invalid\n"
 "%s"
-msgstr ""
-
-msgid "Image: "
 msgstr ""
 
 msgid "ImageWizard"
@@ -5602,13 +5583,6 @@ msgid "Input devices"
 msgstr ""
 
 msgid "Insert"
-msgstr ""
-
-#, fuzzy
-msgid "Insert Service"
-msgstr "Enter the service PIN"
-
-msgid "Insert entry"
 msgstr ""
 
 msgid "Insert line before current line"
@@ -6184,9 +6158,6 @@ msgstr ""
 msgid "MB"
 msgstr ""
 
-msgid "MENU"
-msgstr ""
-
 msgid "MHz"
 msgstr ""
 
@@ -6655,9 +6626,6 @@ msgid "Moving"
 msgstr ""
 
 msgid "Moving east..."
-msgstr ""
-
-msgid "Moving files"
 msgstr ""
 
 msgid "Moving to position"
@@ -7176,9 +7144,6 @@ msgstr ""
 msgid "Number or SMS style data entry"
 msgstr ""
 
-msgid "OE Version: "
-msgstr ""
-
 msgid "OK"
 msgstr ""
 
@@ -7444,12 +7409,6 @@ msgstr ""
 msgid "PPanel"
 msgstr ""
 
-msgid "PREVIOUS"
-msgstr ""
-
-msgid "PVR"
-msgstr ""
-
 msgid "Package list update"
 msgstr ""
 
@@ -7608,9 +7567,6 @@ msgid "Pillarbox"
 msgstr ""
 
 msgid "Pilot"
-msgstr ""
-
-msgid "Pin Userbouquet"
 msgstr ""
 
 msgid "Pitcairn"
@@ -8323,9 +8279,6 @@ msgstr ""
 msgid "Python version: "
 msgstr ""
 
-msgid "Pythonscript"
-msgstr ""
-
 msgid "Qatar"
 msgstr ""
 
@@ -8568,9 +8521,6 @@ msgid "Reload Services"
 msgstr ""
 
 msgid "Reload blacklists"
-msgstr ""
-
-msgid "Reload services/bouquets list"
 msgstr ""
 
 msgid "Reloading EPG Cache..."
@@ -9396,9 +9346,6 @@ msgstr ""
 msgid "Select OPKG source....."
 msgstr ""
 
-msgid "Select Service"
-msgstr ""
-
 msgid "Select Software Update"
 msgstr ""
 
@@ -9538,25 +9485,13 @@ msgstr ""
 msgid "Select secondary softcam"
 msgstr ""
 
-msgid "Select service name"
-msgstr ""
-
 msgid "Select service to add..."
-msgstr ""
-
-msgid "Select service type"
 msgstr ""
 
 msgid "Select slot"
 msgstr ""
 
 msgid "Select sort method:"
-msgstr ""
-
-msgid "Select stream URL"
-msgstr ""
-
-msgid "Select stream type"
 msgstr ""
 
 msgid "Select target folder"
@@ -9611,9 +9546,6 @@ msgid "Select the shifted character set"
 msgstr ""
 
 msgid "Select the shifted character set for the next character only"
-msgstr ""
-
-msgid "Select the timer from the fallback tuner by default"
 msgstr ""
 
 msgid "Select the tuner that controls the motorised dish."
@@ -9724,9 +9656,6 @@ msgstr ""
 msgid "Serial No"
 msgstr ""
 
-msgid "Serial: "
-msgstr ""
-
 #, python-format
 msgid "Serial: %s"
 msgstr ""
@@ -9741,12 +9670,6 @@ msgid "Service & PIDs"
 msgstr ""
 
 msgid "Service ID"
-msgstr ""
-
-msgid "Service Name"
-msgstr ""
-
-msgid "Service Type"
 msgstr ""
 
 msgid "Service belongs to a parental protected bouquet"
@@ -9779,9 +9702,6 @@ msgstr ""
 msgid "Service info - tuner setting values"
 msgstr ""
 
-msgid "Service info font size"
-msgstr ""
-
 msgid ""
 "Service invalid!\n"
 "(Timeout reading PMT)"
@@ -9790,15 +9710,9 @@ msgstr ""
 msgid "Service name"
 msgstr ""
 
-msgid "Service name font size"
-msgstr ""
-
 msgid ""
 "Service not found!\n"
 "(SID not found in PAT)"
-msgstr ""
-
-msgid "Service number font size"
 msgstr ""
 
 msgid "Service reference"
@@ -10108,9 +10022,6 @@ msgstr ""
 msgid "Show directories on first or last in list.(must restart File Commander)"
 msgstr ""
 
-msgid "Show disabled timers (local only)"
-msgstr ""
-
 msgid "Show disclaimer"
 msgstr ""
 
@@ -10404,6 +10315,9 @@ msgid "Single"
 msgstr ""
 
 msgid "Single EPG"
+msgstr ""
+
+msgid "Single line mode"
 msgstr ""
 
 msgid "Single satellite"
@@ -10922,16 +10836,6 @@ msgstr ""
 msgid "Stream"
 msgstr ""
 
-msgid "Stream Relay delay"
-msgstr ""
-
-msgid "Stream Type"
-msgstr ""
-
-#, fuzzy
-msgid "Stream URL"
-msgstr "Changelog"
-
 msgid "Stream request"
 msgstr ""
 
@@ -11368,11 +11272,6 @@ msgid ""
 "Make sure you select a writable directory instead."
 msgstr ""
 
-msgid ""
-"The enigma.info file for the boxinformation is not available or the content is invalid.\n"
-"Press any key to continue?"
-msgstr ""
-
 msgid "The following files were found..."
 msgstr ""
 
@@ -11494,9 +11393,6 @@ msgstr "There are at least %d updates available."
 msgid "There are currently no outstanding actions."
 msgstr ""
 
-msgid "There are no items currently available for this screen."
-msgstr ""
-
 msgid "There are no saved playlists to delete!"
 msgstr ""
 
@@ -11515,9 +11411,6 @@ msgid ""
 msgstr ""
 
 msgid "This DVD RW medium is already formatted - reformatting will erase all content on the disc."
-msgstr ""
-
-msgid "This allows you to change the font size relative to skin size, so 1 increases by 1 point size, and -1 decreases by 1 point size"
 msgstr ""
 
 msgid "This allows you to set the number of digits to 5, if you have more than 9999 channels."
@@ -12282,9 +12175,6 @@ msgstr ""
 msgid "Unpack to current folder"
 msgstr ""
 
-msgid "Unpin Userbouquet"
-msgstr ""
-
 msgid "Unsupported"
 msgstr ""
 
@@ -12402,10 +12292,6 @@ msgstr ""
 msgid "Use a gateway"
 msgstr ""
 
-#, fuzzy
-msgid "Use alternative skin"
-msgstr "Show tag menu"
-
 msgid "Use as PiP if possible"
 msgstr ""
 
@@ -12438,13 +12324,6 @@ msgstr ""
 
 msgid "Use power measurement"
 msgstr ""
-
-msgid "Use skin default"
-msgstr ""
-
-#, fuzzy
-msgid "Use the alternative screen"
-msgstr "Show tag menu"
 
 msgid "Use the cursor keys to select an installed image and then Start button."
 msgstr ""
@@ -12940,9 +12819,6 @@ msgstr ""
 msgid "When enabled the timer from the fallback tuner is imported"
 msgstr ""
 
-msgid "When enabled the timer from the fallback tuner is the default timer"
-msgstr ""
-
 msgid "When enabled then when you select a new channel in the channel selection the channel selection will not close. It will only close when you select the current playing service. This is a kind of preview mode"
 msgstr ""
 
@@ -13043,6 +12919,9 @@ msgid "When enabled, it will automatically play to the last saved radio service 
 msgstr ""
 
 msgid "When enabled, measure power consumption to detect when the rotor stops turning (when supported by the tuner)."
+msgstr ""
+
+msgid "When enabled, number markers will be hidden."
 msgstr ""
 
 msgid "When enabled, reformat subtitles to match the width of the screen."
@@ -13975,9 +13854,6 @@ msgstr ""
 msgid "extensions"
 msgstr ""
 
-msgid "extra high"
-msgstr ""
-
 msgid "extra wide"
 msgstr ""
 
@@ -14068,9 +13944,6 @@ msgstr ""
 msgid "green"
 msgstr ""
 
-msgid "half an hour"
-msgstr ""
-
 msgid "handicraft"
 msgstr ""
 
@@ -14084,9 +13957,6 @@ msgid "help..."
 msgstr ""
 
 msgid "hide"
-msgstr ""
-
-msgid "high"
 msgstr ""
 
 msgid "horizontal"
@@ -14797,9 +14667,6 @@ msgstr ""
 msgid "violet"
 msgstr ""
 
-msgid "wait for ci..."
-msgstr ""
-
 msgid "wait for mmi..."
 msgstr ""
 
@@ -14888,10 +14755,4 @@ msgid "zap and record"
 msgstr ""
 
 msgid "zapped"
-msgstr ""
-
-msgid "°E"
-msgstr ""
-
-msgid "°W"
 msgstr ""
