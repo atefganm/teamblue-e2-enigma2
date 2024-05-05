@@ -44,7 +44,7 @@ from Tools.Notifications import AddPopup, AddNotificationWithCallback, current_n
 from Tools.HardwareInfo import HardwareInfo
 
 from enigma import eTimer, eServiceCenter, eDVBServicePMTHandler, iServiceInformation, iPlayableService, eServiceReference, eEPGCache, eActionMap, getDesktop, eDVBDB
-
+from skin import findSkinScreen
 from time import time, localtime, strftime
 import os
 from bisect import insort
@@ -395,7 +395,7 @@ class InfoBarShowHide(InfoBarScreenSaver):
 
 		self.onShowHideNotifiers = []
 
-		self.actualSecondInfoBarScreen = None
+		self.actualSecondInfoBarScreen = self.InfoBarAdds = None
 		self.secondInfoBarScreen = None
 		if isStandardInfoBar(self):
 			self.secondInfoBarScreen = self.session.instantiateDialog(SecondInfoBar, "SecondInfoBar")
@@ -407,8 +407,9 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			self.secondInfoBarScreenSimple.onShow.append(self.__SecondInfobarOnShow)
 			self.secondInfoBarScreenSimple.onHide.append(self.__SecondInfobarOnHide)
 			self.actualSecondInfoBarScreen = config.usage.show_simple_second_infobar.value and self.secondInfoBarScreenSimple.skinAttributes and self.secondInfoBarScreenSimple or self.secondInfoBarScreen
-			self.InfoBarAdds = self.session.instantiateDialog(SecondInfoBar, "InfoBarAdds")
-			self.InfoBarAdds.show()
+			if findSkinScreen("InfoBarAdds"):
+				self.InfoBarAdds = self.session.instantiateDialog(SecondInfoBar, "InfoBarAdds")
+				self.InfoBarAdds.show()
 
 		self.InfobarPluginScreens = [self.session.instantiateDialog(plugin) for plugin in plugins.getPlugins(where=PluginDescriptor.WHERE_INFOBAR_SCREEN)]
 		self.SecondInfobarPluginScreens = [self.session.instantiateDialog(plugin) for plugin in plugins.getPlugins(where=PluginDescriptor.WHERE_SECONDINFOBAR_SCREEN)]
@@ -433,6 +434,7 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		if self.actualSecondInfoBarScreen:
 			self.secondInfoBarScreen.hide()
 			self.secondInfoBarScreenSimple.hide()
+		if self.InfoBarAdds:
 			self.InfoBarAdds.hide()
 		self.hideVBILineScreen.hide()
 
@@ -444,7 +446,7 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			PluginScreen.show()
 		self.startHideTimer()
 		VolumeControl.instance and VolumeControl.instance.showMute()
-		if config.usage.show_infobar_adds.value:
+		if self.InfoBarAdds and config.usage.show_infobar_adds.value:
 			self.InfoBarAdds.show()
 
 	def __onHide(self):
@@ -457,7 +459,8 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			x(False)
 		for PluginScreen in self.InfobarPluginScreens:
 			PluginScreen.hide()
-		self.InfoBarAdds.hide()
+		if self.InfoBarAdds:
+			self.InfoBarAdds.hide()
 
 	def __SecondInfobarOnShow(self):
 		for PluginScreen in self.InfobarPluginScreens:
@@ -503,13 +506,13 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			self.toggleViews()
 
 	def toggleViews(self):
-		if self.shown and not self.secondInfoBarScreen.shown and not self.secondInfoBarScreenSimple.shown:
+		if self.shown:
 			self.toggleInfoBarAddon()
 		else:
 			self.toggleSecondInfoBar()
 
 	def toggleSecondInfoBar(self):
-		if self.actualSecondInfoBarScreen and not self.shown and not self.actualSecondInfoBarScreen.shown and self.secondInfoBarScreenSimple.skinAttributes and self.secondInfoBarScreen.skinAttributes:
+		if self.actualSecondInfoBarScreen and not self.actualSecondInfoBarScreen.shown and self.secondInfoBarScreenSimple.skinAttributes and self.secondInfoBarScreen.skinAttributes:
 			self.actualSecondInfoBarScreen.hide()
 			config.usage.show_simple_second_infobar.value = not config.usage.show_simple_second_infobar.value
 			config.usage.show_simple_second_infobar.save()
@@ -517,6 +520,7 @@ class InfoBarShowHide(InfoBarScreenSaver):
 			self.showSecondInfoBar()
 
 	def toggleInfoBarAddon(self):
+		if self.InfoBarAdds and (self.actualSecondInfoBarScreen and not self.actualSecondInfoBarScreen.shown or not self.actualSecondInfoBarScreen):
 			config.usage.show_infobar_adds.value = not config.usage.show_infobar_adds.value
 			if config.usage.show_infobar_adds.value:
 				self.InfoBarAdds.show()
