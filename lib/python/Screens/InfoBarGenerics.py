@@ -13,7 +13,7 @@ from Components.ServiceEventTracker import ServiceEventTracker
 from Components.ServiceList import refreshServiceList
 from Components.Sources.Boolean import Boolean
 from Components.config import config, ConfigBoolean, ConfigClock
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import BoxInfo
 from Components.UsageConfig import preferredInstantRecordPath, defaultMoviePath
 from Components.VolumeControl import VolumeControl
 from Components.Sources.StaticText import StaticText
@@ -171,13 +171,11 @@ class InfoBarStreamRelay:
 
 	FILENAME = "/etc/enigma2/whitelist_streamrelay"
 
-
 	def __init__(self):
 		self.__srefs = self.__sanitizeData(open(self.FILENAME, 'r').readlines()) if os.path.isfile(self.FILENAME) else []
 
 	def __sanitizeData(self, data):
 		return list(set([line.strip() for line in data if line and isinstance(line, str) and match("^(?:[0-9A-F]+[:]){10}$", line.strip())])) if isinstance(data, list) else []
-
 
 	def __saveToFile(self):
 		self.__srefs.sort(key=lambda ref: (int((x := ref.split(":"))[6], 16), int(x[5], 16), int(x[4], 16), int(x[3], 16)))
@@ -199,7 +197,6 @@ class InfoBarStreamRelay:
 
 	def getData(self):
 		return self.__srefs
-
 
 	def setData(self, data):
 		self.__srefs = self.__sanitizeData(data)
@@ -449,10 +446,30 @@ class InfoBarShowHide(InfoBarScreenSaver):
 		if self.InfoBarAdds and config.usage.show_infobar_adds.value:
 			self.InfoBarAdds.show()
 
+	def doDimming(self):
+		if config.usage.show_infobar_do_dimming.value:
+			self.dimmed = self.dimmed - 1
+		else:
+			self.dimmed = 0
+		self.DimmingTimer.stop()
+		self.doHide()
+
+	def unDimming(self):
+		self.unDimmingTimer.stop()
+		self.doWriteAlpha(config.av.osd_alpha.value)
+
+	def doWriteAlpha(self, value):
+		if fileExists("/proc/stb/video/alpha"):
+			f = open("/proc/stb/video/alpha", "w")
+			f.write("%i" % (value))
+			f.close()
+
 	def __onHide(self):
+		if BoxInfo.getItem("CanChangeOsdAlpha"):
+			self.unDimmingTimer = eTimer()
+			self.unDimmingTimer.callback.append(self.unDimming)
+			self.unDimmingTimer.start(100, True)
 		self.__state = self.STATE_HIDDEN
-		if config.usage.show_infobar_do_dimming.value is True:
-			self.resetAlpha()
 		if self.actualSecondInfoBarScreen:
 			self.actualSecondInfoBarScreen.hide()
 		for x in self.onShowHideNotifiers:
@@ -568,34 +585,18 @@ class InfoBarShowHide(InfoBarScreenSaver):
 
 	def doShow(self):
 		self.show()
-		if config.usage.show_infobar_do_dimming.value is True:
-			self.hideTimer.stop()
-			self.DimmingTimer.stop()
-			self.doWriteAlpha(config.av.osd_alpha.value)
 		self.startHideTimer()
 
 	def doTimerHide(self):
 		self.hideTimer.stop()
-		if config.usage.show_infobar_do_dimming.value is True:
+		if BoxInfo.getItem("CanChangeOsdAlpha"):
+			self.DimmingTimer = eTimer()
+			self.DimmingTimer.callback.append(self.doDimming)
 			self.DimmingTimer.start(70, True)
 			self.dimmed = config.usage.show_infobar_dimming_speed.value
 		else:
 			if self.__state == self.STATE_SHOWN:
 				self.hide()
-
-	def doHide(self):
-		if self.__state != self.STATE_HIDDEN:
-			if self.dimmed > 0:
-				self.doWriteAlpha(int(int(config.av.osd_alpha.value) * int(self.dimmed) / int(config.usage.show_infobar_dimming_speed.value)))
-				self.DimmingTimer.start(5, True)
-			else:
-				self.DimmingTimer.stop()
-				self.hide()
-
-		self.DimmingTimer = eTimer()
-		self.DimmingTimer.callback.append(self.doDimming)
-		self.DimmingTimer.start(70, True)
-		self.dimmed = config.usage.show_infobar_dimming_speed.value
 
 	def doHide(self):
 		if self.__state != self.STATE_HIDDEN:
@@ -4220,7 +4221,7 @@ class InfoBarHDMI:
 		self.hdmi_enabled_full = False
 		self.hdmi_enabled_pip = False
 
-		if SystemInfo["HasHDMI-In"]:
+		if BoxInfo.getItem("HasHDMI-In"):
 			if not self.hdmi_enabled_full:
 				self.addExtension((self.getHDMIInFullScreen, self.HDMIInFull, lambda: True), "blue")
 			if not self.hdmi_enabled_pip:
