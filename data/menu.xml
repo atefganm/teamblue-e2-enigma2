@@ -99,7 +99,7 @@
 					<item weight="5" level="0" text="Display Skin" entryID="display_skin_selector" requires="OledDisplay"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
 					<item weight="10" level="0" text="Clock Skin" entryID="clock_skin_selector" requires="OledDisplay"><screen module="SkinSelector" screen="ClockSkinSelector"/></item>
 					<item weight="10" level="0" text="Display Skin" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
-					<item level="0" requires="FrontpanelDisplay" text="Display Skin" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
+					<item entryID="led_setup" level="1" text="LED Setup" weight="15"><setup id="ledsetup" /></item>
 				</menu>
 
 				<!-- Menu / Settings / System / Recording Menu -->
@@ -212,6 +212,6 @@ self.session.openWithCallback(msgClosed, FactoryReset)
 			<item weight="24" level="0" text="Switch to Android" requires="canDualBoot" entryID="dualboot"><screen module="Standby" screen="SwitchToAndroid" /></item>
 			<item weight="25" level="0" text="Restart" entryID="restart"><screen module="Standby" screen="TryQuitMainloop">2</screen></item>
 			<item weight="30" level="0" text="Shutdown" requires="!DeepstandbySupport" entryID="deep_standby"><screen module="Standby" screen="TryQuitMainloop">1</screen></item>
- 			<item entryID="maintenance_mode" level="0" text="Recovery Mode" weight="55" requires="RecoveryMode"><screen module="Standby" screen="TryQuitMainloop">16</screen></item>
+			<item entryID="maintenance_mode" level="0" text="Recovery Mode" weight="55" requires="RecoveryMode"><screen module="Standby" screen="TryQuitMainloop">16</screen></item>
 		</menu>
 </menu>
