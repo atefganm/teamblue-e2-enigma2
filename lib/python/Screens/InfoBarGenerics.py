@@ -13,7 +13,7 @@ from Components.ServiceEventTracker import ServiceEventTracker
 from Components.ServiceList import refreshServiceList
 from Components.Sources.Boolean import Boolean
 from Components.config import config, ConfigBoolean, ConfigClock
-from Components.SystemInfo import BoxInfo
+from Components.SystemInfo import SystemInfo, BoxInfo
 from Components.UsageConfig import preferredInstantRecordPath, defaultMoviePath
 from Components.VolumeControl import VolumeControl
 from Components.Sources.StaticText import StaticText
@@ -1253,7 +1253,7 @@ class InfoBarMenu:
 		self.session.openWithCallback(self.mainMenuClosed, MainMenu, menu)
 
 	def showHDMiRecordSetup(self):
-		if SystemInfo["HasHDMI-In"]:
+		if BoxInfo.getItem("HasHDMI-In"):
 			self.session.openWithCallback(self.mainMenuClosed, Setup, 'HDMIRecord')
 
 	def mainMenuClosed(self, *val):
@@ -2410,8 +2410,8 @@ class InfoBarTimeshift:
 		self.restartSubtitle()
 
 	def setLCDsymbolTimeshift(self):
-		if SystemInfo["LCDsymbol_timeshift"]:
-			open(SystemInfo["LCDsymbol_timeshift"], "w").write(self.timeshiftEnabled() and "1" or "0")
+		if BoxInfo.getItem("LCDsymbol_timeshift"):
+			open(BoxInfo.getItem("LCDsymbol_timeshift"), "w").write(self.timeshiftEnabled() and "1" or "0")
 
 	def __serviceStarted(self):
 		self.pvrStateDialog.hide()
@@ -2694,7 +2694,7 @@ class InfoBarPiP:
 
 		self.lastPiPService = None
 
-		if SystemInfo["PIPAvailable"]:
+		if BoxInfo.getItem("PIPAvailable"):
 			self["PiPActions"] = HelpableActionMap(self, ["InfobarPiPActions"],
 				{
 					"activatePiP": (self.activePiP, self.activePiPName),
@@ -2759,7 +2759,7 @@ class InfoBarPiP:
 					if lastPiPServiceTimeout:
 						self.lastPiPServiceTimeoutTimer.startLongTimer(lastPiPServiceTimeout)
 				del self.session.pip
-				if SystemInfo["LCDMiniTV"]:
+				if BoxInfo.getItem("LCDMiniTV"):
 					if config.lcd.modepip.value >= "1":
 						f = open("/proc/stb/lcd/mode", "w")
 						f.write(config.lcd.modeminitv.value)
@@ -2774,7 +2774,7 @@ class InfoBarPiP:
 			if self.session.pip.playService(newservice):
 				self.session.pipshown = True
 				self.session.pip.servicePath = slist and slist.getCurrentServicePath()
-				if SystemInfo["LCDMiniTV"]:
+				if BoxInfo.getItem("LCDMiniTV"):
 					if config.lcd.modepip.value >= "1":
 						f = open("/proc/stb/lcd/mode", "w")
 						f.write(config.lcd.modepip.value)

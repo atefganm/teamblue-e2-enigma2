@@ -8,7 +8,7 @@ from Screens.MessageBox import MessageBox
 from Screens.InputBox import InputBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.InfoBar import InfoBar
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarScreenSaver, InfoBarAudioSelection, InfoBarCueSheetSupport, InfoBarNotifications, InfoBarSubtitleSupport, InfoBarAspectSelection
+from Screens.InfoBarGenerics import InfoBarSeek, InfoBarScreenSaver, InfoBarAudioSelection, InfoBarCueSheetSupport, InfoBarNotifications, InfoBarSubtitleSupport
 from Components.ActionMap import NumberActionMap, HelpableActionMap, eActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap, MultiPixmap
@@ -20,7 +20,7 @@ from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Playlist import PlaylistIOInternal, PlaylistIOM3U, PlaylistIOPLS
 from Components.AVSwitch import AVSwitch
 from Components.config import config
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import BoxInfo
 from Tools.Directories import fileExists, resolveFilename, SCOPE_CONFIG, SCOPE_PLAYLIST, SCOPE_CURRENT_SKIN
 from Tools.BoundFunction import boundFunction
 from .settings import MediaPlayerSettings
@@ -100,7 +100,7 @@ class MediaPlayerInfoBar(Screen):
 		self.skinName = "MoviePlayer"
 
 
-class MediaPlayer(Screen, InfoBarBase, InfoBarScreenSaver, InfoBarSeek, InfoBarAudioSelection, InfoBarCueSheetSupport, InfoBarNotifications, InfoBarSubtitleSupport, HelpableScreen, InfoBarAspectSelection):
+class MediaPlayer(Screen, InfoBarBase, InfoBarScreenSaver, InfoBarSeek, InfoBarAudioSelection, InfoBarCueSheetSupport, InfoBarNotifications, InfoBarSubtitleSupport, HelpableScreen):
 	ALLOW_SUSPEND = True
 	ENABLE_RESUME_SUPPORT = True
 	FLAG_CENTER_DVB_SUBS = 2048
@@ -109,7 +109,6 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarScreenSaver, InfoBarSeek, InfoBarA
 	def __init__(self, session, args=None):
 		Screen.__init__(self, session)
 		InfoBarAudioSelection.__init__(self)
-		InfoBarAspectSelection.__init__(self)
 		InfoBarCueSheetSupport.__init__(self, actionmap="MediaPlayerCueSheetActions")
 		InfoBarNotifications.__init__(self)
 		InfoBarBase.__init__(self)
@@ -268,7 +267,7 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarScreenSaver, InfoBarSeek, InfoBarA
 		if InfoBar.instance is not None:
 			self.servicelist = InfoBar.instance.servicelist
 			if self.servicelist and hasattr(self.servicelist, 'dopipzap'):
-				self.pipZapAvailable = SystemInfo.get("NumVideoDecoders", 1) > 1
+				self.pipZapAvailable = BoxInfo.getItem("NumVideoDecoders", 1) > 1
 
 	def prevBouquetHelpText(self):
 		if not self.shown and self.isPiPzap():
