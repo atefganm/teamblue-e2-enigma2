@@ -5,7 +5,7 @@ from time import sleep
 from enigma import eAVSwitch, eDVBVolumecontrol, getDesktop
 from Components.config import config, ConfigSlider, ConfigSelection, ConfigSubDict, ConfigYesNo, ConfigEnableDisable, ConfigOnOff, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave
 from Components.About import about
-from Components.SystemInfo import SystemInfo, BoxInfo
+from Components.SystemInfo import BoxInfo
 from Tools.CList import CList
 from Tools.HardwareInfo import HardwareInfo
 
@@ -1405,14 +1405,14 @@ def InitAVSwitch():
 	else:
 		config.av.scaler_sharpness = NoSave(ConfigNothing())
 
-	if SystemInfo["CanChangeOsdAlpha"]:
-		def setAlpha(config):
+	if BoxInfo.getItem("CanChangeOsdAlpha"):
+		def setOSDAlpha(config):
 			try:
 				open("/proc/stb/video/alpha", "w").write(str(config.value))
 			except:
 				print("[AVSwitch] Write to /proc/stb/video/alpha failed!")
-		config.av.osd_alpha = ConfigSlider(default=255, limits=(0, 255))
-		config.av.osd_alpha.addNotifier(setAlpha)
+		config.av.osd_alpha = ConfigSlider(default=255, increment=5, limits=(20, 255)) # Make Openpli compatible with some plugins who still use config.av.osd_alpha.
+		config.av.osd_alpha.addNotifier(setOSDAlpha)
 
 
 class VideomodeHotplug:
