@@ -512,6 +512,14 @@ def InitUsageConfig():
 
 	config.osd.alpha_teletext = ConfigSelectionNumber(default=255, stepwidth=1, min=0, max=255, wraparound=False)
 
+	config.usage.multiboot_order = ConfigYesNo(default=True)
+
+	config.usage.setupShowDefault = ConfigSelection(default="spaces", choices=[
+		("", _("Don't show default")),
+		("spaces", _("Show default after description")),
+		("newline", _("Show default on new line"))
+	])
+
 	config.epg = ConfigSubsection()
 	config.epg.eit = ConfigYesNo(default=True)
 	config.epg.mhw = ConfigYesNo(default=False)

@@ -10,6 +10,8 @@ from sys import _getframe as getframe
 from unicodedata import normalize
 from xml.etree.ElementTree import Element, ParseError, fromstring, parse
 
+from xml.etree.ElementTree import Element, fromstring, parse
+
 pathExists = os.path.exists
 
 DEFAULT_MODULE_NAME = __name__.split(".")[-1]
@@ -443,6 +445,22 @@ def fileWriteLines(filename, lines, source=DEFAULT_MODULE_NAME, debug=False):
 	if debug or forceDebug:
 		print("[%s] Line %d: %s %d lines to file '%s'." % (source, stack()[1][0].f_lineno, msg, len(lines), filename))
 	return result
+
+
+def fileReadXML(filename, default=None, *args, **kwargs):
+	dom = None
+	try:
+		with open(filename, "r", encoding="utf-8") as fd:
+			dom = parse(fd).getroot()
+	except:
+		print("[fileReadXML] failed to read", filename)
+		print_exc()
+	if dom is None and default:
+		if isinstance(default, str):
+			dom = fromstring(default)
+		elif isinstance(default, Element):
+			dom = default
+	return dom
 
 
 def getRecordingFilename(basename, dirname=None):
