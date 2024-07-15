@@ -1,14 +1,13 @@
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <fcntl.h>
 #include <stdio.h>
-#include <vector>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <libsig_comp.h>
 #include <linux/dvb/version.h>
-
 #include <lib/actions/action.h>
 #include <lib/driver/rc.h>
 #include <lib/base/ioprio.h>
@@ -40,6 +39,16 @@
 
 #include <gst/gst.h>
 
+#include <unistd.h>
+#include <lib/components/scan.h>
+#include <lib/dvb/idvb.h>
+#include <lib/dvb/dvb.h>
+#include <lib/dvb/db.h>
+#include <lib/dvb/dvbtime.h>
+#include <lib/dvb/epgcache.h>
+#include <lib/dvb/epgtransponderdatareader.h>
+#include <malloc.h>
+
 #ifdef OBJECT_DEBUG
 int object_total_remaining;
 
@@ -50,7 +59,6 @@ void object_dump()
 #endif
 
 static eWidgetDesktop *wdsk, *lcddsk;
-
 static int prev_ascii_code;
 
 int getPrevAsciiCode()
@@ -93,14 +101,6 @@ void keyEvent(const eRCKey &key)
 }
 
 /************************************************/
-#include <unistd.h>
-#include <lib/components/scan.h>
-#include <lib/dvb/idvb.h>
-#include <lib/dvb/dvb.h>
-#include <lib/dvb/db.h>
-#include <lib/dvb/dvbtime.h>
-#include <lib/dvb/epgcache.h>
-#include <lib/dvb/epgtransponderdatareader.h>
 
 /* Defined in eerror.cpp */
 void setDebugTime(bool enable);
@@ -144,8 +144,42 @@ bool fileExists(const std::string& path) {
 	return file.good();
 }
 
+bool getConfigBoolValue(const std::string& configFile, const std::string& key, bool defaultValue) {
+	std::ifstream in(configFile);
+	if (!in.is_open()) {
+		eDebug("[MAIN] Error opening config file: %s", configFile.c_str());
+		return defaultValue;
+	}
+
+	std::string line;
+	while (std::getline(in, line)) {
+		if (line.find(key) != std::string::npos) {
+			size_t pos = line.find('=');
+			if (pos != std::string::npos) {
+				std::string valueStr = line.substr(pos + 1);
+				// Trim leading and trailing whitespace
+				size_t start = valueStr.find_first_not_of(" \t");
+				size_t end = valueStr.find_last_not_of(" \t");
+				if (start != std::string::npos && end != std::string::npos) {
+					valueStr = valueStr.substr(start, end - start + 1);
+				}
+				// Check if valueStr is "true" or "false"
+				if (valueStr == "true" || valueStr == "TRUE") {
+					return true;
+				} else if (valueStr == "false" || valueStr == "FALSE") {
+					return false;
+				} else {
+					break;
+				}
+			}
+		}
+	}
+
+	return defaultValue;
+}
+
 static const std::string getConfigCurrentSpinner(const std::string &key) {
-	std::string value = "";
+	std::string value;
 	std::ifstream in(eEnv::resolve("${sysconfdir}/enigma2/settings").c_str());
 
 	if (in.good()) {
@@ -167,13 +201,17 @@ static const std::string getConfigCurrentSpinner(const std::string &key) {
 		value = "GigabluePaxV2";
 	}
 
-	std::vector<std::string> directories = {
-		"/usr/share/enigma2/" + value + "/spinner/wait1.png",
-		"/usr/share/enigma2/" + value + "/skin_default/spinner/wait1.png",
-		"/usr/share/enigma2/skin_default/spinner/wait1.png"
-	};
+	std::vector<std::string> directories;
+	bool useDefaultSpinner = getConfigBoolValue("/etc/enigma2/settings", "config.usage.usedefaultspinner", false);
+
+	if (!useDefaultSpinner) {
+		directories.push_back("/usr/share/enigma2/" + value + "/spinner/wait1.png");
+		directories.push_back("/usr/share/enigma2/" + value + "/skin_default/spinner/wait1.png");
+	}
+	directories.push_back("/usr/share/enigma2/skin_default/spinner/wait1.png");
 
 	for (const auto& dir : directories) {
+
 		if (fileExists(dir)) {
 			if (dir.find("skin_default") != std::string::npos && dir.find(value) != std::string::npos) {
 				return value + "/skin_default";
@@ -188,27 +226,24 @@ static const std::string getConfigCurrentSpinner(const std::string &key) {
 	return "skin_default";
 }
 
+
 int exit_code;
 
 void quitMainloop(int exitCode)
 {
 	FILE *f = fopen("/proc/stb/fp/was_timer_wakeup", "w");
-	if (f)
-	{
+	if (f) {
 		fprintf(f, "%d", 0);
 		fclose(f);
-	}
-	else
-	{
+	} else {
 		int fd = open("/dev/dbox/fp0", O_WRONLY);
-		if (fd >= 0)
-		{
+		if (fd >= 0) {
 			if (ioctl(fd, 10 /*FP_CLEAR_WAKEUP_TIMER*/) < 0)
 				eDebug("[quitMainloop] FP_CLEAR_WAKEUP_TIMER failed: %m");
 			close(fd);
-		}
-		else
+		} else {
 			eDebug("[quitMainloop] open /dev/dbox/fp0 for wakeup timer clear failed: %m");
+		}
 	}
 	exit_code = exitCode;
 	eApp->quit(0);
@@ -254,33 +289,26 @@ int main(int argc, char **argv)
 
 	gst_init(&argc, &argv);
 
-	// set pythonpath if unset
 	setenv("PYTHONPATH", eEnv::resolve("${libdir}/enigma2/python").c_str(), 0);
 	printf("[enigma2] PYTHONPATH: %s\n", getenv("PYTHONPATH"));
 	printf("[enigma2] DVB_API_VERSION %d DVB_API_VERSION_MINOR %d\n", DVB_API_VERSION, DVB_API_VERSION_MINOR);
 
-	// get enigma2 debug level settings
 	debugLvl = getenv("ENIGMA_DEBUG_LVL") ? atoi(getenv("ENIGMA_DEBUG_LVL")) : DEFAULT_DEBUG_LVL;
 	if (debugLvl < 0)
 		debugLvl = 0;
 	printf("ENIGMA_DEBUG_LVL=%d\n", debugLvl);
 	if (getenv("ENIGMA_DEBUG_TIME"))
 		setDebugTime(atoi(getenv("ENIGMA_DEBUG_TIME")) != 0);
+
 	ePython python;
 	eMain main;
 
-#if 1
 	ePtr<gMainDC> my_dc;
 	gMainDC::getInstance(my_dc);
-
-	//int double_buffer = my_dc->haveDoubleBuffering();
 
 	ePtr<gLCDDC> my_lcd_dc;
 	gLCDDC::getInstance(my_lcd_dc);
 
-
-		/* ok, this is currently hardcoded for arabic. */
-			/* some characters are wrong in the regular font, force them to use the replacement font */
 	for (int i = 0x60c; i <= 0x66d; ++i)
 		eTextPara::forceReplacementGlyph(i);
 	eTextPara::forceReplacementGlyph(0xfdf2);
@@ -293,12 +321,6 @@ int main(int argc, char **argv)
 	dsk.setStyleID(0);
 	dsk_lcd.setStyleID(1);
 
-/*	if (double_buffer)
-	{
-		eDebug("[MAIN] - double buffering found, enable buffered graphics mode.");
-		dsk.setCompositionMode(eWidgetDesktop::cmBuffered);
-	} */
-
 	wdsk = &dsk;
 	lcddsk = &dsk_lcd;
 
@@ -306,42 +328,38 @@ int main(int argc, char **argv)
 	dsk_lcd.setDC(my_lcd_dc);
 
 	dsk.setBackgroundColor(gRGB(0,0,0,0xFF));
-#endif
 
-		/* redrawing is done in an idle-timer, so we have to set the context */
 	dsk.setRedrawTask(main);
 	dsk_lcd.setRedrawTask(main);
 
 	std::string active_skin = getConfigCurrentSpinner("config.skin.primary_skin");
 	eDebug("[MAIN] Loading spinners from /usr/share/enigma2/%s/spinner/", active_skin.c_str());
 
+	int i;
+	#define MAX_SPINNER 64
+	ePtr<gPixmap> wait[MAX_SPINNER];
+	for (i=0; i<MAX_SPINNER; ++i)
 	{
-		int i;
-#define MAX_SPINNER 64
-		ePtr<gPixmap> wait[MAX_SPINNER];
-		for (i=0; i<MAX_SPINNER; ++i)
+		char filename[64] = {};
+		std::string rfilename;
+		snprintf(filename, sizeof(filename), "${datadir}/enigma2/%s/spinner/wait%d.png", active_skin.c_str(), i + 1);
+		rfilename = eEnv::resolve(filename);
+
+		if (::access(rfilename.c_str(), R_OK) < 0)
+			break;
+
+		loadImage(wait[i], rfilename.c_str());
+		if (!wait[i])
 		{
-			char filename[64] = {};
-			std::string rfilename;
-			snprintf(filename, sizeof(filename), "${datadir}/enigma2/%s/spinner/wait%d.png", active_skin.c_str(), i + 1);
-			rfilename = eEnv::resolve(filename);
-
-			if (::access(rfilename.c_str(), R_OK) < 0)
-				break;
-
-			loadImage(wait[i], rfilename.c_str());
-			if (!wait[i])
-			{
-				eDebug("[MAIN] failed to load %s: %m", rfilename.c_str());
-				break;
-			}
+			eDebug("[MAIN] failed to load %s: %m", rfilename.c_str());
+			break;
 		}
-		eDebug("[MAIN] found %d spinner!", i);
-		if (i)
-			my_dc->setSpinner(eRect(ePoint(25, 25), wait[0]->size()), wait, i);
-		else
-			my_dc->setSpinner(eRect(25, 25, 0, 0), wait, 1);
 	}
+	eDebug("[MAIN] found %d spinner!", i);
+	if (i)
+		my_dc->setSpinner(eRect(ePoint(25, 25), wait[0]->size()), wait, i);
+	else
+		my_dc->setSpinner(eRect(25, 25, 0, 0), wait, 1);
 
 	gRC::getInstance()->setSpinnerDC(my_dc);
 
@@ -354,12 +372,10 @@ int main(int argc, char **argv)
 
 	setIoPrio(IOPRIO_CLASS_BE, 3);
 
-	/* start at full size */
 	eVideoWidget::setFullsize(true);
 
 	python.execFile(eEnv::resolve("${libdir}/enigma2/python/StartEnigma.py").c_str());
 
-	/* restore both decoders to full size */
 	eVideoWidget::setFullsize(true);
 
 	if (exit_code == 5) /* python crash */
@@ -377,6 +393,7 @@ int main(int argc, char **argv)
 		p.clear();
 		p.flush();
 	}
+
 	return exit_code;
 }
 
@@ -405,7 +422,6 @@ const char *getE2Rev()
 {
 	return E2REV;
 }
-
 
 const char *getGStreamerVersionString()
 {
