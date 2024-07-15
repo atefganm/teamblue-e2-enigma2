@@ -24,9 +24,6 @@ eDVBServiceStream::eDVBServiceStream()
 void eDVBServiceStream::serviceEvent(int event)
 {
 	eDebug("[eDVBServiceStream] STREAM service event %d", event);
-	if(event == eDVBServicePMTHandler::eventTuneFailed || event == eDVBServicePMTHandler::eventMisconfiguration || event == eDVBServicePMTHandler::eventNoResources)
-		eventUpdate(event);
-
 	switch (event)
 	{
 	case eDVBServicePMTHandler::eventTuned:
@@ -48,7 +45,7 @@ void eDVBServiceStream::serviceEvent(int event)
 	}
 	case eDVBServicePMTHandler::eventTuneFailed:
 	{
-		eDebug("stream failed to tune");
+		eDebug("[eDVBServiceStream] failed to tune");
 		tuneFailed();
 		break;
 	}
@@ -67,8 +64,6 @@ void eDVBServiceStream::serviceEvent(int event)
 		tuneFailed();
 		break;
 	}
-	if(event != eDVBServicePMTHandler::eventTuneFailed && event != eDVBServicePMTHandler::eventMisconfiguration && event != eDVBServicePMTHandler::eventNoResources)
-		eventUpdate(event);
 }
 
 int eDVBServiceStream::start(const char *serviceref, int fd)
@@ -138,20 +133,20 @@ int eDVBServiceStream::doRecord()
 		ePtr<iDVBDemux> demux;
 		if (m_service_handler.getDataDemux(demux))
 		{
-			eDebug("eDVBServiceStream - NO DEMUX available");
+			eDebug("[eDVBServiceStream] NO DEMUX available");
 			return -1;
 		}
 		demux->createTSRecorder(m_record, /*packetsize*/ 188, /*streaming*/ true);
 		if (!m_record)
 		{
-			eDebug("eDVBServiceStream - no ts recorder available.");
+			eDebug("[eDVBServiceStream] no ts recorder available.");
 			return -1;
 		}
 		m_record->setTargetFD(m_target_fd);
 		m_record->connectEvent(sigc::mem_fun(*this, &eDVBServiceStream::recordEvent), m_con_record_event);
 	}
 
-	eDebug("start streaming...");
+	eDebug("[eDVBServiceStream] start streaming...");
 
 	if (recordCachedPids())
 	{
@@ -162,9 +157,9 @@ int eDVBServiceStream::doRecord()
 	eDVBServicePMTHandler::program program;
 	if (m_service_handler.getProgramInfo(program))
 	{
-		eDebug("getting program info failed.");
+		eDebug("[eDVBServiceStream] getting program info failed.");
 	}
-	else if(m_record_no_pids == 0)
+	else
 	{
 		std::set<int> pids_to_record;
 
@@ -204,7 +199,7 @@ int eDVBServiceStream::doRecord()
 		int timing_pid = -1, timing_stream_type = -1;
 		iDVBTSRecorder::timing_pid_type timing_pid_type = iDVBTSRecorder::none;
 
-		eDebugNoNewLineStart("STREAM: have %zd video stream(s)", program.videoStreams.size());
+		eDebugNoNewLineStart("[eDVBServiceStream] have %zd video stream(s)", program.videoStreams.size());
 		if (!program.videoStreams.empty())
 		{
 			eDebugNoNewLine(" (");
@@ -268,7 +263,7 @@ int eDVBServiceStream::doRecord()
 		eDebugNoNewLine(", and the pcr pid is %04x", program.pcrPid);
 		if (program.pcrPid >= 0 && program.pcrPid < 0x1fff)
 			pids_to_record.insert(program.pcrPid);
-		eDebugNoNewLine(", and the text pid is %04x", program.textPid);
+		eDebugNoNewLine(", and the text pid is %04x\n", program.textPid);
 		if (program.textPid != -1)
 			pids_to_record.insert(program.textPid); // Videotext
 
@@ -402,7 +397,7 @@ void eDVBServiceStream::recordEvent(int event)
 		streamStopped();
 		break;
 	default:
-		eDebug("unhandled record event %d", event);
+		eDebug("[eDVBServiceStream] unhandled record event %d", event);
 		break;
 	}
 }

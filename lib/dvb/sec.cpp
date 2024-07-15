@@ -9,7 +9,7 @@
 
 #include "absdiff.h"
 
-// #define SEC_DEBUG
+//#define SEC_DEBUG
 
 #ifdef SEC_DEBUG
 #define eSecDebug(arg...) eDebug(arg)
@@ -204,7 +204,7 @@ int eDVBSatelliteEquipmentControl::canTune(const eDVBFrontendParametersSatellite
 					if (((linked_unicable != -1 || is_unicable) && diseqc && !rotor && no_compare_satpos) ||
 						(!is_unicable && ((csw != linked_csw) || (diseqc && (ucsw != linked_ucsw || toneburst != linked_toneburst)) ||
 						(rotor && ((linked_satpos_depends == -1 && rotor_pos != sat.orbital_position) || (!direct_connected && linked_satpos_depends != -1 && no_compare_satpos))))))
-
+					
 					{
 						ret = 0;
 						satcount = old_satcount;
@@ -399,7 +399,7 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, const eDVB
 					diseqc_mode = eDVBSatelliteDiseqcParameters::V1_0;
 				else
 				{
-					if (!((eDVBFrontend*)&frontend)->is_FBCTuner())
+					if (!((eDVBFrontend*)&frontend)->is_FBCTuner()) 
 					{
 						// in eDVBFrontend::tuneLoop we call closeFrontend and ->inc_use() in this this condition (to put the kernel frontend thread into idle state)
 						// so we must resend all diseqc stuff (voltage is disabled when the frontend is closed)
@@ -1153,7 +1153,7 @@ void eDVBSatelliteEquipmentControl::prepareTurnOffSatCR(iDVBFrontend &frontend)
 
 	sec_sequence.push_back( eSecCommand(eSecCommand::IF_VOLTAGE_GOTO, compare) );
 	sec_sequence.push_back( eSecCommand(eSecCommand::SET_VOLTAGE, iDVBFrontend::voltage13) );
-	sec_sequence.push_back( eSecCommand(eSecCommand::SLEEP, m_params[UNICABLE_DELAY_AFTER_ENABLE_VOLTAGE_BEFORE_SWITCH_CMDS] > m_lnbs[m_lnbidx].boot_up_time ? m_params[UNICABLE_DELAY_AFTER_ENABLE_VOLTAGE_BEFORE_SWITCH_CMDS] : m_lnbs[m_lnbidx].boot_up_time ) );
+	sec_sequence.push_back( eSecCommand(eSecCommand::SLEEP, m_params[DELAY_AFTER_ENABLE_VOLTAGE_BEFORE_SWITCH_CMDS]) );
 
 	sec_sequence.push_back( eSecCommand(eSecCommand::SET_VOLTAGE, iDVBFrontend::voltage18_5) );
 	sec_sequence.push_back( eSecCommand(eSecCommand::SET_TONE, iDVBFrontend::toneOff) );
@@ -1171,7 +1171,7 @@ void eDVBSatelliteEquipmentControl::prepareTurnOffSatCR(iDVBFrontend &frontend)
 			//	data[3]		"data1": data[3][7..5]: user band, data[3][4..2]: bank, data[3][1..0]: T[9..8]
 			//	data[4]		"data2": data[4][7..0]: T[7..0]
 
-			unsigned int ub = userband & 0x07;
+			unsigned int ub = userband & 0x01;
 			unsigned int encoded_frequency_T = 0;
 			unsigned int mode = 0;
 			unsigned int position = 0;
@@ -1962,4 +1962,52 @@ int eDVBSatelliteEquipmentControl::frontendLastRotorOrbitalPosition(int slot)
 void eDVBSatelliteEquipmentControl::forceUpdateRotorPos(int slot, int orbital_position)
 {
 	slotRotorSatPosChanged(slot, orbital_position); // emit python
+}
+
+PyObject *eDVBSatelliteEquipmentControl::getBandCutOffFrequency(int slot_no, int orbital_position)
+{
+	PyObject *pyList = PyList_New(0);
+	for (int idx=0; idx <= m_lnbidx; ++idx)
+	{
+		eDVBSatelliteLNBParameters &lnb_param = m_lnbs[idx];
+		if ( lnb_param.m_slot_mask & (1 << slot_no)) // lnb for correct tuner?
+		{
+			std::map<int, eDVBSatelliteSwitchParameters>::iterator sit = lnb_param.m_satellites.find(orbital_position);
+			if ( sit != lnb_param.m_satellites.end())
+				PyList_Append(pyList, PyLong_FromLong(lnb_param.m_lof_threshold));
+		}
+	}
+	return pyList;
+}
+
+PyObject *eDVBSatelliteEquipmentControl::getFrequencyRangeList(int slot_no, int orbital_position)
+{
+	PyObject *pyList = PyList_New(0);
+	dvb_frontend_info fe_info;
+
+	eSmartPtrList<eDVBRegisteredFrontend>::iterator it(m_avail_frontends.begin());
+	for (; it != m_avail_frontends.end(); ++it)
+	{
+		if (it->m_frontend->getSlotID() == slot_no)
+		{
+			fe_info = ((eDVBFrontend*)it->m_frontend)->getFrontendInfo(SYS_DVBS);
+		}
+	}
+
+	for (int idx=0; idx <= m_lnbidx; ++idx)
+	{
+		eDVBSatelliteLNBParameters &lnb_param = m_lnbs[idx];
+		if ( lnb_param.m_slot_mask & (1 << slot_no)) // lnb for correct tuner?
+		{
+			std::map<int, eDVBSatelliteSwitchParameters>::iterator sit = lnb_param.m_satellites.find(orbital_position);
+			if ( sit != lnb_param.m_satellites.end())
+			{
+				PyObject *pyTuple = PyTuple_New(2);
+				PyTuple_SET_ITEM(pyTuple, 0, PyLong_FromLong(lnb_param.m_lof_lo + fe_info.frequency_min));
+				PyTuple_SET_ITEM(pyTuple, 1, PyLong_FromLong(lnb_param.m_lof_hi + fe_info.frequency_max));
+				PyList_Append(pyList, pyTuple);
+			}
+		}
+	}
+	return pyList;
 }

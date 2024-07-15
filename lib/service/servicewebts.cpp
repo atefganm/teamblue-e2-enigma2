@@ -164,7 +164,7 @@ void TSAudioInfoWeb::addAudio(int pid, std::string lang, std::string desc, int t
 /* eServiceWebTS                                                       */
 /********************************************************************/
 
-eServiceWebTS::eServiceWebTS(const eServiceReference &url): m_reference(url), m_pump(eApp, 1)
+eServiceWebTS::eServiceWebTS(const eServiceReference &url): m_reference(url), m_pump(eApp, 1, "eServiceWebTS")
 {
 	eDebug("ServiceWebTS construct!");
 	m_filename = url.path.c_str();
@@ -257,13 +257,12 @@ int eServiceWebTS::openHttpConnection(std::string url)
 	request.append("Connection: close\r\n");
 	request.append("\r\n");
 	//eDebug(request.c_str());
-
-	int rc;
-	rc = ::write(fd, request.c_str(), request.length());
-	if (rc < 0) {
-		eDebug("eServiceWebTS::openHttpConnection: error in write (%d)", errno);
+	if (write(fd, request.c_str(), request.length()) == -1)
+	{
+		eDebug("[eServiceWebTS] failed to write response %m");
 	}
 
+	int rc;
 	size_t buflen = 1000;
 	char* linebuf = (char*)malloc(1000);
 
@@ -566,7 +565,7 @@ int eServiceWebTS::getCurrentTrack() {
 
 DEFINE_REF(eStreamThreadWeb)
 
-eStreamThreadWeb::eStreamThreadWeb(): m_messagepump(eApp, 0) {
+eStreamThreadWeb::eStreamThreadWeb(): m_messagepump(eApp, 0, "eStreamThreadWeb") {
 	CONNECT(m_messagepump.recv_msg, eStreamThreadWeb::recvEvent);
 	m_running = false;
 }

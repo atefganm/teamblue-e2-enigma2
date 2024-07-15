@@ -424,8 +424,10 @@ public:
 	PSignal2<void, int, int> slotRotorSatPosChanged;
 	void forceUpdateRotorPos(int slot, int orbital_position); // called from the frontend's
 
+	PyObject *getBandCutOffFrequency(int slot_no, int orbital_position);
+	PyObject *getFrequencyRangeList(int slot_no, int orbital_position);
+
 	friend class eFBCTunerManager;
-	friend class eRTSPStreamClient;
 
 };
 

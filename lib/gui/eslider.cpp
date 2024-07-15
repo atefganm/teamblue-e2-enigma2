@@ -2,9 +2,8 @@
 
 eSlider::eSlider(eWidget *parent)
 	:eWidget(parent), m_have_border_color(false), m_have_foreground_color(false), m_have_background_color(false),
-	m_have_sliderborder_color(false), m_have_sliderforeground_color(false), m_have_sliderborder_width(false),
 	m_min(0), m_max(0), m_value(0), m_start(0), m_orientation(orHorizontal), m_orientation_swapped(0),
-	m_border_width(0), m_sliderborder_width(0)
+	m_border_width(0)
 {
 }
 
@@ -28,11 +27,6 @@ void eSlider::setBackgroundPixmap(gPixmap *pixmap)
 {
 	m_backgroundpixmap = pixmap;
 	invalidate();
-}
-
-void eSlider::setAlphatest(int alphatest)
-{
-	setTransparent(alphatest);
 }
 
 void eSlider::setBorderWidth(int pixel)
@@ -59,49 +53,6 @@ void eSlider::setBackgroundColor(const gRGB &col)
 {
 	m_background_color = col;
 	m_have_background_color = true;
-	invalidate();
-}
-
-void eSlider::setSliderBorderWidth(int pixel)
-{
-	m_sliderborder_width = pixel;
-	m_have_sliderborder_width = true;
-	invalidate();
-}
-
-void eSlider::setScrollbarSliderPicture(ePtr<gPixmap> &pixmap)
-{
-	setScrollbarSliderPicture(pixmap.operator->());
-}
-
-void eSlider::setScrollbarSliderPicture(gPixmap *pixmap)
-{
-	m_pixmap = pixmap;
-	event(evtChangedSlider);
-}
-
-void eSlider::setScrollbarBackgroundPicture(ePtr<gPixmap> &pixmap)
-{
-	setScrollbarBackgroundPicture(pixmap.operator->());
-}
-
-void eSlider::setScrollbarBackgroundPicture(gPixmap *pixmap)
-{
-	m_backgroundpixmap = pixmap;
-	invalidate();
-}
-
-void eSlider::setSliderBorderColor(const gRGB &color)
-{
-	m_sliderborder_color = color;
-	m_have_sliderborder_color = true;
-	invalidate();
-}
-
-void eSlider::setSliderForegroundColor(const gRGB &color)
-{
-	m_sliderforeground_color = color;
-	m_have_sliderforeground_color = true;
 	invalidate();
 }
 
@@ -179,12 +130,9 @@ int eSlider::event(int event, void *data, void *data2)
 				painter.drawRectangle(rect);
 			}
 			else {
-				if (m_have_sliderforeground_color)
-				    painter.setForegroundColor(m_sliderforeground_color);
-			    else if (m_have_foreground_color)
+				if (m_have_foreground_color)
 					painter.setForegroundColor(m_foreground_color);
-
-                painter.fill(m_currently_filled);
+				painter.fill(m_currently_filled);
 			}
 		}
 		else {
@@ -193,22 +141,15 @@ int eSlider::event(int event, void *data, void *data2)
 				painter.setRadius(cornerRadius, getCornerRadiusEdges());
 			painter.blit(m_pixmap, ePoint(0, 0), m_currently_filled.extends, isTransparent() ? gPainter::BT_ALPHABLEND : 0);
 		}
-        // border
-        if(drawborder) {
-		    if (m_have_sliderborder_color)
-			    painter.setForegroundColor(m_sliderborder_color);
-		    else if (m_have_border_color)
-			    painter.setForegroundColor(m_border_color);
 
-		    int border_width;
-		    if(m_have_sliderborder_width)
-			    border_width = m_sliderborder_width;
-		    else
-			    border_width = m_border_width;
-		    painter.fill(eRect(0, 0, s.width(), border_width));
-		    painter.fill(eRect(0, border_width, border_width, s.height() - border_width));
-		    painter.fill(eRect(border_width, s.height() - border_width, s.width() - border_width, border_width));
-            painter.fill(eRect(s.width() - border_width, border_width, border_width, s.height() - border_width));
+		if(drawborder) {
+			if (m_have_border_color)
+				painter.setForegroundColor(m_border_color);
+
+			painter.fill(eRect(0, 0, s.width(), m_border_width));
+			painter.fill(eRect(0, m_border_width, m_border_width, s.height() - m_border_width));
+			painter.fill(eRect(m_border_width, s.height() - m_border_width, s.width() - m_border_width, m_border_width));
+			painter.fill(eRect(s.width() - m_border_width, m_border_width, m_border_width, s.height() - m_border_width));
 		}
 
 		return 0;

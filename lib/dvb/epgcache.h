@@ -89,6 +89,8 @@ struct hash_uniqueEPGKey
 struct EventCacheItem {
 	eventMap byEvent;
 	timeMap byTime;
+	int sources;
+	EventCacheItem(): sources(0) {}
 };
 
 typedef std::tr1::unordered_map<uniqueEPGKey, EventCacheItem, hash_uniqueEPGKey, uniqueEPGKey::equal> eventCache;
@@ -98,13 +100,17 @@ typedef std::tr1::unordered_map<uniqueEPGKey, EventCacheItem, hash_uniqueEPGKey,
 	typedef std::tr1::unordered_map<uniqueEPGKey, contentMap, hash_uniqueEPGKey, uniqueEPGKey::equal > contentMaps;
 #endif
 
+struct eit_parental_rating {
+        u_char  country_code[3];
+        u_char  rating;
+};
 #endif
 
 class eEPGCache: public eMainloop, private eThread, public sigc::trackable
 {
 #ifndef SWIG
 	DECLARE_REF(eEPGCache)
-	bool FixOverlapping(EventCacheItem &servicemap, time_t TM, int duration, const timeMap::iterator &tm_it, const uniqueEPGKey &service);
+
 public:
 	struct Message
 	{
@@ -136,7 +142,6 @@ private:
 
 	unsigned int historySeconds;
 
-	std::vector<int> onid_blacklist;
 	eventCache eventDB;
 	std::string m_filename;
 	bool m_running;
@@ -144,6 +149,8 @@ private:
 	ePtr<eTimer> cleanTimer;
 	bool load_epg;
 	PSignal0<void> epgCacheStarted;
+	std::vector<uniqueEPGKey> eit_blacklist;
+	std::vector<uniqueEPGKey> eit_whitelist;
 
 #ifdef ENABLE_PRIVATE_EPG
 	contentMaps content_time_tables;
@@ -159,6 +166,7 @@ private:
 	void gotMessage(const Message &message);
 	void cleanLoop();
 	void submitEventData(const std::vector<int>& sids, const std::vector<eDVBChannelID>& chids, long start, long duration, const char* title, const char* short_summary, const char* long_description, char event_type, int event_id, int source);
+	void submitEventData(const std::vector<int>& sids, const std::vector<eDVBChannelID>& chids, long start, long duration, const char* title, const char* short_summary, const char* long_description, std::vector<uint8_t> event_types, std::vector<eit_parental_rating> parental_ratings, int event_id, int source);
 	void clearCompleteEPGCache();
 
 	eServiceReferenceDVB *m_timeQueryRef;
@@ -172,10 +180,13 @@ private:
 public:
 	static eEPGCache *getInstance() { return instance; }
 
+	void crossepgImportEPGv21(std::string dbroot);
+
 	void save();
 	void load();
 	void timeUpdated();
 	void flushEPG(const uniqueEPGKey & s=uniqueEPGKey(), bool lock = true);
+	void reloadEITConfig(int listType);
 #ifndef SWIG
 	eEPGCache();
 	~eEPGCache();
@@ -225,6 +236,7 @@ public:
 	SWIG_VOID(RESULT) lookupEventTime(const eServiceReference &service, time_t, ePtr<eServiceEvent> &SWIG_OUTPUT, int direction=0);
 	SWIG_VOID(RESULT) getNextTimeEntry(ePtr<eServiceEvent> &SWIG_OUTPUT);
 
+	enum {ALL=0, WHITELIST=1, BLACKLIST=2};
 	enum {PRIVATE=0, NOWNEXT=1, SCHEDULE=2, SCHEDULE_OTHER=4
 #ifdef ENABLE_MHW_EPG
 	,MHW=8
@@ -254,8 +266,10 @@ public:
 	void setEpgHistorySeconds(time_t seconds);
 	void setEpgSources(unsigned int mask);
 	unsigned int getEpgSources();
+	bool getIsBlacklisted(const uniqueEPGKey epgKey);
+	bool getIsWhitelisted(const uniqueEPGKey epgKey);
 
-	void submitEventData(const std::vector<eServiceReferenceDVB>& serviceRefs, long start, long duration, const char* title, const char* short_summary, const char* long_description, char event_type);
+	void submitEventData(const std::vector<eServiceReferenceDVB>& serviceRefs, long start, long duration, const char* title, const char* short_summary, const char* long_description, std::vector<uint8_t> event_types, std::vector<eit_parental_rating> parental_ratings, uint16_t eventId=0);
 
 	void importEvents(SWIG_PYOBJECT(ePyObject) serviceReferences, SWIG_PYOBJECT(ePyObject) list);
 	void importEvent(SWIG_PYOBJECT(ePyObject) serviceReference, SWIG_PYOBJECT(ePyObject) list);

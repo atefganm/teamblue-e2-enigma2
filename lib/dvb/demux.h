@@ -184,7 +184,6 @@ private:
 	eDVBRecordFileThread *m_thread;
 	std::string m_target_filename;
 	int m_packetsize;
-	friend class eRTSPStreamClient;
 };
 
 #endif

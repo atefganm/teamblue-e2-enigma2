@@ -6,9 +6,12 @@
 #include <signal.h>
 #include <sys/sysinfo.h>
 #include <sys/mman.h>
+
 #include <linux/dvb/dmx.h>
+
 #include <lib/base/eerror.h>
 #include <lib/base/cfile.h>
+#include <lib/dvb/dvb.h>
 #include <lib/dvb/idvb.h>
 #include <lib/dvb/demux.h>
 #include <lib/dvb/esection.h>
@@ -33,7 +36,6 @@ enum dmx_source {
 };
 #define DMX_SET_SOURCE _IOW('o', 49, enum dmx_source)
 #endif
-
 
 //#define SHOW_WRITE_TIME
 static int determineBufferCount()
@@ -80,15 +82,47 @@ int eDVBDemux::openDemux(void)
 	char filename[32] = {};
 	snprintf(filename, sizeof(filename), "/dev/dvb/adapter%d/demux%d", adapter, demux);
 	eDebug("[eDVBDemux] open demux %s", filename);
+	int tmp_fd = -1;
+	tmp_fd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
+	/* eDebug("[eDVBDemux] Twol00 Opened tmp_fd: %d", tmp_fd); */
+	if (tmp_fd == 0)
+	{
+		::close(tmp_fd);
+		tmp_fd = -1;	
+		fd0lock = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
+		/* eDebug("[eDVBDemux] opening null fd returned: %d", fd0lock); */
+	}
+	if (tmp_fd != -1)
+	{
+		::close(tmp_fd);
+	}
 	return ::open(filename, O_RDWR | O_CLOEXEC);
 }
 
 int eDVBDemux::openDVR(int flags)
 {
+#ifdef HAVE_OLDPVR
+	return ::open("/dev/misc/pvr", flags);
+#else
 	char filename[32];
 	snprintf(filename, sizeof(filename), "/dev/dvb/adapter%d/dvr%d", adapter, demux);
 	eDebug("[eDVBDemux] open dvr %s", filename);
+	int tmp_fd = -1;
+	tmp_fd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
+	/* eDebug("[eDVBDemux] Twol00 Opened tmp_fd: %d", tmp_fd); */
+	if (tmp_fd == 0)
+	{
+		::close(tmp_fd);
+		tmp_fd = -1;	
+		fd0lock = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
+		/* eDebug("[eDVBDemux] opening null fd returned: %d", fd0lock); */
+	}
+	if (tmp_fd != -1)
+	{
+		::close(tmp_fd);
+	}
 	return ::open(filename, flags);
+#endif
 }
 
 DEFINE_REF(eDVBDemux)
@@ -261,6 +295,7 @@ RESULT eDVBSectionReader::start(const eDVBSectionFilterMask &mask)
 	notifier->start();
 
 	dmx_sct_filter_params sct = {};
+	memset(&sct, 0, sizeof(sct));
 	sct.pid     = mask.pid;
 	sct.timeout = 0;
 	sct.flags   = DMX_IMMEDIATE_START;
@@ -373,6 +408,8 @@ RESULT eDVBPESReader::start(int pid)
 	m_notifier->start();
 
 	dmx_pes_filter_params flt = {};
+	memset(&flt, 0, sizeof(flt));
+
 	flt.pes_type = DMX_PES_OTHER;
 	flt.pid     = pid;
 	flt.input   = DMX_IN_FRONTEND;
@@ -526,7 +563,7 @@ int eDVBRecordFileThread::AsyncIO::poll()
 
 int eDVBRecordFileThread::AsyncIO::start(int fd, off_t offset, size_t nbytes, void* buffer)
 {
-	memset(&aio, 0, sizeof(aiocb)); // Documentation says "zero it before call".
+	memset(&aio, 0, sizeof(struct aiocb)); // Documentation says "zero it before call".
 	aio.aio_fildes = fd;
 	aio.aio_nbytes = nbytes;
 	aio.aio_offset = offset;   // Offset can be omitted with O_APPEND
@@ -648,7 +685,7 @@ void eDVBRecordFileThread::flush()
 		it->wait();
 	}
 	int bufferCount = m_aio.size();
-	eDebug("[eDVBRecordFileThread] buffer usage histogram (%d buffers of %zd kB)", bufferCount, m_buffersize>>10);
+	eDebug("[eDVBRecordFileThread] buffer usage histogram (%d buffers of %jd kB)", bufferCount, (intmax_t)m_buffersize>>10);
 	for (int i=0; i <= bufferCount; ++i)
 	{
 		if (m_buffer_use_histogram[i] != 0)
@@ -669,7 +706,6 @@ eDVBRecordStreamThread::eDVBRecordStreamThread(int packetsize, int buffersize, b
 {
 	eDebug("[eDVBRecordStreamThread] allocated %zu buffers of %zu kB", m_aio.size(), m_buffersize>>10);
 }
-
 
 int eDVBRecordStreamThread::writeData(int len)
 {
@@ -795,6 +831,20 @@ RESULT eDVBTSRecorder::start()
 
 	char filename[128];
 	snprintf(filename, 128, "/dev/dvb/adapter%d/demux%d", m_demux->adapter, m_demux->demux);
+	int tmp_fd = -1;
+	tmp_fd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
+	/* eDebug("[eDVBTSRecorder] Opened tmp_fd: %d", tmp_fd); */
+	if (tmp_fd == 0)
+	{
+		::close(tmp_fd);
+		tmp_fd = -1;	
+		fd0lock = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
+		/* eDebug("[eDVBTSRecorder] opening null fd returned: %d", fd0lock); */
+	}
+	if (tmp_fd != -1)
+	{
+		::close(tmp_fd);
+	}
 
 #if HAVE_HISILICON
 	m_source_fd = ::open(filename, O_RDONLY | O_CLOEXEC | O_NONBLOCK);
@@ -811,6 +861,8 @@ RESULT eDVBTSRecorder::start()
 	setBufferSize(1024*1024);
 
 	dmx_pes_filter_params flt = {};
+	memset(&flt, 0, sizeof(flt));
+
 	flt.pes_type = DMX_PES_OTHER;
 	flt.output  = DMX_OUT_TSDEMUX_TAP;
 	flt.pid     = i->first;

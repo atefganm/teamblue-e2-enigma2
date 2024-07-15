@@ -74,12 +74,7 @@ public:
 	enum { evtEOF, evtReadError, evtWriteError, evtUser, evtStopped };
 	sigc::signal<void(int)> m_event;
 
-	int getProtocol() { return m_protocol;}
-        void setProtocol(int i){ m_protocol = i;}
-        void setSession(int se, int st) { m_session_id = se; m_stream_id = st;}
-	int pushReply(void *buf, int len);
 	void sendEvent(int evt);
-	static int64_t getTick();
 protected:
 	// This method should write the data out and return the number of bytes written.
 	// If result <0, set 'errno'. The simplest implementation is just "::write(m_buffer, ...)"
@@ -95,11 +90,8 @@ protected:
 	unsigned int m_overflow_count;
 private:
 	int m_stop;
-	bool m_stopped;
 	eFixedMessagePump<int> m_messagepump;
 	void recvEvent(const int &evt);
-	int m_protocol, m_session_id, m_stream_id, m_packet_no;
-	std::vector<unsigned char> m_reply;
 };
 
 #endif

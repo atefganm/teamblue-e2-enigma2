@@ -748,6 +748,10 @@ void eDVBScan::channelDone()
 				SCAN_eDebug("[eDVBScan] ignoring NetworkId %d!", (*i)->getTableIdExtension());
 				continue;
 			}
+			else
+			{
+				SCAN_eDebug("[eDVBScan] m_networkid %d getTableIdExtension %d", m_networkid, (*i)->getTableIdExtension());
+			}
 
 			const TransportStreamInfoList &tsinfovec = *(*i)->getTsInfo();
 
@@ -1190,17 +1194,6 @@ void eDVBScan::insertInto(iDVBChannelList *db, bool backgroundscanresult)
 		bool clearCable=false;
 		std::set<unsigned int> scanned_sat_positions;
 
-		for (std::map<eServiceReferenceDVB, ePtr<eDVBService> >::const_iterator
-			service(m_new_services.begin()); service != m_new_services.end(); ++service)
-		{
-			ePtr<eDVBService> dvb_service;
-			if (!db->getService(service->first, dvb_service))
-			{
-				if (dvb_service->m_flags & eDVBService::dxDontshow)
-					service->second->m_flags |= eDVBService::dxDontshow;
-			}
-		}
-
 		std::list<ePtr<iDVBFrontendParameters> >::iterator it(m_ch_scanned.begin());
 		for (;it != m_ch_scanned.end(); ++it)
 		{
@@ -1301,7 +1294,7 @@ void eDVBScan::insertInto(iDVBChannelList *db, bool backgroundscanresult)
 			eDVBChannelID chid;
 			if (m_flags & scanDontRemoveFeeds)
 				chid.dvbnamespace = eDVBNamespace((*x)<<16);
-//			eDebug("remove %d %08x", *x, chid.dvbnamespace.get());
+//			eDebug("[eDVBScan] remove %d %08x", *x, chid.dvbnamespace.get());
 			db->removeServices(chid, *x);
 		}
 	}
@@ -1468,7 +1461,7 @@ RESULT eDVBScan::processSDT(eDVBNamespace dvbnamespace, const ServiceDescription
 					{
 					/* DISH/BEV servicetypes: */
 					case 128:
-					case 131: /*Sky UK OpenTV EPG channel */
+					case 131: /*Sky UK OpenTV EPG channel */ 
 					case 133:
 					case 137:
 					case 144:

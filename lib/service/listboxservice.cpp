@@ -704,18 +704,10 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 		style.setStyle(painter, selected ? eWindowStyle::styleListboxSelected : eWindowStyle::styleListboxNormal);
 
 	eListboxStyle *local_style = 0;
-	eRect itemRect = eRect(offset, m_itemsize);
-	int radius = 0;
-	int edges = 0;
 
 		/* get local listbox style, if present */
 	if (m_listbox)
 		local_style = m_listbox->getLocalStyle();
-
-	if (local_style) {
-		radius = local_style->cornerRadius(selected ? 1:0);
-		edges = local_style->cornerRadiusEdges(selected ? 1:0);
-	}
 
 	if (marked == 1)  // marked
 	{
@@ -761,19 +753,13 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 		/* blit background picture, if available (otherwise, clear only) */
 		if (local_style && local_style->m_background)
 			painter.blit(local_style->m_background, offset, eRect(), 0);
-		else if (local_style && !local_style->m_background && radius)
-		{
-			if(radius)
-				painter.setRadius(radius, edges);
-			painter.drawRectangle(itemRect);
-		}
 		else
 			painter.clear();
 	} else
 	{
 		if (local_style->m_background)
 			painter.blit(local_style->m_background, offset, eRect(), gPainter::BT_ALPHABLEND);
-		else if (selected && !local_style->m_selection && !local_style->m_selection_large && !radius)
+		else if (selected && !local_style->m_selection && !local_style->m_selection_large)
 			painter.clear();
 	}
 
@@ -787,8 +773,8 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 		}
 
 		// Draw the frame for selected item here so to be under the content
-		if (selected && (!local_style || (!local_style->m_selection && !local_style->m_selection_large)) && !radius)
-			style.drawFrame(painter, itemRect, eWindowStyle::frameListboxEntry);
+		if (selected && (!local_style || (!local_style->m_selection && !local_style->m_selection_large)))
+			style.drawFrame(painter, eRect(offset, m_itemsize), eWindowStyle::frameListboxEntry);
 
 		eServiceReference ref = *m_cursor;
 		std::string orig_ref_str = ref.toString();
@@ -821,6 +807,7 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 		if (!marked && isPlayable && service_info && m_is_playable_ignore.valid())
 		{
 			isplayable_value = service_info->isPlayable(*m_cursor, m_is_playable_ignore);
+
 			if (isplayable_value == 0) // service unavailable
 			{
 				if (m_color_set[serviceNotAvail])
@@ -933,7 +920,7 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 					painter.clippop();
 				}
 
-				if (m_pixmaps[picRecord] && isRecorded && ((m_record_indicator_mode == 1) || (m_record_indicator_mode == 2)))
+				if (m_pixmaps[picRecord] && isRecorded)
 				{
 					eSize pixmap_size = m_pixmaps[picRecord]->size();
 					xlpos -= 15 + pixmap_size.width();
@@ -1002,6 +989,9 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 			// channel number + name
 			if (service_info)
 				service_info->getName(ref, text);
+#ifdef USE_LIBVUGLES2
+					painter.setFlush(text == "<n/a>");
+#endif
 
 			ePtr<eTextPara> paraName = new eTextPara(eRect(0, 0, m_itemsize.width(), m_itemheight/2));
 			paraName->setFont(m_element_font[celServiceName]);
@@ -1218,7 +1208,7 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 						//------------------------------------------------ Event remaining ------------------------------------------------------------------------
 						std::string timeLeft_str = "";
 						char buffer[15];
-						snprintf(buffer, sizeof(buffer), "%s%d %s", timeLeft < 60 ? "" : "+", timeLeft/60, m_text_time.c_str());
+						snprintf(buffer, sizeof(buffer), ("%s" + m_text_time).c_str(), timeLeft == 0 ? "" : "+", timeLeft/60);
 						timeLeft_str = buffer;
 						ePtr<eTextPara> paraLeft = new eTextPara(eRect(0, 0, m_itemsize.width(), m_itemheight/2));
 						paraLeft->setFont(m_element_font[celServiceInfoRemainingTime]);

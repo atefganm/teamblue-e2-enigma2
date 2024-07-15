@@ -19,8 +19,8 @@ void eRCDeviceInputDev::handleCode(long rccode)
 
 	if (ev->type != EV_KEY)
 		return;
-
-	//eDebug("[eRCDeviceInputDev] %x %x %x", ev->value, ev->code, ev->type);
+		
+	eDebug("[eInputDeviceInit] %x %x (%u) %x", ev->value, ev->code, ev->code, ev->type);
 
 	int km = iskeyboard ? input->getKeyboardMode() : eRCInput::kmNone;
 
@@ -90,76 +90,46 @@ void eRCDeviceInputDev::handleCode(long rccode)
 		}
 	}
 
-#if KEY_FAV_TO_KEY_PVR
-	if (ev->code == KEY_FAVORITES)
+	if (!remaps.empty())
 	{
-		/* spycat remote dont have a PVR Key. Correct this, so we do not have to place hacks in the keymaps. */
-		ev->code = KEY_PVR;
-	}
-#endif
-
-#if KEY_F3_TO_KEY_LIST
-	if (ev->code == KEY_F3)
-	{
-		/* Xtrend New Remote rc has a KEY_F3 key, which sends KEY_LIST events. Correct this, so we do not have to place hacks in the keymaps. */
-		ev->code = KEY_LIST;
-	}
-#endif
-
-#if KEY_F2_TO_KEY_F6
-	if (ev->code == KEY_F2)
-	{
-		/* Gigablue New Remote rc has a KEY_PIP key, which sends KEY_F2 events. Correct this, so we do not have to place hacks in the keymaps. */
-		ev->code = KEY_F6;
-
-	}
-#endif
-
-#if KEY_F1_TO_KEY_F6
-	if (ev->code == KEY_F1)
-	{
-		/* define when rc sends a KEY_F1 event for its KEY_F6 key */
-		ev->code = KEY_F6;
-	}
-#endif
-
-#if KEY_F2_TO_KEY_AUX
-	if (ev->code == KEY_F2)
-	{
-		/* define when rc sends a KEY_F2 event for its KEY_AUX key */
-		ev->code = KEY_AUX;
-	}
-#endif
-
-#if KEY_CONTEXT_MENU_TO_KEY_AUX
-	if (ev->code == KEY_CONTEXT_MENU)
-	{
-		/* define when rc sends a KEY_CONTEXT_MENU event for its HDMIIN functionality */
-		ev->code = KEY_AUX;
-	}
-#endif
-
-
-#if KEY_GUIDE_TO_KEY_EPG
-	if (ev->code == KEY_HELP)
-	{
-		/* GB800 rc has a KEY_GUIDE key, which sends KEY_HELP events. Correct this, so we do not have to place hacks in the keymaps. */
-		ev->code = KEY_EPG;
-
-	}
-#endif
-
-#if KEY_PLAY_ACTUALLY_IS_KEY_PLAYPAUSE
-	if (ev->code == KEY_PLAY)
-	{
-		if (id == "dreambox advanced remote control (native)")
+		std::unordered_map<unsigned int, unsigned int>::iterator i = remaps.find(ev->code);
+		if (i != remaps.end())
 		{
-			/* 8k rc has a KEY_PLAYPAUSE key, which sends KEY_PLAY events. Correct this, so we do not have to place hacks in the keymaps. */
-			ev->code = KEY_PLAYPAUSE;
+			eDebug("[eRCDeviceInputDev] map: %u->%u", i->first, i->second);
+			ev->code = i->second;
 		}
 	}
+	else
+	{
+#if KEY_PLAY_ACTUALLY_IS_KEY_PLAYPAUSE
+		if (ev->code == KEY_PLAY)
+		{
+			if ((id == "dreambox advanced remote control (native)")  || (id == "bcm7325 remote control"))
+			{
+				/* 8k rc has a KEY_PLAYPAUSE key, which sends KEY_PLAY events. Correct this, so we do not have to place hacks in the keymaps. */
+				ev->code = KEY_PLAYPAUSE;
+			}
+		}
 #endif
 
+#if KEY_VIDEO_TO_KEY_FAVORITES
+		if (ev->code == KEY_VIDEO)
+		{
+			/* formuler rcu fav key send key_media change this to  KEY_FAVORITES */
+			ev->code = KEY_FAVORITES;
+		}
+#endif
+
+#if KEY_BOOKMARKS_TO_KEY_MEDIA
+		if (ev->code == KEY_BOOKMARKS)
+		{
+			/* formuler and triplex remote send wrong keycode */
+			ev->code = KEY_MEDIA;
+		}
+#endif
+	}
+
+	eDebug("[eRCDeviceInputDev] emit: %u", ev->value); // ZZ
 	switch (ev->value)
 	{
 		case 0:
@@ -172,6 +142,12 @@ void eRCDeviceInputDev::handleCode(long rccode)
 			input->keyPressed(eRCKey(this, ev->code, eRCKey::flagRepeat)); /*emit*/
 			break;
 	}
+}
+
+int eRCDeviceInputDev::setKeyMapping(const std::unordered_map<unsigned int, unsigned int>& remaps_p)
+{
+	remaps = remaps_p;
+	return eRCInput::remapOk;
 }
 
 eRCDeviceInputDev::eRCDeviceInputDev(eRCInputEventDriver *driver, int consolefd)
@@ -230,8 +206,7 @@ public:
 		{
 			char filename[32];
 			sprintf(filename, "/dev/input/event%d", i);
-			if (::access(filename, R_OK) < 0)
-				break;
+			if (::access(filename, R_OK) < 0) break;
 			add(filename);
 			++i;
 		}
@@ -249,7 +224,6 @@ public:
 
 	void add(const char* filename)
 	{
-		eDebug("[eInputDeviceInit] adding device %s", filename);
 		eRCInputEventDriver *p = new eRCInputEventDriver(filename);
 		items.push_back(new element(filename, p, new eRCDeviceInputDev(p, consoleFd)));
 	}

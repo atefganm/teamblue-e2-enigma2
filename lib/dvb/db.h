@@ -46,7 +46,6 @@ class eDVBDB: public iDVBChannelList
 	friend class eDVBDBBouquetQuery;
 	friend class eDVBDBSatellitesQuery;
 	friend class eDVBDBProvidersQuery;
-	friend class eRTSPStreamClient;
 
 	struct channel
 	{
@@ -58,7 +57,7 @@ class eDVBDB: public iDVBChannelList
 	std::map<eServiceReferenceDVB, ePtr<eDVBService> > m_services;
 
 	std::map<std::string, eBouquet> m_bouquets;
-	
+
 	bool m_numbering_mode, m_load_unlinked_userbouquets;
 #ifdef SWIG
 	eDVBDB();
@@ -103,12 +102,12 @@ public:
 	RESULT getBouquet(const eServiceReference &ref, eBouquet* &bouquet);
 //////
 	void loadBouquet(const char *path);
-	eServiceReference searchReference(int tsid, int onid, int sid);
 	void searchAllReferences(std::vector<eServiceReference> &result, int tsid, int onid, int sid);
 	eDVBDB();
 	virtual ~eDVBDB();
 	int renumberBouquet(eBouquet &bouquet, int startChannelNum = 1);
 #endif
+	eServiceReference searchReference(int tsid, int onid, int sid);
 	void setNumberingMode(bool numberingMode);
 	void setLoadUnlinkedUserbouquets(bool value) { m_load_unlinked_userbouquets=value; }
 	void renumberBouquet();

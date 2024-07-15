@@ -19,7 +19,6 @@ public:
 	virtual int valid()=0;
 	virtual off_t offset() = 0;
 	virtual bool isStream() { return false; }
-	virtual int reconnect() { return 0; }
 	unsigned int getPacketSize() const { return packetSize; }
 };
 
