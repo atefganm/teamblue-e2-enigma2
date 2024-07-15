@@ -2,12 +2,11 @@
                 /* avoid warnigs :) */
 #undef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200112L
-
 extern "C" PyObject* PyInit__enigma(void);
 extern "C" PyObject* PyInit_eBaseImpl(void);
 extern "C" PyObject* PyInit_eConsoleImpl(void);
-extern void bsodFatal(const char *component);
 extern void quitMainloop(int exitCode);
+extern void bsodFatal(const char *component);
 
 #define SKIP_PART2
 #include <lib/python/python.h>

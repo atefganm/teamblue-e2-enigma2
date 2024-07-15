@@ -6,6 +6,7 @@
 
 #include <string>
 #include <lib/base/object.h>
+#define PY_SSIZE_T_CLEAN 1
 #include "Python.h"
 
 #if !defined(SKIP_PART1) && !defined(SWIG)
@@ -40,7 +41,7 @@ public:
 	ePyObject &operator=(PyListObject *ob) { return operator=((PyObject*)ob); }
 	ePyObject &operator=(PyUnicodeObject *ob) { return operator=((PyObject*)ob); }
 	operator PyObject*();
-	operator PyVarObject*() { return (PyVarObject*)operator PyVarObject*(); }
+	operator PyVarObject*() { return (PyVarObject*)operator PyObject*(); }
 	operator PyTupleObject*() { return (PyTupleObject*)operator PyObject*(); }
 	operator PyListObject*() { return (PyListObject*)operator PyObject*(); }
 	operator PyUnicodeObject*() { return (PyUnicodeObject*)operator PyObject*(); }
@@ -222,12 +223,12 @@ inline void Impl_Py_XINCREF(const char* file, int line, const ePyObject &obj)
 
 inline ePyObject Impl_PyTuple_New(const char* file, int line, int elements=0)
 {
-	return ePyObject(PyTuple_New(elements), file, line);
+	return ePyObject(PyTuple_New((Py_ssize_t)elements), file, line);
 }
 
 inline ePyObject Impl_PyList_New(const char* file, int line, int elements=0)
 {
-	return ePyObject(PyList_New(elements), file, line);
+	return ePyObject(PyList_New((Py_ssize_t)elements), file, line);
 }
 
 inline ePyObject Impl_PyDict_New(const char* file, int line)
@@ -275,12 +276,12 @@ inline ePyObject Impl_PyLong_FromUnsignedLongLong(const char* file, int line, un
 
 inline ePyObject Impl_PyList_GET_ITEM(const char *file, int line, ePyObject list, unsigned int pos)
 {
-	return ePyObject(PyList_GET_ITEM(list, pos), file, line);
+	return ePyObject(PyList_GET_ITEM(list, (Py_ssize_t)pos), file, line);
 }
 
 inline ePyObject Impl_PyTuple_GET_ITEM(const char *file, int line, ePyObject list, unsigned int pos)
 {
-	return ePyObject(PyTuple_GET_ITEM(list, pos), file, line);
+	return ePyObject(PyTuple_GET_ITEM(list, (Py_ssize_t)pos), file, line);
 }
 #else
 inline void Impl_Py_DECREF(const ePyObject &obj)
@@ -307,12 +308,12 @@ inline void Impl_Py_XINCREF(const ePyObject &obj)
 
 inline ePyObject Impl_PyTuple_New(int elements=0)
 {
-	return PyTuple_New(elements);
+	return PyTuple_New((Py_ssize_t)elements);
 }
 
 inline ePyObject Impl_PyList_New(int elements=0)
 {
-	return PyList_New(elements);
+	return PyList_New((Py_ssize_t)elements);
 }
 
 inline ePyObject Impl_PyDict_New()
@@ -350,12 +351,12 @@ inline ePyObject Impl_PyLong_FromUnsignedLongLong(unsigned long long val)
 
 inline ePyObject Impl_PyList_GET_ITEM(ePyObject list, unsigned int pos)
 {
-	return PyList_GET_ITEM(list, pos);
+	return PyList_GET_ITEM(list, (Py_ssize_t)pos);
 }
 
 inline ePyObject Impl_PyTuple_GET_ITEM(ePyObject list, unsigned int pos)
 {
-	return PyTuple_GET_ITEM(list, pos);
+	return PyTuple_GET_ITEM(list, (Py_ssize_t)pos);
 }
 #endif
 
