@@ -3,11 +3,9 @@
 #include <linux/dvb/dmx.h>
 #include <linux/dvb/version.h>
 
-#include <lib/base/cfile.h>
 #include <lib/base/eerror.h>
 #include <lib/base/estring.h>
 #include <lib/base/wrappers.h>
-#include <lib/base/httpstream.h>
 #include <lib/dvb/cahandler.h>
 #include <lib/dvb/idvb.h>
 #include <lib/dvb/dvb.h>
@@ -32,6 +30,8 @@ DEFINE_REF(eDVBRegisteredFrontend);
 DEFINE_REF(eDVBRegisteredDemux);
 
 DEFINE_REF(eDVBAllocatedFrontend);
+
+int fd0lock = -1;
 
 void eDVBRegisteredFrontend::closeFrontend()
 {
@@ -146,62 +146,14 @@ eDVBResourceManager::eDVBResourceManager()
 		m_boxtype = DM900;
 	else if (!strncmp(tmp, "dm920\n", rd))
 		m_boxtype = DM920;
-	else if (!strncmp(tmp, "Gigablue\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800solo\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800se\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800ue\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800seplus\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gb800ueplus\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbipbox\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbquad\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbquadplus\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbultra\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbultrase\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbultraue\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbultraueh\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx1\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx2\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx3\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx3h\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbquad4k\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbue4k\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "gbx34k\n", rd))
-		m_boxtype = GIGABLUE;
-	else if (!strncmp(tmp, "ebox5000\n", rd))
-		m_boxtype = DM800;
-	else if (!strncmp(tmp, "ebox5100\n", rd))
-		m_boxtype = DM800;
-	else if (!strncmp(tmp, "eboxlumi\n", rd))
-		m_boxtype = DM800;
-	else if (!strncmp(tmp, "ebox7358\n", rd))
-		m_boxtype = DM800SE;
-	else if (!strncmp(tmp, "wetekplay\n", rd))
-		m_boxtype = WETEKPLAY;
-	else if (!strncmp(tmp, "wetekplay2\n", rd))
-		m_boxtype = WETEKPLAY2;
-	else if (!strncmp(tmp, "wetekhub\n", rd))
-		m_boxtype = WETEKHUB;
+	else if (!strncmp(tmp, "one\n", rd))
+		m_boxtype = DREAMONE;
+	else if (!strncmp(tmp, "two\n", rd))
+		m_boxtype = DREAMTWO;
+	else if (!strncmp(tmp, "seven\n", rd))
+		m_boxtype = DREAMSEVEN;
 	else {
-		eDebug("[eDVBResourceManager] boxtype detection via /proc/stb/info not possible... use fallback via demux count!");
+		eDebug("boxtype detection via /proc/stb/info not possible... use fallback via demux count!\n");
 		if (m_demux.size() == 3)
 			m_boxtype = DM800;
 		else if (m_demux.size() < 5)
@@ -210,9 +162,8 @@ eDVBResourceManager::eDVBResourceManager()
 			m_boxtype = DM8000;
 	}
 
-	eDebug("[eDVBResourceManager] found %zd adapter, %zd frontends(%zd sim) and %zd demux, boxtype %d",
-		m_adapter.size(), m_frontend.size(), m_simulate_frontend.size(), m_demux.size(), m_boxtype);
-
+	eDebug("[eDVBResourceManager] found %zd adapter, %zd frontends(%zd sim) and %zd demux",
+		m_adapter.size(), m_frontend.size(), m_simulate_frontend.size(), m_demux.size());
 	m_fbcmng = new eFBCTunerManager(instance);
 
 	CONNECT(m_releaseCachedChannelTimer->timeout, eDVBResourceManager::releaseCachedChannel);
@@ -505,7 +456,7 @@ eDVBUsbAdapter::eDVBUsbAdapter(int nr)
 		goto error;
 	}
 
-#if _IOC_NONE > 0				/* MIPS receivers return _IOC_NONE=1 */
+#if _IOC_NONE > 0		/* MIPS receivers return _IOC_NONE=1 */
 #define VTUNER_GET_MESSAGE      1
 #define VTUNER_SET_RESPONSE     2
 #define VTUNER_SET_NAME         3
@@ -514,7 +465,7 @@ eDVBUsbAdapter::eDVBUsbAdapter(int nr)
 #define VTUNER_SET_FE_INFO      6
 #define VTUNER_SET_NUM_MODES    7
 #define VTUNER_SET_MODES        8
-#else							/* ARM receivers return _IOC_NONE=0 */
+#else				/* ARM receivers return _IOC_NONE=0 */
 #define VTUNER_GET_MESSAGE     11
 #define VTUNER_SET_RESPONSE    12
 #define VTUNER_SET_NAME        13
@@ -526,6 +477,7 @@ eDVBUsbAdapter::eDVBUsbAdapter(int nr)
 #endif
 #define VTUNER_SET_DELSYS      32
 #define VTUNER_SET_ADAPTER     33
+
 	ioctl(vtunerFd, VTUNER_SET_NAME, name);
 	ioctl(vtunerFd, VTUNER_SET_TYPE, type);
 	ioctl(vtunerFd, VTUNER_SET_FE_INFO, &fe_info);
@@ -1062,7 +1014,10 @@ RESULT eDVBResourceManager::allocateFrontend(ePtr<eDVBAllocatedFrontend> &fe, eP
 		}
 
 		if (c)	/* if we have at least one frontend which is compatible with the source, flag this. */
+		{
+			// eDebug("[eDVBResourceManager] allocateFrontend, score=%d", c);
 			foundone = 1;
+		}
 
 		if (!i->m_inuse)
 		{
@@ -1529,7 +1484,7 @@ int tuner_type_channel_default(ePtr<iDVBChannelList> &channellist, const eDVBCha
 	return 0;
 }
 
-int eDVBResourceManager::canAllocateChannel(const eDVBChannelID &channelid, const eDVBChannelID& ignore, int &system, bool simulate)
+int eDVBResourceManager::canAllocateChannel(const eDVBChannelID &channelid, const eDVBChannelID& ignore, const eDVBChannelID& ignoresr, int &system, bool simulate)
 {
 	std::list<active_channel> &active_channels = simulate ? m_active_simulate_channels : m_active_channels;
 	int ret = 0;
@@ -1537,8 +1492,9 @@ int eDVBResourceManager::canAllocateChannel(const eDVBChannelID &channelid, cons
 	if (!simulate && m_cached_channel)
 	{
 		eDVBChannel *cache_chan = (eDVBChannel*)&(*m_cached_channel);
-		if(channelid==cache_chan->getChannelID())
+		if(channelid==cache_chan->getChannelID()) {
 			return tuner_type_channel_default(m_list, channelid, system);
+		}
 	}
 
 		/* first, check if a channel is already existing. */
@@ -1560,6 +1516,7 @@ int eDVBResourceManager::canAllocateChannel(const eDVBChannelID &channelid, cons
 	std::vector<int*> fcc_decremented_fe_usecounts;
 	std::map<eDVBChannelID, int> fcc_chids;
 	int apply_to_ignore = 0;
+	int apply_to_ignoresr = 0;
 	if (!eFCCServiceManager::getFCCChannelID(fcc_chids))
 	{
 		for (std::map<eDVBChannelID, int>::iterator i(fcc_chids.begin()); i != fcc_chids.end(); ++i)
@@ -1606,6 +1563,18 @@ int eDVBResourceManager::canAllocateChannel(const eDVBChannelID &channelid, cons
 		}
 	}
 
+	// For stream relayed channel make a check is it in the available channels and if it is ignore it
+	if (ignoresr) {
+		for (std::list<active_channel>::iterator i(active_channels.begin()); i != active_channels.end(); ++i)
+		{
+			if (i->m_channel_id == ignoresr)
+			{
+				apply_to_ignoresr = 1;
+				break;
+			}
+		}
+	}
+
 	for (std::list<active_channel>::iterator i(active_channels.begin()); i != active_channels.end(); ++i)
 	{
 		eSmartPtrList<eDVBRegisteredFrontend> &frontends = simulate ? m_simulate_frontend : m_frontend;
@@ -1619,6 +1588,7 @@ int eDVBResourceManager::canAllocateChannel(const eDVBChannelID &channelid, cons
 			// or 2 when the cached channel is not equal to the compared channel
 			int check_usecount = channel == &(*m_cached_channel) ? 1 : 0;
 			check_usecount += (apply_to_ignore+1) * 2; // one is used in eDVBServicePMTHandler and another is used in eDVBScan.
+			check_usecount += apply_to_ignoresr;
 			//eDebug("[eDVBResourceManager] canAllocateChannel channel->getUseCount() : %d , check_usecount : %d (cached : %d)", channel->getUseCount(), check_usecount, channel == &(*m_cached_channel));
 			if (channel->getUseCount() == check_usecount)  // channel only used once..(except fcc)
 			{
@@ -1889,9 +1859,11 @@ void eDVBChannel::cueSheetEvent(int event)
 				eDebug("[eDVBChannel] skipmode ratio is %lld:90000, bitrate is %d bit/s", m_cue->m_skipmode_ratio, bitrate);
 						/* i agree that this might look a bit like black magic. */
 				m_skipmode_n = 512*1024; /* must be 1 iframe at least. */
-				//* The / and * are done in order, resulting in a distinct integer
-				// truncation after bitrate / 8 / 90000
-				// I don't think that this is intended*/
+// The / and * are done in order, resulting in a distinct integer
+// truncation after bitrate / 8 / 90000
+// I don't think that this is intended...
+// github.com/OpenViX/enigma2/commit/33d172b5a3ad1b22d69ce60c2102552537b77929
+//				m_skipmode_m = bitrate / 8 / 90000 * m_cue->m_skipmode_ratio / 8;
 				m_skipmode_frames = m_cue->m_skipmode_ratio / 90000;
 				m_skipmode_m = (bitrate / 8) * (m_skipmode_frames / 8);
 				m_skipmode_frames_remainder = 0;
@@ -1991,7 +1963,7 @@ void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off
 	if (m_skipmode_m)
 	{
 		int frames_to_skip = m_skipmode_frames + m_skipmode_frames_remainder;
-		//eDebug("[eDVBChannel] we are at %llu, and we try to skip %d+%d frames from here", current_offset, m_skipmode_frames, m_skipmode_frames_remainder);
+		//eDebug("[eDVBChannel] we are at %lld, and we try to skip %d+%d frames from here", current_offset, m_skipmode_frames, m_skipmode_frames_remainder);
 		size_t iframe_len;
 		off_t iframe_start = current_offset;
 		int frames_skipped = frames_to_skip;
@@ -2163,13 +2135,13 @@ void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off
 				/* when skipping reverse, however, choose the zone before. */
 				/* This returns a size 0 block, in case you noticed... */
 				--i;
-				eDebug("[eDVBChannel] skip to previous block, which is %ju..%ju", i->first, i->second);
+				eDebug("[eDVBChannel] skip to previous block, which is %jd..%jd", (intmax_t)i->first, (intmax_t)i->second);
 				size_t len = diff_upto(i->second, i->first, max);
 				start = i->second - len;
 				eDebug("[eDVBChannel] skipping to %jd, %zd", (intmax_t)start, len);
 			}
 
-			eDebug("[eDVBChannel] result: %jd, %zx (%ju %ju)", (intmax_t)start, size, i->first, i->second);
+			eDebug("[eDVBChannel] result: %jd, %zx (%jd %jd)", (intmax_t)start, size, (intmax_t)i->first, (intmax_t)i->second);
 			return;
 		}
 	}

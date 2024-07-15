@@ -1,9 +1,11 @@
 #ifndef __lib_dvb_iservice_h
 #define __lib_dvb_iservice_h
+#define HAVE_ITAPSERVICE
 
 #include <lib/python/swig.h>
 #include <lib/python/python.h>
 #include <lib/base/object.h>
+#include <lib/base/estring.h>
 #include <string>
 #include <connection.h>
 #include <list>
@@ -44,11 +46,13 @@ public:
 		isMarker=64,			// Marker
 		isGroup=128,			// is a group of services
 		isNumberedMarker=256, //use together with isMarker, to force the marker to be numbered
-		isInvisible=512 // use to make services or markers in a list invisable
+		isInvisible=512 // use together with isMarker and isNumberedMarker, to force an empty number
 	};
 	int flags; // flags will NOT be compared.
 
 	inline int getSortKey() const { return (flags & hasSortKey) ? data[3] : ((flags & sort1) ? 1 : 0); }
+
+	static RESULT parseNameAndProviderFromName(std::string &sourceName, std::string& name, std::string& prov);
 
 #ifndef SWIG
 	int data[8];
@@ -87,9 +91,18 @@ public:
 // real existing service ( for dvb eServiceDVB )
 #ifndef SWIG
 	std::string name;
+	std::string prov;
 	int number;
 #endif
-	std::string getName() const { return name; }
+	std::string getName() const { 
+		if (!name.empty()) {
+			std::vector<std::string> name_split = split(name, "•");
+			std::string name_res = name_split[0];
+			return name_res; 
+		}
+		return name; 
+	}
+	std::string getProvider() const { return prov; }
 	void setName( const std::string &n ) { name=n; }
 	int getChannelNum() const { return number; }
 	void setChannelNum(const int n) { number = n; }
@@ -157,15 +170,31 @@ public:
 		return valid();
 	}
 #endif
+#ifdef SWIG
+public:
+%typemap(in) (const char* string2) {
+	if (PyBytes_Check($input)) {
+		$1 = PyBytes_AsString($input);
+	} else {
+		$1 = PyBytes_AsString(PyUnicode_AsEncodedString($input, "utf-8", "surrogateescape"));
+	}
+}
+#endif
 	eServiceReference(int type, int flags, const std::string &path)
 		: type(type), flags(flags), path(path)
 	{
 		memset(data, 0, sizeof(data));
 		number = 0;
 	}
+	void eServiceReferenceBase(const std::string &string);
+#ifdef SWIG
+	eServiceReference(const eServiceReference &ref);
+#endif
 	eServiceReference(const std::string &string);
+	eServiceReference(const char* string2);
 	std::string toString() const;
 	std::string toCompareString() const;
+	std::string toReferenceString() const;
 	bool operator==(const eServiceReference &c) const
 	{
 		if (!c || type != c.type)
@@ -179,7 +208,7 @@ public:
 	bool operator<(const eServiceReference &c) const
 	{
 		if (!c) return 0;
-
+		
 		if (type < c.type)
 			return 1;
 
@@ -431,7 +460,6 @@ public:
 	virtual ePtr<iServiceInfoContainer> getInfoObject(int w);
 	virtual ePtr<iDVBTransponderData> getTransponderData();
 	virtual void getAITApplications(std::map<int, std::string> &aitlist) {};
-	virtual PyObject *getHbbTVApplications() {return getHbbTVApplications();};
 	virtual void getCaIds(std::vector<int> &caids, std::vector<int> &ecmpids, std::vector<std::string> &ecmdatabytes);
 	virtual long long getFileSize();
 
@@ -1049,6 +1077,10 @@ public:
 	virtual SWIG_VOID(RESULT) stream(ePtr<iStreamableService> &SWIG_OUTPUT)=0;
 	virtual SWIG_VOID(RESULT) subServices(ePtr<iSubserviceList> &SWIG_OUTPUT)=0;
 	virtual SWIG_VOID(RESULT) getFilenameExtension(std::string &SWIG_OUTPUT)=0;
+	virtual PyObject *getCutList()
+	{
+		return PyList_New(0);
+	}
 };
 SWIG_TEMPLATE_TYPEDEF(ePtr<iRecordableService>, iRecordableServicePtr);
 
