@@ -7,14 +7,9 @@
 #include <stdio.h>
 #include "eerror.h"
 
-bool contains(const std::string &str, const std::string &substr);
-bool endsWith(const std::string &str, const std::string &suffix);
-bool startsWith(const std::string &str, const std::string &prefix);
-
 std::string buildShortName( const std::string &str );
 
 void undoAbbreviation(std::string &str1, std::string &str2);
-void removePrefixesFromEventName(std::string &str1, std::string &str2);
 
 int strnicmp(const char*, const char*, int);
 
@@ -28,7 +23,6 @@ std::string convertDVBUTF8(const unsigned char *data, int len, int table=-1, int
 std::string convertLatin1UTF8(const std::string &string);
 int isUTF8(const std::string &string);
 std::string repairUTF8(const char *szIn, int len);
-
 unsigned int truncateUTF8(std::string &s, unsigned int newsize);
 
 std::string removeDVBChars(const std::string &s);

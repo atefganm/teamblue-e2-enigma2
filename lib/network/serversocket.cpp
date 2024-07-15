@@ -12,8 +12,7 @@ void eServerSocket::notifier(int)
 {
 	int clientfd;
 	socklen_t clientlen;
-// handle multiple socket types...
-	union
+	union // ugly workaround for sizeof(sockaddr) < sizeof(sockaddr_in6) issue
 	{
 		sockaddr sock;
 		sockaddr_in sock_in;
@@ -167,11 +166,8 @@ int eServerSocket::startListening(struct addrinfo *addr)
 	{
 		return -1;
 	}
-#if HAVE_HISILICON
-	if (listen(getDescriptor(), 10) < 0)
-#else
+
 	if (listen(getDescriptor(), 0) < 0)
-#endif
 	{
 		close();
 		return -1;

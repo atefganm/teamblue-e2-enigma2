@@ -1,12 +1,6 @@
 #ifndef __volume_h
 #define __volume_h
 
-#ifdef DREAMNEXTGEN
-#ifdef HAVE_ALSA
-#undef HAVE_ALSA
-#endif
-#endif
-
 #ifdef HAVE_ALSA
 #include <alsa/asoundlib.h>
 #endif

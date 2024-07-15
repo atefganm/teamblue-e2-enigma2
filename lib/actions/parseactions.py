@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 # takes a header file, outputs action ids
+
 import tokenize
 import sys
 
@@ -17,7 +17,7 @@ def filter(g):
 			continue
 
 		if t[1] != "\n":
-			# print(t)
+#			print t
 			yield t[1]
 
 
@@ -64,7 +64,7 @@ def do_file(f, mode):
 						pass
 
 					try:
-						print(classname)
+						print(actionname)
 					except:
 						pass
 

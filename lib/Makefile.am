@@ -9,16 +9,12 @@ AM_CPPFLAGS = \
 
 # initialize these, to be filled with targets in the included files
 noinst_LIBRARIES=
-plugin_LTLIBRARIES=
 BUILT_SOURCES=
 CLEANFILES=
 EXTRA_DIST=
 noinst_PYTHON=
 nobase_install_PYTHON=
 installdir = $(pkglibdir)
-plugindir = $(libdir)/enigma2/python/Components
-pluginexecdir = $(libdir)/enigma2/python/Components
-pluginexec_PROGRAMS=
 
 include actions/Makefile.inc
 include base/Makefile.inc
@@ -34,7 +30,6 @@ include gui/Makefile.inc
 include mmi/Makefile.inc
 include network/Makefile.inc
 include python/Makefile.inc
-include timeshift/Makefile.inc
 
 # Build the subdirs without parallellism
 SUBDIRS = python

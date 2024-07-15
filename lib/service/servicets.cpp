@@ -14,8 +14,6 @@
 #include <lib/base/init_num.h>
 #include <lib/base/init.h>
 #include <lib/dvb/decoder.h>
-#include <lib/dvb/dvb.h>
-
 
 #include <lib/dvb/pmt.h>
 
@@ -95,7 +93,7 @@ void TSAudioInfo::addAudio(int pid, std::string lang, std::string desc, int type
 /* eServiceTS                                                       */
 /********************************************************************/
 
-eServiceTS::eServiceTS(const eServiceReference &url): m_pump(eApp, 1, "eServiceTS")
+eServiceTS::eServiceTS(const eServiceReference &url): m_pump(eApp, 1)
 {
 	eDebug("ServiceTS construct!");
 	m_filename = url.path.c_str();
@@ -328,20 +326,6 @@ RESULT eServiceTS::unpause()
 {
 	if (!m_streamthread->running())
 	{
-		int tmp_fd = -1;
-		tmp_fd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
-		/* eDebug("[servicets] Twol00 Opened tmp_fd: %d", tmp_fd); */
-		if (tmp_fd == 0)
-		{
-			::close(tmp_fd);
-			tmp_fd = -1;	
-			fd0lock = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
-			/* eDebug("[servicets] opening null fd returned: %d", fd0lock); */
-		}
-		if (tmp_fd != -1)
-		{
-			::close(tmp_fd);
-		}
 		int is_streaming = !strncmp(m_filename.c_str(), "http://", 7);
 		int srcfd = -1;
 
@@ -473,7 +457,7 @@ int eServiceTS::getCurrentTrack() {
 
 DEFINE_REF(eStreamThread)
 
-eStreamThread::eStreamThread(): m_messagepump(eApp, 0, "eStreamThread") {
+eStreamThread::eStreamThread(): m_messagepump(eApp, 0) {
 	CONNECT(m_messagepump.recv_msg, eStreamThread::recvEvent);
 	m_running = false;
 }

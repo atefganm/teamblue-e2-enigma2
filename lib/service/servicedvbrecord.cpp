@@ -1,16 +1,15 @@
 #include <lib/service/servicedvbrecord.h>
 #include <lib/base/eerror.h>
 #include <lib/dvb/db.h>
-#include <lib/dvb/dvb.h>
 #include <lib/dvb/epgcache.h>
 #include <lib/dvb/metaparser.h>
+#include <lib/base/nconfig.h>
 #include <lib/base/httpstream.h>
 #include <fcntl.h>
 
 	/* for cutlist */
 #include <byteswap.h>
 #include <netinet/in.h>
-#include <lib/base/nconfig.h> // access to python config
 
 DEFINE_REF(eDVBServiceRecord);
 
@@ -89,10 +88,13 @@ void eDVBServiceRecord::serviceEvent(int event)
 
 RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t endTime, int eit_event_id, const char *name, const char *descr, const char *tags, bool descramble, bool recordecm, int packetsize)
 {
+	bool config_recording_always_ecm = eConfigManager::getConfigBoolValue("config.recording.always_ecm", false);
+	bool config_recording_never_decrypt = eConfigManager::getConfigBoolValue("config.recording.never_decrypt", false);
+
 	m_filename = filename;
 	m_streaming = 0;
-	m_descramble = descramble;
-	m_record_ecm = recordecm;
+	m_descramble = config_recording_never_decrypt ? false : descramble;
+	m_record_ecm = config_recording_always_ecm ? true : recordecm;
 	m_packet_size = packetsize;
 
 	if (m_state == stateIdle)
@@ -135,7 +137,7 @@ RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t e
 				meta.m_description = descr;
 			if (tags)
 				meta.m_tags = tags;
-			meta.m_scrambled = m_record_ecm; /* assume we will record scrambled data, when ecm will be included in the recording */
+			meta.m_scrambled = !m_descramble;
 			meta.m_packet_size = m_packet_size;
 			ret = meta.updateMeta(filename) ? -255 : 0;
 			if (!ret)
@@ -291,20 +293,6 @@ int eDVBServiceRecord::doRecord()
 	{
 		eDebug("[eDVBServiceRecord] Recording to %s...", m_filename.c_str());
 		::remove(m_filename.c_str());
-		int tmp_fd = -1;
-		tmp_fd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
-		/* eDebug("[servicedvbrecord] Twol00 Opened tmp_fd: %d", tmp_fd); */
-		if (tmp_fd == 0)
-		{
-			::close(tmp_fd);
-			tmp_fd = -1;	
-			fd0lock = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
-			/* eDebug("[servicedvbrecord] opening null fd returned: %d", fd0lock); */
-		}
-		if (tmp_fd != -1)
-		{
-			::close(tmp_fd);
-		}
 		int fd = ::open(m_filename.c_str(), O_WRONLY | O_CREAT | O_LARGEFILE | O_CLOEXEC, 0666);
 		if (fd == -1)
 		{
@@ -345,7 +333,7 @@ int eDVBServiceRecord::doRecord()
 		eDebug("[eDVBServiceRecord] start streaming...");
 	} else
 	{
-		eDebug("[eDVBServiceRecord] start recording...");
+		eDebugNoNewLineStart("[eDVBServiceRecord] start recording...");
 
 		eDVBServicePMTHandler::program program;
 		if (m_service_handler.getProgramInfo(program))
@@ -473,7 +461,14 @@ int eDVBServiceRecord::doRecord()
 				}
 			}
 
-				/* find out which pids are NEW and which pids are obsolete.. */
+			bool include_ait = eConfigManager::getConfigBoolValue("config.recording.include_ait");
+			if (include_ait)
+			{
+				/* add AIT pid (if any) */
+				if (program.aitPid >= 0) pids_to_record.insert(program.aitPid);
+			}
+
+			/* find out which pids are NEW and which pids are obsolete.. */
 			std::set<int> new_pids, obsolete_pids;
 
 			std::set_difference(pids_to_record.begin(), pids_to_record.end(),
@@ -577,12 +572,8 @@ void eDVBServiceRecord::gotNewEvent(int /*error*/)
 			eDebug("[eDVBServiceRecord] getting PCR failed!");
 		else
 		{
-			std::pair<std::map<int, pts_t>::iterator, bool> ret;
-			ret = m_event_timestamps.insert(std::pair<int, pts_t>(event_id, p));
-			if (ret.second)
-				eDebug("[eDVBServiceRecord] pcr of eit change for event %d: %llx", ret.first->first, ret.first->second);
-			else
-				eDebug("[eDVBServiceRecord] pcr of eit change for event %d at %llx already set to: %llx", ret.first->first, p, ret.first->second);
+			m_event_timestamps[event_id] = p;
+			eDebug("[eDVBServiceRecord] pcr of eit change: %llx", p);
 		}
 	}
 
@@ -594,73 +585,41 @@ void eDVBServiceRecord::gotNewEvent(int /*error*/)
 	m_event((iRecordableService*)this, evNewEventInfo);
 }
 
-void eDVBServiceRecord::fixupCuts(std::list<pts_t> &offsets)
-{
-	eDVBTSTools tstools;
-	offsets.clear();
-
-	if (tstools.openFile(m_filename.c_str()))
-	{
-		eDebug("[eDVBServiceRecord] fetching cutlist failed because tstools failed");
-		return;
-	}
-
-	for (std::map<int,pts_t>::iterator i(m_event_timestamps.begin()); i != m_event_timestamps.end(); ++i)
-	{
-		pts_t p = i->second;
-		off_t offset = 0; // fixme, we need to note down both
-		if (tstools.fixupPTS(offset, p))
-		{
-			eDebug("[eDVBServiceRecord] fixing up PTS failed, not saving");
-			continue;
-		}
-		eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %llx)", i->second, p, offset);
-		offsets.push_back(p);
-	}
-}
-
-PyObject *eDVBServiceRecord::getCutList()
-{
-        ePyObject list = PyList_New(0);
-	std::list<pts_t> offsets;
-	fixupCuts(offsets);
-
-	for (std::list<pts_t>::iterator i(offsets.begin()); i != offsets.end(); ++i)
-	{
-		pts_t p = *i;
-		eDebug("[eDVBServiceRecord] getCutList %llx", p);
-		ePyObject tuple = PyTuple_New(2);
-		PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(p));
-		PyTuple_SET_ITEM(tuple, 1, PyLong_FromLong(2)); /* mark */
-		PyList_Append(list, tuple);
-		Py_DECREF(tuple);
-	}
-
-	return list;
-}
-
 void eDVBServiceRecord::saveCutlist()
 {
+	/* XXX: dupe of eDVBServicePlay::saveCuesheet, refactor plz */
+
 	/* save cuesheet only when main file is accessible. */
 	if (::access(m_filename.c_str(), R_OK) < 0)
 		return;
 
 	std::string filename = m_filename + ".cuts";
 
+	eDVBTSTools tstools;
+
+	if (tstools.openFile(m_filename.c_str()))
+	{
+		eDebug("[eDVBServiceRecord] saving cutlist failed because tstools failed");
+		return;
+	}
+
 	// If a cuts file exists, append to it (who cares about sorting it)
 	FILE *f = fopen(filename.c_str(), "a+b");
 	if (f)
 	{
-		std::list<pts_t> offsets;
-		fixupCuts(offsets);
+		unsigned long long where;
+		int what;
 
-		for (std::list<pts_t>::iterator i(offsets.begin()); i != offsets.end(); ++i)
+		for (std::map<int,pts_t>::iterator i(m_event_timestamps.begin()); i != m_event_timestamps.end(); ++i)
 		{
-			unsigned long long where;
-			int what;
-			pts_t p = *i;
-
-			eDebug("[eDVBServiceRecord] saveCutlist %llx", p);
+			pts_t p = i->second;
+			off_t offset = 0; // fixme, we need to note down both
+			if (tstools.fixupPTS(offset, p))
+			{
+				eDebug("[eDVBServiceRecord] fixing up PTS failed, not saving");
+				continue;
+			}
+			eDebug("[eDVBServiceRecord] fixed up %llx to %llx (offset %jx)", i->second, p, (intmax_t)offset);
 			where = htobe64(p);
 			what = htonl(2); /* mark */
 			fwrite(&where, sizeof(where), 1, f);
@@ -668,6 +627,7 @@ void eDVBServiceRecord::saveCutlist()
 		}
 		fclose(f);
 	}
+
 }
 
 RESULT eDVBServiceRecord::subServices(ePtr<iSubserviceList> &ptr)

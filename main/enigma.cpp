@@ -1,14 +1,13 @@
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
-#include <sstream>
+#include <vector>
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <libsig_comp.h>
 #include <linux/dvb/version.h>
-
 #include <lib/actions/action.h>
 #include <lib/driver/rc.h>
 #include <lib/base/ioprio.h>
@@ -16,7 +15,6 @@
 #include <lib/base/ebase.h>
 #include <lib/base/eenv.h>
 #include <lib/base/eerror.h>
-#include <lib/base/esimpleconfig.h>
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
 #include <lib/gdi/gmaindc.h>
@@ -41,6 +39,16 @@
 
 #include <gst/gst.h>
 
+#include <unistd.h>
+#include <lib/components/scan.h>
+#include <lib/dvb/idvb.h>
+#include <lib/dvb/dvb.h>
+#include <lib/dvb/db.h>
+#include <lib/dvb/dvbtime.h>
+#include <lib/dvb/epgcache.h>
+#include <lib/dvb/epgtransponderdatareader.h>
+#include <malloc.h>
+
 #ifdef OBJECT_DEBUG
 int object_total_remaining;
 
@@ -51,7 +59,6 @@ void object_dump()
 #endif
 
 static eWidgetDesktop *wdsk, *lcddsk;
-
 static int prev_ascii_code;
 
 int getPrevAsciiCode()
@@ -68,6 +75,7 @@ void keyEvent(const eRCKey &key)
 
 	ePtr<eActionMap> ptr;
 	eActionMap::getInstance(ptr);
+	/*eDebug("key.code : %02x \n", key.code);*/
 
 	if ((key.code == last.code) && (key.producer == last.producer) && key.flags & eRCKey::flagRepeat)
 		num_repeat++;
@@ -93,18 +101,9 @@ void keyEvent(const eRCKey &key)
 }
 
 /************************************************/
-#include <unistd.h>
-#include <lib/components/scan.h>
-#include <lib/dvb/idvb.h>
-#include <lib/dvb/dvb.h>
-#include <lib/dvb/db.h>
-#include <lib/dvb/dvbtime.h>
-#include <lib/dvb/epgcache.h>
-#include <lib/dvb/epgtransponderdatareader.h>
 
 /* Defined in eerror.cpp */
-void setDebugTime(int level);
-
+void setDebugTime(bool enable);
 class eMain: public eApplication, public sigc::trackable
 {
 	eInit init;
@@ -140,56 +139,111 @@ public:
 	}
 };
 
-bool replace(std::string& str, const std::string& from, const std::string& to) 
-{
-	size_t start_pos = str.find(from);
-	if(start_pos == std::string::npos)
-		return false;
-	str.replace(start_pos, from.length(), to);
-	return true;
+bool fileExists(const std::string& path) {
+	std::ifstream file(path.c_str());
+	return file.good();
 }
 
-static const std::string getConfigCurrentSpinner(const char* key)
-{
-	auto value = eSimpleConfig::getString(key);
+bool getConfigBoolValue(const std::string& configFile, const std::string& key, bool defaultValue) {
+	std::ifstream in(configFile);
+	if (!in.is_open()) {
+		eDebug("[MAIN] Error opening config file: %s", configFile.c_str());
+		return defaultValue;
+	}
 
-	 // if value is NOT empty, means config.skin.primary_skin exists in settings file, so return SCOPE_CURRENT_SKIN + "/spinner"
-	 // ( /usr/share/enigma2/MYSKIN/spinner ) BUT check if /usr/share/enigma2/MYSKIN/spinner/wait1.png exist
-	if (!value.empty())
-	{
-		replace(value, "skin.xml", "spinner");
-		std::string png_location = eEnv::resolve("${datadir}/enigma2/" + value + "/wait1.png");
-		std::ifstream png(png_location.c_str());
-		if (png.good()) {
-			png.close();
-			return value; 
+	std::string line;
+	while (std::getline(in, line)) {
+		if (line.find(key) != std::string::npos) {
+			size_t pos = line.find('=');
+			if (pos != std::string::npos) {
+				std::string valueStr = line.substr(pos + 1);
+				// Trim leading and trailing whitespace
+				size_t start = valueStr.find_first_not_of(" \t");
+				size_t end = valueStr.find_last_not_of(" \t");
+				if (start != std::string::npos && end != std::string::npos) {
+					valueStr = valueStr.substr(start, end - start + 1);
+				}
+				// Check if valueStr is "true" or "false"
+				if (valueStr == "true" || valueStr == "TRUE") {
+					return true;
+				} else if (valueStr == "false" || valueStr == "FALSE") {
+					return false;
+				} else {
+					break;
+				}
+			}
 		}
 	}
 
-	return "spinner"; // fallback on default system spinner
+	return defaultValue;
 }
+
+static const std::string getConfigCurrentSpinner(const std::string &key) {
+	std::string value;
+	std::ifstream in(eEnv::resolve("${sysconfdir}/enigma2/settings").c_str());
+
+	if (in.good()) {
+		std::string line;
+		while (std::getline(in, line)) {
+			if (line.compare(0, key.size(), key) == 0) {
+				value = line.substr(key.size() + 1);
+				size_t end_pos = value.find("skin.xml");
+				if (end_pos != std::string::npos) {
+					value = value.substr(0, end_pos);
+				}
+				break;
+			}
+		}
+		in.close();
+	}
+
+	if (value.empty()) {
+		value = "GigabluePaxV2";
+	}
+
+	std::vector<std::string> directories;
+	bool useDefaultSpinner = getConfigBoolValue("/etc/enigma2/settings", "config.usage.usedefaultspinner", false);
+
+	if (!useDefaultSpinner) {
+		directories.push_back("/usr/share/enigma2/" + value + "/spinner/wait1.png");
+		directories.push_back("/usr/share/enigma2/" + value + "/skin_default/spinner/wait1.png");
+	}
+	directories.push_back("/usr/share/enigma2/skin_default/spinner/wait1.png");
+
+	for (const auto& dir : directories) {
+
+		if (fileExists(dir)) {
+			if (dir.find("skin_default") != std::string::npos && dir.find(value) != std::string::npos) {
+				return value + "/skin_default";
+			} else if (dir.find("skin_default") != std::string::npos) {
+				return "skin_default";
+			} else {
+				return value;
+			}
+		}
+	}
+
+	return "skin_default";
+}
+
 
 int exit_code;
 
 void quitMainloop(int exitCode)
 {
 	FILE *f = fopen("/proc/stb/fp/was_timer_wakeup", "w");
-	if (f)
-	{
+	if (f) {
 		fprintf(f, "%d", 0);
 		fclose(f);
-	}
-	else
-	{
+	} else {
 		int fd = open("/dev/dbox/fp0", O_WRONLY);
-		if (fd >= 0)
-		{
+		if (fd >= 0) {
 			if (ioctl(fd, 10 /*FP_CLEAR_WAKEUP_TIMER*/) < 0)
 				eDebug("[quitMainloop] FP_CLEAR_WAKEUP_TIMER failed: %m");
 			close(fd);
-		}
-		else
+		} else {
 			eDebug("[quitMainloop] open /dev/dbox/fp0 for wakeup timer clear failed: %m");
+		}
 	}
 	exit_code = exitCode;
 	eApp->quit(0);
@@ -225,7 +279,6 @@ void catchTermSignal()
 
 int main(int argc, char **argv)
 {
-
 #ifdef MEMLEAK_CHECK
 	atexit(DumpUnfreed);
 #endif
@@ -234,23 +287,18 @@ int main(int argc, char **argv)
 	atexit(object_dump);
 #endif
 
-	// Clear LD_PRELOAD so that shells and processes launched by Enigma2 can pass on file handles and pipes
-	unsetenv("LD_PRELOAD");
-
 	gst_init(&argc, &argv);
 
-	// set pythonpath if unset
 	setenv("PYTHONPATH", eEnv::resolve("${libdir}/enigma2/python").c_str(), 0);
-	printf("[Enigma2] PYTHONPATH: %s\n", getenv("PYTHONPATH"));
-	printf("[Enigma2] DVB_API_VERSION %d DVB_API_VERSION_MINOR %d\n", DVB_API_VERSION, DVB_API_VERSION_MINOR);
+	printf("[enigma2] PYTHONPATH: %s\n", getenv("PYTHONPATH"));
+	printf("[enigma2] DVB_API_VERSION %d DVB_API_VERSION_MINOR %d\n", DVB_API_VERSION, DVB_API_VERSION_MINOR);
 
-	// get enigma2 debug level settings
-	debugLvl = getenv("ENIGMA_DEBUG_LVL") ? atoi(getenv("ENIGMA_DEBUG_LVL")) : eSimpleConfig::getInt("config.crash.e2_debug_level", 4);
+	debugLvl = getenv("ENIGMA_DEBUG_LVL") ? atoi(getenv("ENIGMA_DEBUG_LVL")) : DEFAULT_DEBUG_LVL;
 	if (debugLvl < 0)
 		debugLvl = 0;
 	printf("ENIGMA_DEBUG_LVL=%d\n", debugLvl);
 	if (getenv("ENIGMA_DEBUG_TIME"))
-		setDebugTime(atoi(getenv("ENIGMA_DEBUG_TIME")));
+		setDebugTime(atoi(getenv("ENIGMA_DEBUG_TIME")) != 0);
 
 	ePython python;
 	eMain main;
@@ -258,14 +306,9 @@ int main(int argc, char **argv)
 	ePtr<gMainDC> my_dc;
 	gMainDC::getInstance(my_dc);
 
-	//int double_buffer = my_dc->haveDoubleBuffering();
-
 	ePtr<gLCDDC> my_lcd_dc;
 	gLCDDC::getInstance(my_lcd_dc);
 
-
-	/* ok, this is currently hardcoded for arabic. */
-	/* some characters are wrong in the regular font, force them to use the replacement font */
 	for (int i = 0x60c; i <= 0x66d; ++i)
 		eTextPara::forceReplacementGlyph(i);
 	eTextPara::forceReplacementGlyph(0xfdf2);
@@ -276,13 +319,7 @@ int main(int argc, char **argv)
 	eWidgetDesktop dsk_lcd(my_lcd_dc->size());
 
 	dsk.setStyleID(0);
-	dsk_lcd.setStyleID(my_lcd_dc->size().width() == 96 ? 2 : 1);
-
-/*	if (double_buffer)
-	{
-		eDebug("[MAIN] - double buffering found, enable buffered graphics mode.");
-		dsk.setCompositionMode(eWidgetDesktop::cmBuffered);
-	} */
+	dsk_lcd.setStyleID(1);
 
 	wdsk = &dsk;
 	lcddsk = &dsk_lcd;
@@ -292,58 +329,37 @@ int main(int argc, char **argv)
 
 	dsk.setBackgroundColor(gRGB(0,0,0,0xFF));
 
-		/* redrawing is done in an idle-timer, so we have to set the context */
 	dsk.setRedrawTask(main);
 	dsk_lcd.setRedrawTask(main);
 
 	std::string active_skin = getConfigCurrentSpinner("config.skin.primary_skin");
-	std::string spinnerPostion = eSimpleConfig::getString("config.misc.spinnerPosition", "25,25");
-	int spinnerPostionX,spinnerPostionY;
-	if (sscanf(spinnerPostion.c_str(), "%d,%d", &spinnerPostionX, &spinnerPostionY) != 2)
-	{
-		spinnerPostionX = spinnerPostionY = 25;
-	}
+	eDebug("[MAIN] Loading spinners from /usr/share/enigma2/%s/spinner/", active_skin.c_str());
 
-	eDebug("[MAIN] Loading spinners...");
+	int i;
+	#define MAX_SPINNER 64
+	ePtr<gPixmap> wait[MAX_SPINNER];
+	for (i=0; i<MAX_SPINNER; ++i)
 	{
-#define MAX_SPINNER 64
-		int i = 0;
-		std::string skinpath = "${datadir}/enigma2/" + active_skin;
-		std::string defpath = "${datadir}/enigma2/spinner";
-		bool def = (skinpath.compare(defpath) == 0);
-		ePtr<gPixmap> wait[MAX_SPINNER];
-		while(i < MAX_SPINNER)
+		char filename[64] = {};
+		std::string rfilename;
+		snprintf(filename, sizeof(filename), "${datadir}/enigma2/%s/spinner/wait%d.png", active_skin.c_str(), i + 1);
+		rfilename = eEnv::resolve(filename);
+
+		if (::access(rfilename.c_str(), R_OK) < 0)
+			break;
+
+		loadImage(wait[i], rfilename.c_str());
+		if (!wait[i])
 		{
-			char filename[64] = {};
-			std::string rfilename;
-			snprintf(filename, sizeof(filename), "%s/wait%d.png", skinpath.c_str(), i + 1);
-			rfilename = eEnv::resolve(filename);
-			loadPNG(wait[i], rfilename.c_str());
-
-			if (!wait[i]) 
-			{
-				// spinner failed
-				if (i==0)
-				{
-					// retry default spinner only once
-					if (!def)
-					{
-						def = true;
-						skinpath = defpath;
-						continue;
-					}
-				}
-				// exit loop because of no more spinners
-				break;
-			}
-			i++;
+			eDebug("[MAIN] failed to load %s: %m", rfilename.c_str());
+			break;
 		}
-		eDebug("[MAIN] Found %d spinners.", i);
-		if (i==0)
-			my_dc->setSpinner(eRect(spinnerPostionX, spinnerPostionY, 0, 0), wait, 1);
-		else
-			my_dc->setSpinner(eRect(ePoint(spinnerPostionX, spinnerPostionY), wait[0]->size()), wait, i);
 	}
+	eDebug("[MAIN] found %d spinner!", i);
+	if (i)
+		my_dc->setSpinner(eRect(ePoint(25, 25), wait[0]->size()), wait, i);
+	else
+		my_dc->setSpinner(eRect(25, 25, 0, 0), wait, 1);
 
 	gRC::getInstance()->setSpinnerDC(my_dc);
 
@@ -356,12 +372,10 @@ int main(int argc, char **argv)
 
 	setIoPrio(IOPRIO_CLASS_BE, 3);
 
-	/* start at full size */
 	eVideoWidget::setFullsize(true);
 
 	python.execFile(eEnv::resolve("${libdir}/enigma2/python/StartEnigma.py").c_str());
 
-	/* restore both decoders to full size */
 	eVideoWidget::setFullsize(true);
 
 	if (exit_code == 5) /* python crash */
@@ -419,40 +433,19 @@ const char *getBoxType()
 	return BOXTYPE;
 }
 
-int getE2Flags()
-{
-	return 1;
-}
-
 #include <malloc.h>
 
 void dump_malloc_stats(void)
 {
+#ifdef __GLIBC__
+#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 33)
 	struct mallinfo2 mi = mallinfo2();
 	eDebug("MALLOC: %zu total", mi.uordblks);
-}
-
-#ifdef USE_LIBVUGLES2
-#include <vuplus_gles.h>
-
-void setAnimation_current(int a)
-{
-	gles_set_animation_func(a);
-}
-
-void setAnimation_speed(int speed)
-{
-	gles_set_animation_speed(speed);
-}
-
-void setAnimation_current_listbox(int a)
-{
-	gles_set_animation_listbox_func(a);
-}
 #else
-#ifndef HAVE_OSDANIMATION
-void setAnimation_current(int a) {}
-void setAnimation_speed(int speed) {}
-void setAnimation_current_listbox(int a) {}
+	struct mallinfo mi = mallinfo();
+	eDebug("MALLOC: %d total", mi.uordblks);
 #endif
+#else
+	eDebug("MALLOC: info not exposed");
 #endif
+}

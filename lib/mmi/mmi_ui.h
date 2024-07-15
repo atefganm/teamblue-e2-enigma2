@@ -2,7 +2,7 @@
 #define __mmi_ui_h
 
 #include <string>
-		/* avoid warnigs :) */
+                /* avoid warnigs :) */
 #undef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200112L
 #include <lib/python/python.h>
@@ -16,6 +16,7 @@ struct slot_ui_data
 	ePyObject mmiScreen;
 	int mmiTuplePos;
 	int mmiScreenReady;
+	int isError10;
 };
 #endif
 
@@ -45,6 +46,7 @@ public:
 	virtual int getMMIState(int slot)=0;
 #endif
 	int availableMMI(int slot);
+	int isError10(int slot);
 	PyObject *getMMIScreen(int slot);
 #ifndef SWIG
 	int processMMIData(int slot, const unsigned char *tag, const void *data, int len);
@@ -53,6 +55,7 @@ public:
 	int mmiScreenBegin(int slot, int listmenu);
 	int mmiScreenAddText(int slot, int type, char *value);
 	int mmiScreenFinish(int slot);
+	int mmiScreenError10(int slot);
 	void mmiSessionDestroyed(int slot);
 #endif
 };

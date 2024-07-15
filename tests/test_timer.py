@@ -1,12 +1,11 @@
+import enigma
 import time
-import calendar
-from os import environ
-from . import enigma
-from . import tests
-from . import events
+
+import tests
+
+#enigma.reset()
 
 
-# enigma.reset()
 def test_timer(repeat=0, timer_start=3600, timer_length=1000, sim_length=86400 * 7):
 
 	import NavigationInstance
@@ -18,27 +17,31 @@ def test_timer(repeat=0, timer_start=3600, timer_length=1000, sim_length=86400 *
 	print("old mwt:", t.MaxWaitTime)
 	t.MaxWaitTime = 86400 * 1000
 
+	# hack:
+	NavigationInstance.instance.SleepTimer.MaxWaitTime = 86400 * 1000
+
 	t.processed_timers = []
 	t.timer_list = []
 
 	# generate a timer to test
-	import xml.etree.cElementTree
+	import xml.etree.ElementTree
 	import RecordTimer
 
-	timer = RecordTimer.createTimer(xml.etree.cElementTree.fromstring(
-		"""
-			<timer
-				begin="%d"
-				end="%d"
-				serviceref="1:0:1:6DD2:44D:1:C00000:0:0:0:"
-				repeated="%d"
-				name="Test Event Name"
-				description="Test Event Description"
-				afterevent="nothing"
-				eit="56422"
-				disabled="0"
-				justplay="0">
-			</timer>""" % (at + timer_start, at + timer_start + timer_length, repeat)))
+	timer = RecordTimer.createTimer(xml.etree.ElementTree.fromstring(
+	"""
+		<timer
+			begin="%d"
+			end="%d"
+			serviceref="1:0:1:6DD2:44D:1:C00000:0:0:0:"
+			repeated="%d"
+			name="Test Event Name"
+			description="Test Event Description"
+			afterevent="nothing"
+			eit="56422"
+			disabled="0"
+			justplay="0">
+	</timer>""" % (at + timer_start, at + timer_start + timer_length, repeat)
+	))
 
 	t.record(timer)
 
@@ -74,10 +77,17 @@ enigma.init_nav()
 enigma.init_record_config()
 enigma.init_parental_control()
 
+
+from events import log
+
+import calendar
+
+
+import os
 # we are operating in CET/CEST
-environ['TZ'] = 'CET'
+os.environ['TZ'] = 'CET'
 time.tzset()
 
-# events.log(test_timer, test_name = "test_timer_repeating", base_time = calendar.timegm((2007, 3, 1, 12, 0, 0)), repeat=0x7f, sim_length = 86400 * 7)
-events.log(test_timer, test_name="test_timer_repeating_dst_skip", base_time=calendar.timegm((2007, 0o3, 20, 0, 0, 0)), timer_start=3600, repeat=0x7f, sim_length=86400 * 7)
-# events.log(test_timer, test_name = "test_timer_repeating_dst_start", base_time = calendar.timegm((2007, 03, 20, 0, 0, 0)), timer_start = 10000, repeat=0x7f, sim_length = 86400 * 7)
+#log(test_timer, test_name = "test_timer_repeating", base_time = calendar.timegm((2007, 3, 1, 12, 0, 0)), repeat=0x7f, sim_length = 86400 * 7)
+log(test_timer, test_name="test_timer_repeating_dst_skip", base_time=calendar.timegm((2007, 0o3, 20, 0, 0, 0)), timer_start=3600, repeat=0x7f, sim_length=86400 * 7)
+#log(test_timer, test_name = "test_timer_repeating_dst_start", base_time = calendar.timegm((2007, 03, 20, 0, 0, 0)), timer_start = 10000, repeat=0x7f, sim_length = 86400 * 7)

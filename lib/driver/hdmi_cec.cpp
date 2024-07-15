@@ -10,7 +10,7 @@
 #include <lib/base/nconfig.h>
 #include <lib/driver/input_fake.h>
 #include <lib/driver/hdmi_cec.h>
-#include <lib/driver/avcontrol.h>
+#include <lib/driver/avswitch.h>
 /* NOTE: this header will move to linux uapi, once the cec framework is out of staging */
 #include <lib/driver/linux-uapi-cec.h>
 
@@ -176,6 +176,7 @@ void eHdmiCEC::reportPhysicalAddress()
 {
 	struct cec_message txmessage;
 	memset(&txmessage, 0, sizeof(txmessage));
+
 	txmessage.address = 0x0f; /* broadcast */
 	txmessage.data[0] = 0x84; /* report address */
 	txmessage.data[1] = physicalAddress[0];
@@ -316,9 +317,8 @@ int eHdmiCEC::getDeviceType()
 bool eHdmiCEC::getActiveStatus()
 {
 	bool active = true;
-	eAVControl *avc = eAVControl::getInstance();
-	if (avc)
-		active = avc->isEncoderActive();
+	eAVSwitch *avswitch = eAVSwitch::getInstance();
+	if (avswitch) active = avswitch->isActive();
 	return active;
 }
 
@@ -378,7 +378,6 @@ void eHdmiCEC::hdmiEvent(int what)
 			static unsigned char pressedkey = 0;
 
 			eDebugNoNewLineStart("[eHdmiCEC] received message");
-			eDebugNoNewLine(" %02X", rxmessage.address);
 			for (int i = 0; i < rxmessage.length; i++)
 			{
 				eDebugNoNewLine(" %02X", rxmessage.data[i]);
@@ -523,7 +522,6 @@ long eHdmiCEC::translateKey(unsigned char code)
 			break;
 		default:
 			key = 0x8b;
-			eDebug("eHdmiCEC: unknown code 0x%02X", (unsigned int)(code & 0xFF));
 			break;
 	}
 	return key;
@@ -534,7 +532,6 @@ void eHdmiCEC::sendMessage(struct cec_message &message)
 	if (hdmiFd >= 0)
 	{
 		eDebugNoNewLineStart("[eHdmiCEC] send message");
-		eDebugNoNewLine(" %02X", message.address);
 		for (int i = 0; i < message.length; i++)
 		{
 			eDebugNoNewLine(" %02X", message.data[i]);

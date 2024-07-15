@@ -47,12 +47,14 @@ int eDVBCIApplicationManagerSession::receivedAPDU(const unsigned char *tag,const
 			str[dl] = '\0';
 
 			m_app_name = str;
-			if(m_app_name.size() > 0 && !isUTF8(m_app_name)) {
+			if (m_app_name.size() > 0 && !isUTF8(m_app_name))
+			{
 				eDebug("[CI%d AM]   menu string is not UTF8 hex output:%s\nstr output:%s\n",slot->getSlotID(),string_to_hex(m_app_name).c_str(),m_app_name.c_str());
 				m_app_name = convertLatin1UTF8(m_app_name);
 				eDebug("[CI%d AM]   fixed menu string: %s", slot->getSlotID(), m_app_name.c_str());
 			}
-			else {
+			else
+			{
 				eDebug("[CI%d AM]   menu string: %s", slot->getSlotID(), m_app_name.c_str());
 			}
 			/* emit */ eDVBCI_UI::getInstance()->m_messagepump.send(eDVBCIInterfaces::Message(eDVBCIInterfaces::Message::appNameChanged, slot->getSlotID(), m_app_name.c_str()));
@@ -70,30 +72,29 @@ int eDVBCIApplicationManagerSession::receivedAPDU(const unsigned char *tag,const
 
 int eDVBCIApplicationManagerSession::doAction()
 {
-  switch (state)
-  {
-  case stateStarted:
-  {
-    const unsigned char tag[3]={0x9F, 0x80, 0x20}; // application manager info e    sendAPDU(tag);
+	switch (state)
+	{
+	case stateStarted:
+	{
+		const unsigned char tag[3]={0x9F, 0x80, 0x20}; // application manager info sendAPDU(tag);
 		sendAPDU(tag);
-    state=stateFinal;
-    return 1;
-  }
-  case stateFinal:
-    eDebug("[CI%d AM] in final state.", slot->getSlotID());
+		state = stateFinal;
+		return 1;
+	}
+	case stateFinal:
+		eDebug("[CI%d AM] in final state", slot->getSlotID());
 		wantmenu = 0;
-    if (wantmenu)
-    {
-      eDebug("[CI%d AM] wantmenu: sending Tenter_menu", slot->getSlotID());
-      const unsigned char tag[3]={0x9F, 0x80, 0x22};  // Tenter_menu
-      sendAPDU(tag);
-      wantmenu=0;
-      return 0;
-    } else
-      return 0;
-  default:
-    return 0;
-  }
+		if (wantmenu)
+		{
+			eDebug("[CI%d AM] wantmenu: sending Tenter_menu", slot->getSlotID());
+			const unsigned char tag[3]={0x9F, 0x80, 0x22}; // Tenter_menu
+			sendAPDU(tag);
+			wantmenu = 0;
+		}
+		return 0;
+	default:
+		return 0;
+	}
 }
 
 int eDVBCIApplicationManagerSession::startMMI()

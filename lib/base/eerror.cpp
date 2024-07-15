@@ -13,7 +13,11 @@
 #ifdef MEMLEAK_CHECK
 AllocList *allocList;
 pthread_mutex_t memLock =
+#ifdef __GLIBC__
 	PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+#else
+	{{PTHREAD_MUTEX_RECURSIVE}};
+#endif
 
 void DumpUnfreed()
 {
@@ -77,9 +81,15 @@ void DumpUnfreed()
 #endif
 
 int debugLvl = lvlDebug;
-static int debugTime = 3; // 0 = none, 1 = secs since boot, 2 = local time
+static bool debugTime = false;
 
-static pthread_mutex_t DebugLock = PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP;
+static pthread_mutex_t DebugLock =
+#ifdef __GLIBC__
+    PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP;
+#else
+    PTHREAD_MUTEX_INITIALIZER;
+#endif
+
 #define RINGBUFFER_SIZE 16384
 static char ringbuffer[RINGBUFFER_SIZE];
 static unsigned int ringbuffer_head;
@@ -136,44 +146,21 @@ extern void bsodFatal(const char *component);
 
 #define eDEBUG_BUFLEN    1024
 
-int formatTime(char *buf, int bufferSize, int flags)
-{
-	int pos = 0;
-	struct timespec tp = {};
-
-	if (!(flags & _DBGFLG_NOTIME)) {
-		if (debugTime & 1) {
-			clock_gettime(CLOCK_MONOTONIC, &tp);
-/* Cast to (long long) is to cater for older 32-bit time fields */
-			pos += snprintf(buf, bufferSize, "<%6lld.%06lld> ", (long long)tp.tv_sec, (long long)tp.tv_nsec/1000);
-		}
-
-		if (debugTime & 2) {
-			struct tm loctime;
-			struct timeval tim;
-			gettimeofday(&tim, NULL);
-			localtime_r(&tim.tv_sec, &loctime);
-/* Cast to (long long) is to cater for older 32-bit time fields */
-			pos += snprintf(buf + pos, bufferSize - pos, "%02d:%02d:%02d.%04lld ",
-				loctime.tm_hour, loctime.tm_min, loctime.tm_sec, (long long)tim.tv_usec / 100L);
-		}
-	}
-
-	return pos;
-}
-
 void eDebugImpl(int flags, const char* fmt, ...)
 {
 	char * buf = new char[eDEBUG_BUFLEN];
-	struct timespec;
+	int pos = 0;
+	struct timespec tp = {};
 
-	int pos = formatTime(buf, eDEBUG_BUFLEN, flags);
+	if (debugTime && !(flags & _DBGFLG_NOTIME)) {
+		clock_gettime(CLOCK_MONOTONIC, &tp);
+		pos = snprintf(buf, eDEBUG_BUFLEN, "<%6lu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
+	}
 
 	va_list ap;
 	va_start(ap, fmt);
 	int vsize = vsnprintf(buf + pos, eDEBUG_BUFLEN - pos, fmt, ap);
 	va_end(ap);
-
 	if (vsize < 0) {
 		vsize = 0;
 		pos += snprintf(buf + pos, eDEBUG_BUFLEN - pos, " Error formatting: %s", fmt);
@@ -185,8 +172,8 @@ void eDebugImpl(int flags, const char* fmt, ...)
 		// pos still contains size of timestring
 		// +2 for \0 and optional newline
 		buf = new char[pos + vsize + 2];
-		pos = formatTime(buf, pos + vsize, flags);
-
+		if (debugTime && !(flags & _DBGFLG_NOTIME))
+			pos = snprintf(buf, pos + vsize, "<%6lu.%03lu> ", tp.tv_sec, tp.tv_nsec/1000000);
 		va_start(ap, fmt);
 		vsize = vsnprintf(buf + pos, vsize + 1, fmt, ap);
 		va_end(ap);
@@ -224,7 +211,7 @@ int eGetEnigmaDebugLvl()
 	return debugLvl;
 }
 
-void setDebugTime(int flags)
+void setDebugTime(bool enable)
 {
-	debugTime = flags;
+	debugTime = enable;
 }

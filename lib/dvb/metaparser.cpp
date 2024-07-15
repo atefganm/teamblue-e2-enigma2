@@ -94,35 +94,35 @@ int eDVBMetaParser::parseMeta(const std::string &tsname)
 
 		switch (linecnt)
 		{
-		case iDVBMetaFile::idServiceRef:
+		case 0:
 			m_ref = eServiceReferenceDVB(line);
 			break;
-		case iDVBMetaFile::idName:
+		case 1:
 			m_name = line;
 			break;
-		case iDVBMetaFile::idDescription:
+		case 2:
 			m_description = line;
 			break;
-		case iDVBMetaFile::idCreated:
+		case 3:
 			m_time_create = atoi(line);
 			if (m_time_create == 0)
 			{
 				m_time_create = getctime(tsname);
 			}
 			break;
-		case iDVBMetaFile::idTags:
+		case 4:
 			m_tags = line;
 			break;
-		case iDVBMetaFile::idLength:
+		case 5:
 			m_length = atoll(line);  //movielength in pts
 			break;
-		case iDVBMetaFile::idFileSize:
+		case 6:
 			m_filesize = atoll(line);
 			break;
-		case iDVBMetaFile::idServiceData:
+		case 7:
 			m_service_data = line;
 			break;
-		case iDVBMetaFile::idPacketSize:
+		case 8:
 			m_packet_size = atoi(line);
 			if (m_packet_size <= 0)
 			{
@@ -130,8 +130,9 @@ int eDVBMetaParser::parseMeta(const std::string &tsname)
 				m_packet_size = 188;
 			}
 			break;
-		case iDVBMetaFile::idScrambled:
-			m_scrambled = atoi(line);
+		case 9:
+			// This is not nice but the fastest way to 'fix' the 'records not playable'-bug
+			//m_scrambled = atoi(line);
 			break;
 		default:
 			break;

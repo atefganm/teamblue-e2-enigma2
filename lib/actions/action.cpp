@@ -89,6 +89,7 @@ void eActionMap::unbindAction(const std::string &context, ePyObject function)
 	eFatal("[eActionMap] unbindAction with illegal python reference");
 }
 
+
 void eActionMap::bindKey(const std::string &domain, const std::string &device, int key, int flags, const std::string &context, const std::string &action)
 {
 	// start searching the actionlist table
@@ -164,17 +165,6 @@ void eActionMap::bindToggle(const std::string &domain, const std::string &device
 	}
 }
 
-void eActionMap::unbindNativeKey(const std::string &context, int action)
-{
-	for (std::multimap<std::string, eNativeKeyBinding>::iterator i(m_native_keys.begin()); i != m_native_keys.end(); ++i)
-	{
-		if (i->first == context && i->second.m_action == action)
-		{
-			m_native_keys.erase(i);
-			i = m_native_keys.begin();
-		}
-	}
-}
 
 void eActionMap::unbindKeyDomain(const std::string &domain)
 {

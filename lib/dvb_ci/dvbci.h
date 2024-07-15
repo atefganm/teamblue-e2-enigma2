@@ -48,6 +48,7 @@ class eDVBCISlot: public iObject, public sigc::trackable
 	int slotid;
 	int fd;
 	ePtr<eSocketNotifier> notifier;
+	ePtr<eTimer> startup_timeout;
 	int state;
 	int m_ci_version;
 	std::map<uint16_t, uint8_t> running_services;
@@ -107,11 +108,13 @@ class eDVBCISlot: public iObject, public sigc::trackable
 	int setCaParameter(eDVBServicePMTHandler *pmthandler);
 	void removeService(uint16_t program_number=0xFFFF);
 	int setSource(const std::string &source);
-	int setClockRate(const std::string &rate);
+	int setClockRate(int);
 	void determineCIVersion();
 	int setEnabled(bool);
-public:
 	static std::string getTunerLetter(int tuner_no) { return std::string(1, char(65 + tuner_no)); }
+	static std::string getTunerLetterDM(int);
+	static char* readInputCI(int);
+public:
 	enum {stateRemoved, stateInserted, stateInvalid, stateResetted, stateDisabled};
 	enum {versionUnknown = -1, versionCI = 0, versionCIPlus1 = 1, versionCIPlus2 = 2};
 	eDVBCISlot(eMainloop *context, int nr);
@@ -227,7 +230,7 @@ public:
 	int cancelEnq(int slot);
 	int getMMIState(int slot);
 	int setInputSource(int tunerno, const std::string &source);
-	int setCIClockRate(int slot, const std::string &rate);
+	int setCIClockRate(int slot, int rate);
 	void setCIPlusRouting(int slotid);
 	void revertCIPlusRouting(int slotid);
 	bool canDescrambleMultipleServices(eDVBCISlot* slot);

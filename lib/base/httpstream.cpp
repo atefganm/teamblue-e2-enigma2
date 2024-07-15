@@ -16,12 +16,14 @@ eHttpStream::eHttpStream()
 	partialPktSz = 0;
 	tmpBufSize = 32;
 	tmpBuf = (char*)malloc(tmpBufSize);
+	startDelay = 0;
 	if (eConfigManager::getConfigBoolValue("config.usage.remote_fallback_enabled", false))
 		startDelay = 500000;
 	else
 	{
-		int delay = eConfigManager::getConfigIntValue("config.usage.http_startdelay");
-		startDelay = delay * 1000;
+		int _startDelay = eConfigManager::getConfigIntValue("config.usage.http_startdelay");
+		if (_startDelay > 0)
+			startDelay = _startDelay * 1000;
 	}
 }
 
@@ -50,7 +52,7 @@ int eHttpStream::openUrl(const std::string &url, std::string &newurl)
 
 	close();
 
-	std::string user_agent = "HbbTV/1.1.1 (+PVR+RTSP+DL; Sonic; TV44; 1.32.455; 2.002) Bee/3.5";
+	std::string user_agent = "Enigma2 HbbTV/1.1.1 (+PVR+RTSP+DL;teamBlue;;;)";
 	std::string extra_headers = "";
 	size_t pos = uri.find('#');
 	if (pos != std::string::npos)
@@ -165,14 +167,11 @@ int eHttpStream::openUrl(const std::string &url, std::string &newurl)
 		goto error;
 
 	result = sscanf(linebuf, "%99s %d %99s", proto, &statuscode, statusmsg);
-	eDebug("[eHttpStream] %s: http result code: %d", __func__, result);
-	eDebug("[eHttpStream] %s: http response code: %d", __func__, statuscode);
-	if (statuscode != 301)
-		if (result != 3 || (statuscode != 200 && statuscode != 206 && statuscode != 302))
-		{
-			eDebug("[eHttpStream] %s: wrong http response code: %d", __func__, statuscode);
-			goto error;
-		}
+	if (result != 3 || (statuscode != 200 && statuscode != 206 && statuscode != 302))
+	{
+		eDebug("[eHttpStream] %s: wrong http response code: %d", __func__, statuscode);
+		goto error;
+	}
 
 	while (1)
 	{
@@ -261,7 +260,7 @@ void eHttpStream::thread()
 		if (newurl == "")
 		{
 			/* we have a valid stream connection */
-			eDebug("[eHttpStream] Thread end - have connection");
+			eDebug("[eHttpStream] Thread end connection");
 			connectionStatus = CONNECTED;
 			return;
 		}
@@ -271,7 +270,7 @@ void eHttpStream::thread()
 		newurl = "";
 	}
 	/* too many redirect / playlist levels */
-	eDebug("[eHttpStream] thread end NO connection");
+	eDebug("[eHttpStream] hread end NO connection");
 	connectionStatus = FAILED;
 	return;
 }
@@ -401,3 +400,10 @@ off_t eHttpStream::offset()
 {
 	return 0;
 }
+
+int eHttpStream::reconnect()
+{
+	close();
+	return open(streamUrl.c_str());
+}
+

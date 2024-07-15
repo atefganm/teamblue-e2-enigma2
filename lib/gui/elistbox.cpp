@@ -54,6 +54,7 @@ void eListbox::setScrollbarMode(int mode)
 	{
 		m_scrollbar = new eSlider(this);
 		m_scrollbar->hide();
+		m_scrollbar->setBorderWidth(1);
 		if (m_orientation == orVertical) {
 			m_scrollbar->setOrientation(eSlider::orVertical);
 		} else {
@@ -62,13 +63,7 @@ void eListbox::setScrollbarMode(int mode)
 		m_scrollbar->setRange(0,100);
 		if (m_scrollbarbackgroundpixmap) m_scrollbar->setBackgroundPixmap(m_scrollbarbackgroundpixmap);
 		if (m_scrollbarpixmap) m_scrollbar->setPixmap(m_scrollbarpixmap);
-		if (m_style.m_scrollbarforeground_color_set) m_scrollbar->setForegroundColor(m_style.m_scrollbarforeground_color);
-		if (m_style.m_scrollbarbackground_color_set) m_scrollbar->setBackgroundColor(m_style.m_scrollbarbackground_color);
-		if (m_style.m_scrollbarborder_width_set)
-			m_scrollbar->setBorderWidth(m_style.m_scrollbarborder_width);
-		else
-			m_scrollbar->setBorderWidth(1);
-		if (m_style.m_scrollbarborder_color_set) m_scrollbar->setBorderColor(m_style.m_scrollbarborder_color);
+		if (m_style.m_sliderborder_color_set) m_scrollbar->setSliderBorderColor(m_style.m_sliderborder_color);
 	}
 }
 
@@ -151,52 +146,25 @@ void eListbox::moveToEnd()
 void eListbox::moveSelection(long dir)
 {
 	long r_dir = dir;
-	// For compatability reasons we add this so to support current listbox actions in horizontal listboxes
-	if (m_orientation == orHorizontal) {
-		switch (dir) {
-			case moveUp:
-				r_dir = prevPage;
-				break;
-			case moveDown:
-				r_dir = nextPage;
-				break;
-			case pageUp:
-				r_dir = prevItem;
-				break;
-			case pageDown:
-				r_dir = nextItem;
-				break;
-		}
-	}
-
-	// Map universal actions to the corresponding action for Horizontal and vertical eListbox
 	switch (dir) {
-		case prevItemPage:
+		case moveUp:
 			if (m_orientation == orHorizontal){
-				r_dir = prevPage;
-			} else {
-				r_dir = prevItem;
+				r_dir = pageUp;
 			}
 			break;
-		case nextItemPage:
+		case moveDown:
 			if (m_orientation == orHorizontal){
-				r_dir = nextPage;
-			} else {
-				r_dir = nextItem;
+				r_dir = pageDown;
 			}
 			break;
-		case prevPageItem:
-			if (m_orientation == orVertical){
-				r_dir = prevPage;
-			} else {
-				r_dir = prevItem;
+		case pageUp:
+			if (m_orientation == orHorizontal){
+				r_dir = moveUp;
 			}
 			break;
-		case nextPageItem:
-			if (m_orientation == orVertical){
-				r_dir = nextPage;
-			} else {
-				r_dir = nextItem;
+		case pageDown:
+			if (m_orientation == orHorizontal){
+				r_dir = moveDown;
 			}
 			break;
 	}
@@ -218,7 +186,6 @@ void eListbox::moveSelection(long dir)
 			m_content->cursorEnd();
 			[[fallthrough]];
 		case moveUp:
-		case prevItem:
 			do
 			{
 				m_content->cursorMove(-1);
@@ -241,7 +208,6 @@ void eListbox::moveSelection(long dir)
 			while (newsel != oldsel && !m_content->currentCursorSelectable());
 			break;
 		case moveTop:
-		case moveStart:
 			m_content->cursorHome();
 			[[fallthrough]];
 		case justCheck:
@@ -249,7 +215,6 @@ void eListbox::moveSelection(long dir)
 				break;
 			[[fallthrough]];
 		case moveDown:
-		case nextItem:
 			do
 			{
 				m_content->cursorMove(1);
@@ -263,8 +228,7 @@ void eListbox::moveSelection(long dir)
 			}
 			while (newsel != oldsel && !m_content->currentCursorSelectable());
 			break;
-		case pageUp: 
-		case prevPage: {
+		case pageUp: {
 			int pageind;
 			do
 			{
@@ -303,8 +267,7 @@ void eListbox::moveSelection(long dir)
 			while (newsel == prevsel);
 			break;
 		}
-		case pageDown:
-		case nextPage: {
+		case pageDown: {
 			int pageind;
 			do
 			{
@@ -437,7 +400,7 @@ void eListbox::updateScrollBar()
 		}
 		return;
 	}
-	
+
 	int entries = m_content->size();
 	if (m_content_changed)
 	{
@@ -569,7 +532,7 @@ int eListbox::event(int event, void *data, void *data2)
 				style->setStyle(painter, eWindowStyle::styleListboxNormal);
 				if (m_style.m_background_color_set)
 					painter.setBackgroundColor(m_style.m_background_color);
-				
+
 				if (cornerRadius && cornerRadiusEdges)
 				{
 					painter.setRadius(cornerRadius, cornerRadiusEdges);
@@ -591,7 +554,7 @@ int eListbox::event(int event, void *data, void *data2)
 			{
 				yoffset = m_scrollbar->size().height() + 5;
 			}
-			
+
 			if (m_orientation == orVertical)
 			{
 				for (int y = 0, i = 0; i <= m_items_per_page; y += m_itemheight, ++i)
@@ -801,8 +764,8 @@ void eListbox::entryRemoved(int index)
 		moveSelection(moveUp);
 	else
 		moveSelection(justCheck);
-	
-	if (m_orientation == orVertical) 
+
+	if (m_orientation == orVertical)
 	{
 		if ((m_top <= index) && (index < (m_top + m_items_per_page)))
 		{
@@ -822,7 +785,7 @@ void eListbox::entryRemoved(int index)
 
 void eListbox::entryChanged(int index)
 {
-	if (m_orientation == orVertical) 
+	if (m_orientation == orVertical)
 	{
 		if ((m_top <= index) && (index < (m_top + m_items_per_page)))
 		{
@@ -934,6 +897,23 @@ void eListbox::setBorderWidth(int size)
 	if (m_scrollbar) m_scrollbar->setBorderWidth(size);
 }
 
+void eListbox::setScrollbarSliderBorderWidth(int size)
+{
+	m_style.m_scrollbarsliderborder_size = size;
+	m_style.m_scrollbarsliderborder_size_set = 1;
+	if (m_scrollbar) m_scrollbar->setSliderBorderWidth(size);
+}
+
+void eListbox::setScrollbarWidth(int size)
+{
+	m_scrollbar_width = size;
+}
+
+void eListbox::setScrollbarHeight(int size)
+{
+	m_scrollbar_height = size;
+}
+
 void eListbox::setBackgroundPicture(ePtr<gPixmap> &pm)
 {
 	m_style.m_background = pm;
@@ -954,50 +934,33 @@ void eListbox::setSelectionBorderHidden()
 	m_style.m_border_set = 1;
 }
 
-void eListbox::setScrollbarWidth(int size)
-{
-	m_scrollbar_width = size;
-}
-
-void eListbox::setScrollbarHeight(int size)
-{
-	m_scrollbar_height = size;
-}
-
-void eListbox::setScrollbarBorderWidth(int size)
-{
-	m_style.m_scrollbarborder_width = size;
-	if (m_scrollbar) m_scrollbar->setBorderWidth(size);
-}
-
-void eListbox::setScrollbarBorderColor(const gRGB &col)
-{
-	m_style.m_scrollbarborder_color = col;
-	m_style.m_scrollbarborder_color_set = 1;
-	if (m_scrollbar) m_scrollbar->setBorderColor(col);
-}
-
-void eListbox::setScrollbarForegroundColor(const gRGB &col)
-{
-	m_style.m_scrollbarforeground_color = col;
-	m_style.m_scrollbarforeground_color_set = 1;
-	if (m_scrollbar) m_scrollbar->setForegroundColor(col);
-}
-
-void eListbox::setScrollbarBackgroundColor(const gRGB &col)
-{
-	m_style.m_scrollbarbackground_color = col;
-	m_style.m_scrollbarbackground_color_set = 1;
-	if (m_scrollbar) m_scrollbar->setBackgroundColor(col);
-}
-
-void eListbox::setScrollbarPixmap(ePtr<gPixmap> &pm)
+void eListbox::setSliderPicture(ePtr<gPixmap> &pm)
 {
 	m_scrollbarpixmap = pm;
 	if (m_scrollbar && m_scrollbarpixmap) m_scrollbar->setPixmap(pm);
 }
 
-void eListbox::setScrollbarBackgroundPixmap(ePtr<gPixmap> &pm)
+void eListbox::setSliderForegroundColor(gRGB &col)
+{
+	m_style.m_sliderforeground_color = col;
+	m_style.m_sliderforeground_color_set = 1;
+	if (m_scrollbar) m_scrollbar->setSliderForegroundColor(col);
+}
+
+void eListbox::setSliderBorderColor(const gRGB &col)
+{
+	m_style.m_sliderborder_color = col;
+	m_style.m_sliderborder_color_set = 1;
+	if (m_scrollbar) m_scrollbar->setSliderBorderColor(col);
+}
+
+void eListbox::setSliderBorderWidth(int size)
+{
+	m_style.m_sliderborder_size = size;
+	if (m_scrollbar) m_scrollbar->setSliderBorderWidth(size);
+}
+
+void eListbox::setScrollbarBackgroundPicture(ePtr<gPixmap> &pm)
 {
 	m_scrollbarbackgroundpixmap = pm;
 	if (m_scrollbar && m_scrollbarbackgroundpixmap) m_scrollbar->setBackgroundPixmap(pm);

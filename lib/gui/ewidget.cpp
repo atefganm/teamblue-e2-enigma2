@@ -35,7 +35,7 @@ void eWidget::move(ePoint pos)
 	if (m_position == pos)
 		return;
 
-			/* ?? what about native move support? */
+	/* ?? what about native move support? */
 	invalidate();
 
 	m_position = pos;
@@ -337,13 +337,9 @@ void eWidget::recalcClipRegionsWhenVisible()
 			t->m_desktop->recalcClipRegions(t);
 			break;
 		}
-		if (!t->m_parent)
-		{
-			eLogNoNewLineStart(lvlError, "[eWidget] RecalcClipRegions for widget at (%d,%d)=>(%d,%d).", this->position().x(), this->position().y(), this->size().width(), this->size().height());
-			eLogNoNewLine(lvlError, "Top level parent at (%d,%d)=>(%d,%d) has no desktop", t->position().x(), t->position().y(), t->size().width(), t->size().height());
-		}
 		t = t->m_parent;
-	} while(t);
+		ASSERT(t);
+	} while(1);
 }
 
 void eWidget::parentRemoved()

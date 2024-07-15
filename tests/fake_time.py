@@ -11,7 +11,7 @@ def setRealtime():
 
 def setIdealtime():
 	global real_time
-	real_time = lambda: 0  # noqa: E731
+	real_time = lambda: 0
 
 
 def setTime(now):

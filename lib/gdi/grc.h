@@ -265,11 +265,7 @@ public:
 	void unlock();
 #endif
 
-#if SIGCXX_MAJOR_VERSION == 3
 	sigc::signal<void()> notify;
-#else
-	sigc::signal0<void> notify;
-#endif
 
 	void setSpinnerDC(gDC *dc) { m_spinner_dc = dc; }
 	void setSpinnerOnOff(int onoff) { m_spinneronoff = onoff; }

@@ -4,7 +4,6 @@ driver_libenigma_driver_a_CXXFLAGS = $(LIBSDL_CFLAGS)
 
 driver_libenigma_driver_a_SOURCES = \
 	driver/avswitch.cpp \
-	driver/avcontrol.cpp \
 	driver/etimezone.cpp \
 	driver/misc_options.cpp \
 	driver/rc.cpp \
@@ -15,7 +14,6 @@ driver_libenigma_driver_a_SOURCES = \
 driverincludedir = $(pkgincludedir)/lib/driver
 driverinclude_HEADERS = \
 	driver/avswitch.h \
-	driver/avcontrol.h \
 	driver/etimezone.h \
 	driver/input_fake.h \
 	driver/misc_options.h \
@@ -29,11 +27,7 @@ driverinclude_HEADERS = \
 	driver/hdmi_cec.h
 
 if HAVE_LIBSDL
-driver_libenigma_driver_a_SOURCES += driver/rcsdl.cpp
-driverinclude_HEADERS += driver/rcsdl.h
-endif
-
-if GIGABLUE
-driver_libenigma_driver_a_SOURCES += driver/vfd.cpp
-driverinclude_HEADERS += driver/vfd.h
+driver_libenigma_driver_a_SOURCES += \
+	driver/rcsdl.cpp \
+	driver/rcsdl.h
 endif
