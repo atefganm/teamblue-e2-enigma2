@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2 teamBlue\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-04 18:59+0200\n"
+"POT-Creation-Date: 2024-06-20 07:37+0200\n"
 "PO-Revision-Date: 2019-07-25 17:52+0300\n"
 "Last-Translator: Dimitrij <Dima-73@inbox.lv>\n"
 "Language-Team: openPLi Dimitrij\n"
@@ -1310,6 +1310,14 @@ msgstr "Вы уверены, что хотите выйти из этого ма
 #, fuzzy
 msgid "Are you sure you want to reload the EPG data from:\n"
 msgstr "Вы уверены, что хотите выйти из этого мастера?"
+
+#, fuzzy
+msgid ""
+"Are you sure you want to remove your wifi configuration?\n"
+"\n"
+msgstr ""
+"Вы уверены, что хотите активировать эту конфигурацию сети?\n"
+"\n"
 
 msgid ""
 "Are you sure you want to restart your network interfaces?\n"
@@ -2652,7 +2660,7 @@ msgstr ""
 msgid "Configure the duration in minutes for the screensaver."
 msgstr "Настройка продолжительности в минутах для заставки(хранитель экрана)."
 
-msgid "Configure the duration in minutes for the sleeptimer. Select this entry and click OK or green to start/stop the sleeptimer"
+msgid "Configure the duration in minutes for the sleeptimer. Select this entry and press blue to start/restart the sleeptimer or use yellow for stop active sleeptimer."
 msgstr ""
 
 msgid "Configure the duration when the receiver should go to shut down in case the receiver is in standby mode."
@@ -2862,10 +2870,6 @@ msgstr "Настройка LAN"
 
 msgid "Configure your network again"
 msgstr "Повторить настройку сети"
-
-#, fuzzy
-msgid "Configure your network settings and press OK to scan"
-msgstr "Настройте параметры сети, а затем нажмите OK, чтобы начать поиск"
 
 msgid "Configure your wireless LAN again"
 msgstr "Повторить настройку беспроводной сети"
@@ -3470,6 +3474,10 @@ msgid "Delete Image"
 msgstr "удалить файл"
 
 #, fuzzy
+msgid "Delete Wifi configuration"
+msgstr "Настройка тюнера"
+
+#, fuzzy
 msgid "Delete all the text"
 msgstr "удалить запись из плейлиста"
 
@@ -3514,6 +3522,10 @@ msgstr ""
 
 msgid "Delete the character under the text cursor"
 msgstr ""
+
+#, fuzzy
+msgid "Delete the current Wifi configuration.\n"
+msgstr "Активировать текущие настройки"
 
 msgid "Delete the selected files or directories"
 msgstr ""
@@ -4574,6 +4586,10 @@ msgstr ""
 msgid "Error reading bouquets.tv"
 msgstr "закончить редактирование букета"
 
+#, fuzzy
+msgid "Error removing your wifi configuration"
+msgstr "Конфигурация списка видео"
+
 #, python-format
 msgid ""
 "Error renaming %s to %s:\n"
@@ -5095,6 +5111,10 @@ msgstr "Выбор файлов/папок для резервного копи�
 msgid "Filesystem check"
 msgstr "Проверка файловой системы"
 
+#, fuzzy, python-format
+msgid "Filesystem: %s\n"
+msgstr "Проверка файловой системы"
+
 msgid "Filter extension for 'My extension' setting of 'Filter extension'. Use the extension name without a '.'."
 msgstr ""
 
@@ -5128,6 +5148,10 @@ msgstr "Завершено"
 
 msgid "Finished configuring your network"
 msgstr "Настройка сети закончена"
+
+#, fuzzy
+msgid "Finished removing your wifi configuration"
+msgstr "Перезагрузка вашей сети завершена"
 
 msgid "Finished restarting your network"
 msgstr "Перезагрузка вашей сети завершена"
@@ -5258,6 +5282,10 @@ msgstr "Размер рамки при просмотре во весь экра
 #, fuzzy
 msgid "France"
 msgstr "романс"
+
+#, fuzzy, python-format
+msgid "Free: %s/%s\n"
+msgstr "Модель: "
 
 msgid "French"
 msgstr "Французский"
@@ -6313,6 +6341,10 @@ msgstr "Внутренняя флешь"
 msgid "Internal flash"
 msgstr "Внутренняя флешь"
 
+#, fuzzy
+msgid "Internal flash storage:"
+msgstr "Внутренняя флешь"
+
 msgid "Internal hdd only"
 msgstr "Только внутр. жесткий диск"
 
@@ -7186,6 +7218,10 @@ msgstr "Просмотр подключений"
 msgid "MountView"
 msgstr "Просмотр подключений"
 
+#, fuzzy, python-format
+msgid "Mountpoint: %s (%s)\n"
+msgstr "Просмотр подключений"
+
 #, fuzzy
 msgid "Mountpoints"
 msgstr "Просмотр подключений"
@@ -7654,6 +7690,10 @@ msgstr ""
 
 msgid "No backup needed"
 msgstr "Резервное копирование не требуется"
+
+#, fuzzy
+msgid "No config items available"
+msgstr "Обновлений пока нет"
 
 msgid ""
 "No data on transponder!\n"
@@ -8531,6 +8571,9 @@ msgstr ""
 msgid "Please connect your %s %s to the internet"
 msgstr "Пожалуйста, подключите ваш ресивер к интернету"
 
+msgid "Please contact the manufacturer for clarification."
+msgstr ""
+
 msgid "Please do not change any values unless you know what you are doing!"
 msgstr "Пожалуйста, не изменяйте любые параметры, пока не знаете что делаете!"
 
@@ -9011,9 +9054,6 @@ msgstr "Нажмите OK на пульте, чтобы продолжить."
 msgid "Press OK to activate the selected %s skin."
 msgstr "Нажмите OK для активации выбранного скина."
 
-msgid "Press OK to activate the settings."
-msgstr "Нажмите OK для активации настроек."
-
 msgid "Press OK to edit the settings."
 msgstr "Нажмите OK, чтобы изменить настройки."
 
@@ -9060,6 +9100,10 @@ msgstr "Нажмите ОК для подтверждения или отмен�
 
 msgid "Press OK, save and exit..."
 msgstr ""
+
+#, fuzzy
+msgid "Press green button to activate the settings."
+msgstr "Нажмите OK для активации настроек."
 
 msgid "Press or select button and then press 'OK' for attach function."
 msgstr ""
@@ -9735,6 +9779,10 @@ msgstr "Рестарт GUI сейчас?"
 #, fuzzy
 msgid "Restart Network Adapter"
 msgstr "Перезапустить сеть"
+
+#, fuzzy
+msgid "Restart Sleeptimer"
+msgstr "Таймер сна"
 
 #, fuzzy
 msgid "Restart both"
@@ -11991,16 +12039,24 @@ msgid "Start"
 msgstr "Начать тест"
 
 #, fuzzy
+msgid "Start CableScan"
+msgstr "Кабельное сканирование"
+
+#, fuzzy
+msgid "Start Cablescan"
+msgstr "Начать тест"
+
+#, fuzzy
+msgid "Start Fastscan"
+msgstr "Начать тест"
+
+#, fuzzy
 msgid "Start Sleeptimer"
 msgstr "Таймер сна"
 
 #, fuzzy
 msgid "Start directory"
 msgstr "начальный каталог"
-
-#, fuzzy
-msgid "Start fastscan"
-msgstr "Начать тест"
 
 msgid "Start from the beginning"
 msgstr "Начать с самого начала"
@@ -12041,11 +12097,12 @@ msgstr "Начать таймшифт"
 msgid "Start with list screen"
 msgstr "Начало с режима списка"
 
-#, fuzzy
-msgid "Start/Stop Sleeptimer"
-msgstr "Таймер неактивности"
-
 msgid "Start/stop slide show"
+msgstr ""
+
+msgid ""
+"Starting download of image file?\n"
+"Press OK to start or Exit to abort."
 msgstr ""
 
 msgid "Starting on"
@@ -12485,6 +12542,7 @@ msgid "TEXT"
 msgstr ""
 
 #. TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
+#. Don't translate TRANSLATOR_INFO to show '(N/A)'
 msgid "TRANSLATOR_INFO"
 msgstr "Dimitrij - 24.03.2021"
 
@@ -13216,6 +13274,10 @@ msgstr ""
 msgid "Timer overview"
 msgstr "Обзор таймеров"
 
+#, fuzzy
+msgid "Timer recording failed. No space left on device!\n"
+msgstr "Место записи по таймеру"
+
 msgid "Timer recording location"
 msgstr "Место записи по таймеру"
 
@@ -13381,6 +13443,10 @@ msgstr ""
 
 #, fuzzy
 msgid "Translations Info"
+msgstr "Перевод"
+
+#, fuzzy
+msgid "Translator comment"
 msgstr "Перевод"
 
 msgid "Transmission mode"
@@ -13823,6 +13889,10 @@ msgstr ""
 #, fuzzy
 msgid "Use circular LNB"
 msgstr "круговая левая"
+
+#, fuzzy
+msgid "Use default spinner"
+msgstr "Определены пользователем"
 
 msgid "Use fastscan channel names"
 msgstr "Названия каналов из быстрого поиска"
@@ -14538,6 +14608,10 @@ msgstr "Если включено, сервисы могут быть сгруп
 
 msgid "When enabled, show channel numbers in the channel selection screen."
 msgstr "Если включено, показывается номер канала в окне выбора каналов."
+
+#, fuzzy
+msgid "When enabled, spinners that come with the activated skin are ignored."
+msgstr "Включение субтитров для людей с нарушениями слуха"
 
 msgid "When enabled, subtitles for the hearing impaired can be used."
 msgstr "Включение субтитров для людей с нарушениями слуха"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2 teamBlue\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-04 18:59+0200\n"
+"POT-Creation-Date: 2024-06-20 07:37+0200\n"
 "PO-Revision-Date: 2010-03-09 21:03+0100\n"
 "Last-Translator: \n"
 "Language-Team: HDTV ROMANIA(superonic,costel_mbc,neutrin,otheitis,cipy_1982,neutrin,runcanion)\n"
@@ -1306,6 +1306,14 @@ msgid "Are you sure you want to reload the EPG data from:\n"
 msgstr ""
 "Esti sigur ca vrei sa stergi\n"
 "urmarire backup:\n"
+
+#, fuzzy
+msgid ""
+"Are you sure you want to remove your wifi configuration?\n"
+"\n"
+msgstr ""
+"Esti sigur ca vrei sa activezi asta configuratia de retea?\n"
+"\n"
 
 msgid ""
 "Are you sure you want to restart your network interfaces?\n"
@@ -2643,7 +2651,7 @@ msgstr ""
 msgid "Configure the duration in minutes for the screensaver."
 msgstr ""
 
-msgid "Configure the duration in minutes for the sleeptimer. Select this entry and click OK or green to start/stop the sleeptimer"
+msgid "Configure the duration in minutes for the sleeptimer. Select this entry and press blue to start/restart the sleeptimer or use yellow for stop active sleeptimer."
 msgstr ""
 
 msgid "Configure the duration when the receiver should go to shut down in case the receiver is in standby mode."
@@ -2849,10 +2857,6 @@ msgstr ""
 
 msgid "Configure your network again"
 msgstr ""
-
-#, fuzzy
-msgid "Configure your network settings and press OK to scan"
-msgstr "Apasati OK pentru a activa setarile"
 
 msgid "Configure your wireless LAN again"
 msgstr ""
@@ -3463,6 +3467,10 @@ msgid "Delete Image"
 msgstr "sterge file"
 
 #, fuzzy
+msgid "Delete Wifi configuration"
+msgstr "Configurare tuner"
+
+#, fuzzy
 msgid "Delete all the text"
 msgstr "sterge intrare playlist"
 
@@ -3510,6 +3518,10 @@ msgstr ""
 
 msgid "Delete the character under the text cursor"
 msgstr ""
+
+#, fuzzy
+msgid "Delete the current Wifi configuration.\n"
+msgstr "activeaza configurarea curenta"
 
 msgid "Delete the selected files or directories"
 msgstr ""
@@ -4565,6 +4577,10 @@ msgstr ""
 msgid "Error reading bouquets.tv"
 msgstr "sfarsit editare bouquet"
 
+#, fuzzy
+msgid "Error removing your wifi configuration"
+msgstr "Configurare tuner"
+
 #, python-format
 msgid ""
 "Error renaming %s to %s:\n"
@@ -5077,6 +5093,10 @@ msgstr ""
 msgid "Filesystem check"
 msgstr ""
 
+#, python-format
+msgid "Filesystem: %s\n"
+msgstr ""
+
 msgid "Filter extension for 'My extension' setting of 'Filter extension'. Use the extension name without a '.'."
 msgstr ""
 
@@ -5110,6 +5130,10 @@ msgstr "Finalizat"
 
 msgid "Finished configuring your network"
 msgstr "S-a finalizat configurarea retelei dvs"
+
+#, fuzzy
+msgid "Finished removing your wifi configuration"
+msgstr "Reteaua dvs a fost repornita"
 
 msgid "Finished restarting your network"
 msgstr "Reteaua dvs a fost repornita"
@@ -5238,6 +5262,10 @@ msgstr "Dimensiunea cadrului la vizualizarea completa"
 #, fuzzy
 msgid "France"
 msgstr "Anuleaza"
+
+#, fuzzy, python-format
+msgid "Free: %s/%s\n"
+msgstr "Model:"
 
 msgid "French"
 msgstr "Franceza"
@@ -6291,6 +6319,10 @@ msgstr "Memorie Flash interna"
 msgid "Internal flash"
 msgstr "Memorie Flash interna"
 
+#, fuzzy
+msgid "Internal flash storage:"
+msgstr "Memorie Flash interna"
+
 msgid "Internal hdd only"
 msgstr ""
 
@@ -7183,6 +7215,10 @@ msgstr "Editare"
 msgid "MountView"
 msgstr ""
 
+#, fuzzy, python-format
+msgid "Mountpoint: %s (%s)\n"
+msgstr "Model:"
+
 msgid "Mountpoints"
 msgstr ""
 
@@ -7651,6 +7687,10 @@ msgstr ""
 
 msgid "No backup needed"
 msgstr "Nu este nevoie de backup"
+
+#, fuzzy
+msgid "No config items available"
+msgstr "Descrierea nu este disponibila"
 
 msgid ""
 "No data on transponder!\n"
@@ -8524,6 +8564,9 @@ msgstr ""
 msgid "Please connect your %s %s to the internet"
 msgstr ""
 
+msgid "Please contact the manufacturer for clarification."
+msgstr ""
+
 msgid "Please do not change any values unless you know what you are doing!"
 msgstr "Va rugam nu modificati nicio valoare numai daca sunteti sigur de ceea ce faceti!"
 
@@ -8998,9 +9041,6 @@ msgstr "Va rugam apasati OK de pe telecomanda pentru a continua"
 msgid "Press OK to activate the selected %s skin."
 msgstr "Apasati OK pentru a activa setarile"
 
-msgid "Press OK to activate the settings."
-msgstr "Apasati OK pentru a activa setarile"
-
 msgid "Press OK to edit the settings."
 msgstr "Apasati OK pentru a edita setarile."
 
@@ -9048,6 +9088,10 @@ msgstr ""
 
 msgid "Press OK, save and exit..."
 msgstr ""
+
+#, fuzzy
+msgid "Press green button to activate the settings."
+msgstr "Apasati OK pentru a activa setarile"
 
 msgid "Press or select button and then press 'OK' for attach function."
 msgstr ""
@@ -9721,6 +9765,10 @@ msgstr "Restart GUI acum?"
 #, fuzzy
 msgid "Restart Network Adapter"
 msgstr "Restart retea"
+
+#, fuzzy
+msgid "Restart Sleeptimer"
+msgstr "Ora de incepere"
 
 #, fuzzy
 msgid "Restart both"
@@ -11990,16 +12038,24 @@ msgid "Start"
 msgstr "Incepe test"
 
 #, fuzzy
+msgid "Start CableScan"
+msgstr "Incepe test"
+
+#, fuzzy
+msgid "Start Cablescan"
+msgstr "Incepe test"
+
+#, fuzzy
+msgid "Start Fastscan"
+msgstr "Incepe test"
+
+#, fuzzy
 msgid "Start Sleeptimer"
 msgstr "Ora de incepere"
 
 #, fuzzy
 msgid "Start directory"
 msgstr "start director"
-
-#, fuzzy
-msgid "Start fastscan"
-msgstr "Incepe test"
 
 msgid "Start from the beginning"
 msgstr "Incepe de la capat"
@@ -12042,11 +12098,12 @@ msgstr "start timeshift"
 msgid "Start with list screen"
 msgstr ""
 
-#, fuzzy
-msgid "Start/Stop Sleeptimer"
-msgstr "Ora de incepere"
-
 msgid "Start/stop slide show"
+msgstr ""
+
+msgid ""
+"Starting download of image file?\n"
+"Press OK to start or Exit to abort."
 msgstr ""
 
 msgid "Starting on"
@@ -12496,6 +12553,7 @@ msgid "TEXT"
 msgstr ""
 
 #. TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
+#. Don't translate TRANSLATOR_INFO to show '(N/A)'
 msgid "TRANSLATOR_INFO"
 msgstr "TRANSLATOR_INFO"
 
@@ -13215,6 +13273,10 @@ msgid "Timer overview"
 msgstr "Intrare timer"
 
 #, fuzzy
+msgid "Timer recording failed. No space left on device!\n"
+msgstr "schimba inregistrare (durata)"
+
+#, fuzzy
 msgid "Timer recording location"
 msgstr "schimba inregistrare (durata)"
 
@@ -13382,6 +13444,10 @@ msgstr ""
 
 #, fuzzy
 msgid "Translations Info"
+msgstr "Traducere"
+
+#, fuzzy
+msgid "Translator comment"
 msgstr "Traducere"
 
 msgid "Transmission mode"
@@ -13820,6 +13886,10 @@ msgstr ""
 #, fuzzy
 msgid "Use circular LNB"
 msgstr "circular stanga"
+
+#, fuzzy
+msgid "Use default spinner"
+msgstr "Userul ales"
 
 msgid "Use fastscan channel names"
 msgstr ""
@@ -14524,6 +14594,9 @@ msgid "When enabled, services may be grouped in multiple bouquets."
 msgstr ""
 
 msgid "When enabled, show channel numbers in the channel selection screen."
+msgstr ""
+
+msgid "When enabled, spinners that come with the activated skin are ignored."
 msgstr ""
 
 msgid "When enabled, subtitles for the hearing impaired can be used."

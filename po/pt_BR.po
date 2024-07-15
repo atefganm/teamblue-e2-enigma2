@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2 teamBlue\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-04 18:59+0200\n"
+"POT-Creation-Date: 2024-06-20 07:37+0200\n"
 "PO-Revision-Date: 2013-10-20 19:13-0300\n"
 "Last-Translator: Diogo <pingflood@gmail.com>\n"
 "Language-Team: Traduzido por Frank Viana <franksrviana@gmail.com>\n"
@@ -1288,6 +1288,14 @@ msgstr "Sair do assistente?"
 #, fuzzy
 msgid "Are you sure you want to reload the EPG data from:\n"
 msgstr "Sair do assistente?"
+
+#, fuzzy
+msgid ""
+"Are you sure you want to remove your wifi configuration?\n"
+"\n"
+msgstr ""
+"Ativar esta configuração de rede?\n"
+"\n"
 
 msgid ""
 "Are you sure you want to restart your network interfaces?\n"
@@ -2623,7 +2631,7 @@ msgstr ""
 msgid "Configure the duration in minutes for the screensaver."
 msgstr "Configurar o intervalo em minutos para a proteção de tela."
 
-msgid "Configure the duration in minutes for the sleeptimer. Select this entry and click OK or green to start/stop the sleeptimer"
+msgid "Configure the duration in minutes for the sleeptimer. Select this entry and press blue to start/restart the sleeptimer or use yellow for stop active sleeptimer."
 msgstr ""
 
 msgid "Configure the duration when the receiver should go to shut down in case the receiver is in standby mode."
@@ -2832,10 +2840,6 @@ msgstr "Configurar rede LAN"
 
 msgid "Configure your network again"
 msgstr "Configurar a rede novamente"
-
-#, fuzzy
-msgid "Configure your network settings and press OK to scan"
-msgstr "Configure a rede e pressione OK para iniciar a busca"
 
 msgid "Configure your wireless LAN again"
 msgstr "Configurar rede sem fio novamente"
@@ -3442,6 +3446,10 @@ msgid "Delete Image"
 msgstr "Remover arquivo"
 
 #, fuzzy
+msgid "Delete Wifi configuration"
+msgstr "Configurar tuner"
+
+#, fuzzy
 msgid "Delete all the text"
 msgstr "Remover item da lista de reprodução"
 
@@ -3486,6 +3494,10 @@ msgstr ""
 
 msgid "Delete the character under the text cursor"
 msgstr ""
+
+#, fuzzy
+msgid "Delete the current Wifi configuration.\n"
+msgstr "Ativar configuração atual"
 
 msgid "Delete the selected files or directories"
 msgstr ""
@@ -4542,6 +4554,10 @@ msgstr ""
 msgid "Error reading bouquets.tv"
 msgstr "Salvar modificações"
 
+#, fuzzy
+msgid "Error removing your wifi configuration"
+msgstr "Configurar lista de vídeos"
+
 #, python-format
 msgid ""
 "Error renaming %s to %s:\n"
@@ -5052,6 +5068,10 @@ msgstr "Selecione arquivos/diretórios para backup"
 msgid "Filesystem check"
 msgstr "Verificar sistema de arquivos"
 
+#, fuzzy, python-format
+msgid "Filesystem: %s\n"
+msgstr "Verificar sistema de arquivos"
+
 msgid "Filter extension for 'My extension' setting of 'Filter extension'. Use the extension name without a '.'."
 msgstr ""
 
@@ -5085,6 +5105,10 @@ msgstr "Pronto"
 
 msgid "Finished configuring your network"
 msgstr "Configuração de rede finalizada"
+
+#, fuzzy
+msgid "Finished removing your wifi configuration"
+msgstr "Rede reiniciada"
 
 msgid "Finished restarting your network"
 msgstr "Rede reiniciada"
@@ -5215,6 +5239,10 @@ msgstr "Janela em tamanho grande"
 #, fuzzy
 msgid "France"
 msgstr "Romance"
+
+#, fuzzy, python-format
+msgid "Free: %s/%s\n"
+msgstr "Modelo:"
 
 msgid "French"
 msgstr "Francês"
@@ -6268,6 +6296,10 @@ msgstr "Flash interna"
 msgid "Internal flash"
 msgstr "Flash interna"
 
+#, fuzzy
+msgid "Internal flash storage:"
+msgstr "Flash interna"
+
 msgid "Internal hdd only"
 msgstr "Somente disco interno"
 
@@ -7141,6 +7173,10 @@ msgstr "Montagem"
 msgid "MountView"
 msgstr "Montagem"
 
+#, fuzzy, python-format
+msgid "Mountpoint: %s (%s)\n"
+msgstr "Montagem"
+
 #, fuzzy
 msgid "Mountpoints"
 msgstr "Montagem"
@@ -7610,6 +7646,10 @@ msgstr ""
 
 msgid "No backup needed"
 msgstr "Não fazer backup"
+
+#, fuzzy
+msgid "No config items available"
+msgstr "Nenhuma atualização disponível."
 
 msgid ""
 "No data on transponder!\n"
@@ -8487,6 +8527,9 @@ msgstr ""
 msgid "Please connect your %s %s to the internet"
 msgstr "Configure a conexão de internet"
 
+msgid "Please contact the manufacturer for clarification."
+msgstr ""
+
 msgid "Please do not change any values unless you know what you are doing!"
 msgstr "Não altere os valores se não tiver certeza do que está fazendo!"
 
@@ -8969,9 +9012,6 @@ msgstr "Pressione OK para continuar."
 msgid "Press OK to activate the selected %s skin."
 msgstr "Pressione OK para ativar o tema selecionado."
 
-msgid "Press OK to activate the settings."
-msgstr "Pressione OK para ativar as configurações."
-
 msgid "Press OK to edit the settings."
 msgstr "Pressione OK para editar as configurações."
 
@@ -9018,6 +9058,10 @@ msgstr "Pressione OK para alternar a seleção."
 
 msgid "Press OK, save and exit..."
 msgstr ""
+
+#, fuzzy
+msgid "Press green button to activate the settings."
+msgstr "Pressione OK para ativar as configurações."
 
 msgid "Press or select button and then press 'OK' for attach function."
 msgstr ""
@@ -9692,6 +9736,10 @@ msgstr "Reiniciar interface?"
 #, fuzzy
 msgid "Restart Network Adapter"
 msgstr "Reiniciar rede"
+
+#, fuzzy
+msgid "Restart Sleeptimer"
+msgstr "Temporizador"
 
 #, fuzzy
 msgid "Restart both"
@@ -11944,16 +11992,24 @@ msgid "Start"
 msgstr "Iniciar teste"
 
 #, fuzzy
+msgid "Start CableScan"
+msgstr "Busca via cabo"
+
+#, fuzzy
+msgid "Start Cablescan"
+msgstr "Iniciar teste"
+
+#, fuzzy
+msgid "Start Fastscan"
+msgstr "Iniciar teste"
+
+#, fuzzy
 msgid "Start Sleeptimer"
 msgstr "Temporizador"
 
 #, fuzzy
 msgid "Start directory"
 msgstr "Diretório inicial"
-
-#, fuzzy
-msgid "Start fastscan"
-msgstr "Iniciar teste"
 
 msgid "Start from the beginning"
 msgstr "Começar do início"
@@ -11994,11 +12050,12 @@ msgstr "Iniciar timeshift"
 msgid "Start with list screen"
 msgstr "Iniciar com a lista"
 
-#, fuzzy
-msgid "Start/Stop Sleeptimer"
-msgstr "Evento pro inatividade"
-
 msgid "Start/stop slide show"
+msgstr ""
+
+msgid ""
+"Starting download of image file?\n"
+"Press OK to start or Exit to abort."
 msgstr ""
 
 msgid "Starting on"
@@ -12438,8 +12495,9 @@ msgid "TEXT"
 msgstr ""
 
 #. TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
+#. Don't translate TRANSLATOR_INFO to show '(N/A)'
 msgid "TRANSLATOR_INFO"
-msgstr ""
+msgstr "TRANSLATOR_INFO"
 
 msgid "TS file is too large for ISO9660 level 1!"
 msgstr "O arquivo TS é muito grande para ISO9660 level 1!"
@@ -13167,6 +13225,10 @@ msgstr ""
 msgid "Timer overview"
 msgstr "Temporizador"
 
+#, fuzzy
+msgid "Timer recording failed. No space left on device!\n"
+msgstr "Diretório das gravações agendadas"
+
 msgid "Timer recording location"
 msgstr "Diretório das gravações agendadas"
 
@@ -13333,6 +13395,10 @@ msgstr "Traduções"
 #, fuzzy
 msgid "Translations Info"
 msgstr "Traduções"
+
+#, fuzzy
+msgid "Translator comment"
+msgstr "Tradução"
 
 msgid "Transmission mode"
 msgstr "Modo de transmissão"
@@ -13774,6 +13840,10 @@ msgstr ""
 #, fuzzy
 msgid "Use circular LNB"
 msgstr "Circular esquerda"
+
+#, fuzzy
+msgid "Use default spinner"
+msgstr "Manual"
 
 msgid "Use fastscan channel names"
 msgstr "Usar o nome dos canais da operadora"
@@ -14491,6 +14561,10 @@ msgstr "Quando ativado, os canais podem ser categorizados em diferentes grupos d
 
 msgid "When enabled, show channel numbers in the channel selection screen."
 msgstr "Quando ativado, exibe a numeração dos canais na lista de canais."
+
+#, fuzzy
+msgid "When enabled, spinners that come with the activated skin are ignored."
+msgstr "Quando ativado, legendas para os deficientes auditivos podem ser usadas."
 
 msgid "When enabled, subtitles for the hearing impaired can be used."
 msgstr "Quando ativado, legendas para os deficientes auditivos podem ser usadas."

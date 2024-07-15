@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2 teamBlue\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-04 18:59+0200\n"
+"POT-Creation-Date: 2024-06-20 07:37+0200\n"
 "PO-Revision-Date: 2020-02-29 08:52+0200\n"
 "Last-Translator: Audronis Grincevicius <adga45@gmail.com>\n"
 "Language-Team: Adga (C) <adga45@gmail.com>\n"
@@ -1310,6 +1310,14 @@ msgstr "Jūs esate įsitikinęs, kad norite išjungti šį vedlį?"
 #, fuzzy
 msgid "Are you sure you want to reload the EPG data from:\n"
 msgstr "Jūs esate įsitikinęs, kad norite išjungti šį vedlį?"
+
+#, fuzzy
+msgid ""
+"Are you sure you want to remove your wifi configuration?\n"
+"\n"
+msgstr ""
+"Jūs esate įsitikinęs, kad jūs norite aktyvuoti šią tinklo konfigūraciją?\n"
+"\n"
 
 msgid ""
 "Are you sure you want to restart your network interfaces?\n"
@@ -2654,7 +2662,7 @@ msgstr ""
 msgid "Configure the duration in minutes for the screensaver."
 msgstr ""
 
-msgid "Configure the duration in minutes for the sleeptimer. Select this entry and click OK or green to start/stop the sleeptimer"
+msgid "Configure the duration in minutes for the sleeptimer. Select this entry and press blue to start/restart the sleeptimer or use yellow for stop active sleeptimer."
 msgstr ""
 
 msgid "Configure the duration when the receiver should go to shut down in case the receiver is in standby mode."
@@ -2866,10 +2874,6 @@ msgstr "Konfigūruokite savo vidinį tinklą"
 
 msgid "Configure your network again"
 msgstr "Konfigūruokite savo tinklą dar kartą"
-
-#, fuzzy
-msgid "Configure your network settings and press OK to scan"
-msgstr "Spauskite OK, kad aktyvuoti pasirinktą temą."
 
 msgid "Configure your wireless LAN again"
 msgstr "Konfigūruokite savo belaidį tinklą dar kartą"
@@ -3482,6 +3486,10 @@ msgid "Delete Image"
 msgstr "trinti failą"
 
 #, fuzzy
+msgid "Delete Wifi configuration"
+msgstr "Imtuvo konfigūravimas"
+
+#, fuzzy
 msgid "Delete all the text"
 msgstr "trinti įrašą iš grojaraščio "
 
@@ -3529,6 +3537,10 @@ msgstr ""
 
 msgid "Delete the character under the text cursor"
 msgstr ""
+
+#, fuzzy
+msgid "Delete the current Wifi configuration.\n"
+msgstr "aktyvuokite dabartinę konfigūraciją"
 
 msgid "Delete the selected files or directories"
 msgstr ""
@@ -4588,6 +4600,10 @@ msgstr ""
 msgid "Error reading bouquets.tv"
 msgstr "baigti paketo redagavimą"
 
+#, fuzzy
+msgid "Error removing your wifi configuration"
+msgstr "Rankinė konfigūracija"
+
 #, python-format
 msgid ""
 "Error renaming %s to %s:\n"
@@ -5115,6 +5131,10 @@ msgstr "Išsirinkite failus/aplankus dėl atsarginės kopijos"
 msgid "Filesystem check"
 msgstr "Failų sistemos tikrinimas"
 
+#, fuzzy, python-format
+msgid "Filesystem: %s\n"
+msgstr "Failų sistemos tikrinimas"
+
 msgid "Filter extension for 'My extension' setting of 'Filter extension'. Use the extension name without a '.'."
 msgstr ""
 
@@ -5148,6 +5168,10 @@ msgstr "Baigtas"
 
 msgid "Finished configuring your network"
 msgstr "Baigtas jūsų tinklo konfigūravimas"
+
+#, fuzzy
+msgid "Finished removing your wifi configuration"
+msgstr "Baigtas jūsų tinklo paleidimas iš naujo"
 
 msgid "Finished restarting your network"
 msgstr "Baigtas jūsų tinklo paleidimas iš naujo"
@@ -5276,6 +5300,10 @@ msgstr "Kadro dydis pilname vaizde"
 #, fuzzy
 msgid "France"
 msgstr "Atšaukti"
+
+#, fuzzy, python-format
+msgid "Free: %s/%s\n"
+msgstr "Modelis:"
 
 msgid "French"
 msgstr "Prancūzų"
@@ -6343,6 +6371,10 @@ msgstr "Vidinė atmintinė"
 msgid "Internal flash"
 msgstr "Vidinė atmintinė"
 
+#, fuzzy
+msgid "Internal flash storage:"
+msgstr "Vidinė atmintinė"
+
 msgid "Internal hdd only"
 msgstr ""
 
@@ -7242,6 +7274,10 @@ msgstr "Redaguoti"
 msgid "MountView"
 msgstr ""
 
+#, fuzzy, python-format
+msgid "Mountpoint: %s (%s)\n"
+msgstr "Modelis:"
+
 msgid "Mountpoints"
 msgstr ""
 
@@ -7711,6 +7747,10 @@ msgstr ""
 
 msgid "No backup needed"
 msgstr "Atsarginės kopijos nereikia"
+
+#, fuzzy
+msgid "No config items available"
+msgstr " pasiekiami atnaujinimai."
 
 msgid ""
 "No data on transponder!\n"
@@ -8594,6 +8634,9 @@ msgstr ""
 msgid "Please connect your %s %s to the internet"
 msgstr ""
 
+msgid "Please contact the manufacturer for clarification."
+msgstr ""
+
 msgid "Please do not change any values unless you know what you are doing!"
 msgstr "Prašome nekeisti reikšmių, jeigu Jūs nežinote ką darote! "
 
@@ -9079,9 +9122,6 @@ msgstr "Spauskite OK savo valdymo pulte ir tęskite."
 msgid "Press OK to activate the selected %s skin."
 msgstr "Spauskite OK, kad aktyvuoti pasirinktą temą."
 
-msgid "Press OK to activate the settings."
-msgstr "Spauskite OK norėdami aktyvuoti nustatymus"
-
 msgid "Press OK to edit the settings."
 msgstr "Spauskite OK ir redaguokite nustatymus."
 
@@ -9129,6 +9169,10 @@ msgstr "Spauskite OK dėl pasirinkimo."
 
 msgid "Press OK, save and exit..."
 msgstr ""
+
+#, fuzzy
+msgid "Press green button to activate the settings."
+msgstr "Spauskite OK norėdami aktyvuoti nustatymus"
 
 msgid "Press or select button and then press 'OK' for attach function."
 msgstr ""
@@ -9807,6 +9851,10 @@ msgstr "Paleisti iš naujo GUI dabar?"
 #, fuzzy
 msgid "Restart Network Adapter"
 msgstr "Paleisti iš naujo tinklą"
+
+#, fuzzy
+msgid "Restart Sleeptimer"
+msgstr "Paleidimo pradžia"
 
 #, fuzzy
 msgid "Restart both"
@@ -12095,16 +12143,24 @@ msgid "Start"
 msgstr "Pradėti testą"
 
 #, fuzzy
+msgid "Start CableScan"
+msgstr "Pradėti testą"
+
+#, fuzzy
+msgid "Start Cablescan"
+msgstr "Pradėti testą"
+
+#, fuzzy
+msgid "Start Fastscan"
+msgstr "Pradėti testą"
+
+#, fuzzy
 msgid "Start Sleeptimer"
 msgstr "Paleidimo pradžia"
 
 #, fuzzy
 msgid "Start directory"
 msgstr "pradėti direktoriją"
-
-#, fuzzy
-msgid "Start fastscan"
-msgstr "Pradėti testą"
 
 msgid "Start from the beginning"
 msgstr "Pradžia nuo pradžios"
@@ -12147,11 +12203,12 @@ msgstr "pradėti laiko poslinkį"
 msgid "Start with list screen"
 msgstr ""
 
-#, fuzzy
-msgid "Start/Stop Sleeptimer"
-msgstr "Paleidimo pradžia"
-
 msgid "Start/stop slide show"
+msgstr ""
+
+msgid ""
+"Starting download of image file?\n"
+"Press OK to start or Exit to abort."
 msgstr ""
 
 msgid "Starting on"
@@ -12604,6 +12661,7 @@ msgid "TEXT"
 msgstr ""
 
 #. TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
+#. Don't translate TRANSLATOR_INFO to show '(N/A)'
 msgid "TRANSLATOR_INFO"
 msgstr "Audronis Grincevičius (ADGA) Pasvalys, Lietuva"
 
@@ -13337,6 +13395,10 @@ msgid "Timer overview"
 msgstr "Laikmačio užduotis"
 
 #, fuzzy
+msgid "Timer recording failed. No space left on device!\n"
+msgstr "Laikmačio įrašo vieta"
+
+#, fuzzy
 msgid "Timer recording location"
 msgstr "Laikmačio įrašo vieta"
 
@@ -13504,6 +13566,10 @@ msgstr ""
 
 #, fuzzy
 msgid "Translations Info"
+msgstr "Vertimas"
+
+#, fuzzy
+msgid "Translator comment"
 msgstr "Vertimas"
 
 msgid "Transmission mode"
@@ -13942,6 +14008,10 @@ msgstr ""
 #, fuzzy
 msgid "Use circular LNB"
 msgstr "apskritiminė kairė"
+
+#, fuzzy
+msgid "Use default spinner"
+msgstr "Vartotojo pasirinktas"
 
 msgid "Use fastscan channel names"
 msgstr ""
@@ -14647,6 +14717,9 @@ msgid "When enabled, services may be grouped in multiple bouquets."
 msgstr ""
 
 msgid "When enabled, show channel numbers in the channel selection screen."
+msgstr ""
+
+msgid "When enabled, spinners that come with the activated skin are ignored."
 msgstr ""
 
 msgid "When enabled, subtitles for the hearing impaired can be used."

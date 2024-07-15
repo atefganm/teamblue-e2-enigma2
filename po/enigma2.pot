@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-04 18:59+0200\n"
+"POT-Creation-Date: 2024-06-20 07:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1126,6 +1126,11 @@ msgid "Are you sure you want to reload the EPG data from:\n"
 msgstr ""
 
 msgid ""
+"Are you sure you want to remove your wifi configuration?\n"
+"\n"
+msgstr ""
+
+msgid ""
 "Are you sure you want to restart your network interfaces?\n"
 "\n"
 msgstr ""
@@ -2099,7 +2104,7 @@ msgstr ""
 msgid "Configure the duration in hours the receiver should go to standby when the receiver is not controlled."
 msgstr ""
 
-msgid "Configure the duration in minutes for the sleeptimer. Select this entry and click OK or green to start/stop the sleeptimer"
+msgid "Configure the duration in minutes for the sleeptimer. Select this entry and press blue to start/restart the sleeptimer or use yellow for stop active sleeptimer."
 msgstr ""
 
 msgid "Configure the duration when the receiver should go to shut down in case the receiver is in standby mode."
@@ -2145,9 +2150,6 @@ msgid "Configure which color format should be used on the SCART output."
 msgstr ""
 
 msgid "Configure your internal LAN"
-msgstr ""
-
-msgid "Configure your network settings and press OK to scan"
 msgstr ""
 
 msgid "Configure your wireless LAN again"
@@ -2625,6 +2627,9 @@ msgstr ""
 msgid "Delete Image"
 msgstr ""
 
+msgid "Delete Wifi configuration"
+msgstr ""
+
 msgid "Delete all the text"
 msgstr ""
 
@@ -2665,6 +2670,9 @@ msgid "Delete the character to the left of text cursor"
 msgstr ""
 
 msgid "Delete the character under the text cursor"
+msgstr ""
+
+msgid "Delete the current Wifi configuration.\n"
 msgstr ""
 
 msgid "Delete the selected files or directories"
@@ -3452,6 +3460,9 @@ msgstr ""
 msgid "Error reading bouquets.tv"
 msgstr ""
 
+msgid "Error removing your wifi configuration"
+msgstr ""
+
 #, python-format
 msgid ""
 "Error renaming %s to %s:\n"
@@ -3847,6 +3858,10 @@ msgstr ""
 msgid "Files/folders to exclude from backup"
 msgstr ""
 
+#, python-format
+msgid "Filesystem: %s\n"
+msgstr ""
+
 msgid "Filter extension, (*) appears in title"
 msgstr ""
 
@@ -3866,6 +3881,9 @@ msgid "Finished"
 msgstr ""
 
 msgid "Finished configuring your network"
+msgstr ""
+
+msgid "Finished removing your wifi configuration"
 msgstr ""
 
 msgid "Finished restarting your network"
@@ -3973,6 +3991,10 @@ msgid "Frame size in full view"
 msgstr ""
 
 msgid "France"
+msgstr ""
+
+#, python-format
+msgid "Free: %s/%s\n"
 msgstr ""
 
 msgid "French"
@@ -4773,6 +4795,9 @@ msgstr ""
 msgid "Internal flash"
 msgstr ""
 
+msgid "Internal flash storage:"
+msgstr ""
+
 msgid "Internal hdd only"
 msgstr ""
 
@@ -5500,6 +5525,10 @@ msgstr ""
 msgid "Mount point exist!"
 msgstr ""
 
+#, python-format
+msgid "Mountpoint: %s (%s)\n"
+msgstr ""
+
 msgid "Mountpoints"
 msgstr ""
 
@@ -5863,6 +5892,9 @@ msgid "No active subservices available."
 msgstr ""
 
 msgid "No age block"
+msgstr ""
+
+msgid "No config items available"
 msgstr ""
 
 msgid ""
@@ -6565,6 +6597,9 @@ msgstr ""
 msgid "Please choose an extension..."
 msgstr ""
 
+msgid "Please contact the manufacturer for clarification."
+msgstr ""
+
 msgid "Please do not change any values unless you know what you are doing!"
 msgstr ""
 
@@ -6865,9 +6900,6 @@ msgstr ""
 msgid "Press OK to activate the selected %s skin."
 msgstr ""
 
-msgid "Press OK to activate the settings."
-msgstr ""
-
 msgid "Press OK to edit the settings."
 msgstr ""
 
@@ -6910,6 +6942,9 @@ msgid "Press OK to toggle the selection."
 msgstr ""
 
 msgid "Press OK, save and exit..."
+msgstr ""
+
+msgid "Press green button to activate the settings."
 msgstr ""
 
 msgid "Press or select button and then press 'OK' for attach function."
@@ -7471,6 +7506,9 @@ msgid "Restart GUI now?"
 msgstr ""
 
 msgid "Restart Network Adapter"
+msgstr ""
+
+msgid "Restart Sleeptimer"
 msgstr ""
 
 msgid "Restart both"
@@ -9155,13 +9193,19 @@ msgstr ""
 msgid "Start"
 msgstr ""
 
+msgid "Start CableScan"
+msgstr ""
+
+msgid "Start Cablescan"
+msgstr ""
+
+msgid "Start Fastscan"
+msgstr ""
+
 msgid "Start Sleeptimer"
 msgstr ""
 
 msgid "Start directory"
-msgstr ""
-
-msgid "Start fastscan"
 msgstr ""
 
 msgid "Start from the beginning"
@@ -9197,10 +9241,12 @@ msgstr ""
 msgid "Start timeshift"
 msgstr ""
 
-msgid "Start/Stop Sleeptimer"
+msgid "Start/stop slide show"
 msgstr ""
 
-msgid "Start/stop slide show"
+msgid ""
+"Starting download of image file?\n"
+"Press OK to start or Exit to abort."
 msgstr ""
 
 msgid "Starting on"
@@ -9533,6 +9579,7 @@ msgid "TEXT"
 msgstr ""
 
 #. TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
+#. Don't translate TRANSLATOR_INFO to show '(N/A)'
 msgid "TRANSLATOR_INFO"
 msgstr ""
 
@@ -10083,6 +10130,9 @@ msgstr ""
 msgid "Timer overview"
 msgstr ""
 
+msgid "Timer recording failed. No space left on device!\n"
+msgstr ""
+
 msgid "Timer recording location"
 msgstr ""
 
@@ -10218,6 +10268,9 @@ msgid "Translations"
 msgstr ""
 
 msgid "Translations Info"
+msgstr ""
+
+msgid "Translator comment"
 msgstr ""
 
 msgid "Transmission mode"
@@ -12786,6 +12839,9 @@ msgstr ""
 msgid "Devices"
 msgstr ""
 
+msgid "Display setup"
+msgstr ""
+
 msgid "Factory reset"
 msgstr ""
 
@@ -12802,6 +12858,9 @@ msgid "Frontpanel"
 msgstr ""
 
 msgid "HDMI-IN Recording settings"
+msgstr ""
+
+msgid "Hard disk setup"
 msgstr ""
 
 msgid "HotKey"
@@ -13332,9 +13391,6 @@ msgstr ""
 msgid "Display message before playing next movie"
 msgstr ""
 
-msgid "Display setup"
-msgstr ""
-
 msgid "EPG Cache Path"
 msgstr ""
 
@@ -13456,9 +13512,6 @@ msgid "HDMI Recording"
 msgstr ""
 
 msgid "HI-cleanup for external subtitles"
-msgstr ""
-
-msgid "Hard disk setup"
 msgstr ""
 
 msgid "Hard disk standby after"
@@ -14085,6 +14138,9 @@ msgstr ""
 msgid "Use Virgin EPG information when it is available."
 msgstr ""
 
+msgid "Use default spinner"
+msgstr ""
+
 msgid "Use original DVB subtitle position"
 msgstr ""
 
@@ -14212,6 +14268,9 @@ msgid "When enabled, services may be grouped in multiple bouquets."
 msgstr ""
 
 msgid "When enabled, show channel numbers in the channel selection screen."
+msgstr ""
+
+msgid "When enabled, spinners that come with the activated skin are ignored."
 msgstr ""
 
 msgid "When enabled, subtitles for the hearing impaired can be used."
