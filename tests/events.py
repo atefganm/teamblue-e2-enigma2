@@ -1,5 +1,5 @@
 import time
-import tests
+from . import tests
 
 recorded_events = []
 
@@ -56,7 +56,9 @@ def end_log(test_name):
 	if expected is not None:
 		print("expected:")
 		if expected != results:
-			open(test_name + ".bogus_results", "wb").write(results)
+			f = open(test_name + ".bogus_results", "wb")
+			f.write(results)
+			f.close()
 			raise tests.TestError("test data does not match")
 		else:
 			print("test compared ok")

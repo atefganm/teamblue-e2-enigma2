@@ -3,12 +3,11 @@
 #include <csignal>
 #include <fstream>
 #include <sstream>
-#ifdef __GLIBC__
 #include <execinfo.h>
-#endif
 #include <dlfcn.h>
 #include <lib/base/eenv.h>
 #include <lib/base/eerror.h>
+#include <lib/base/esimpleconfig.h>
 #include <lib/base/nconfig.h>
 #include <lib/gdi/gmaindc.h>
 #include <asm/ptrace.h>
@@ -18,40 +17,23 @@
 
 static const char *crash_emailaddr =
 #ifndef CRASH_EMAILADDR
-	"no email available";
+	"the OpenViX forum";
 #else
 	CRASH_EMAILADDR;
 #endif
 
-/* Defined in bsod.cpp */
+/* Defined in eerror.cpp */
 void retrieveLogBuffer(const char **p1, unsigned int *s1, const char **p2, unsigned int *s2);
 
-static const std::string getConfigString(const std::string &key, const std::string &defaultValue)
+static const std::string getConfigString(const char* key, const char* defaultValue)
 {
-	std::string value = eConfigManager::getConfigValue(key.c_str());
+	std::string value = eConfigManager::getConfigValue(key);
 
 	//we get at least the default value if python is still alive
 	if (!value.empty())
 		return value;
 
-	value = defaultValue;
-
-	// get value from enigma2 settings file
-	std::ifstream in(eEnv::resolve("${sysconfdir}/enigma2/settings").c_str());
-	if (in.good()) {
-		do {
-			std::string line;
-			std::getline(in, line);
-			size_t size = key.size();
-			if (!line.compare(0, size, key) && line[size] == '=') {
-				value = line.substr(size + 1);
-				break;
-			}
-		} while (in.good());
-		in.close();
-	}
-
-	return value;
+	return eSimpleConfig::getString(key, defaultValue);
 }
 
 /* get the kernel log aka dmesg */
@@ -83,15 +65,25 @@ static void getKlog(FILE* f)
 	fprintf(f, "%s\n", &buf[0]);
 }
 
-static void stringFromFile(FILE* f, const char* context, const char* filename)
+static const std::string stringFromFile(const char* filename)
 {
+	std::string retval = "";
+	std::string newline = "";
 	std::ifstream in(filename);
 
 	if (in.good()) {
-		std::string line;
-		std::getline(in, line);
-		fprintf(f, "%s=%s\n", context, line.c_str());
+		do {
+			std::string line;
+			std::getline(in, line);
+			if(line.length() > 0) {
+				retval += newline;
+				newline = '\n';
+				retval += line.c_str();
+			}
+		} while (in.good());
+		in.close();
 	}
+	return retval;
 }
 
 static bool bsodhandled = false;
@@ -116,8 +108,14 @@ void bsodFatal(const char *component)
 	FILE *f;
 	std::string crashlog_name;
 	std::ostringstream os;
-	os << "/media/hdd/enigma2_crash_";
-	os << time(0);
+	time_t t = time(0);
+	struct tm tm;
+	char tm_str[32];
+	localtime_r(&t, &tm);
+	strftime(tm_str, sizeof(tm_str), "%Y-%m-%d_%H-%M-%S", &tm);
+	os << getConfigString("config.crash.debug_path", "/home/root/logs/");
+	os << "Enigma2_crash_";
+	os << tm_str;
 	os << ".log";
 	crashlog_name = os.str();
 	f = fopen(crashlog_name.c_str(), "wb");
@@ -128,14 +126,14 @@ void bsodFatal(const char *component)
 		 * alone because we may be in a crash loop and writing this file
 		 * all night long may damage the flash. Also, usually the first
 		 * crash log is the most interesting one. */
-		crashlog_name = "/home/root/enigma2_crash.log";
+		crashlog_name = "/home/root/logs/Enigma2_crash.log";
 		if ((access(crashlog_name.c_str(), F_OK) == 0) ||
-			((f = fopen(crashlog_name.c_str(), "wb")) == NULL))
+		    ((f = fopen(crashlog_name.c_str(), "wb")) == NULL))
 		{
 			/* Re-write the same file in /tmp/ because it's expected to
 			 * be in RAM. So the first crash log will end up in /home
 			 * and the last in /tmp */
-			crashlog_name = "/tmp/enigma2_crash.log";
+			crashlog_name = "/tmp/Enigma2_crash.log";
 			f = fopen(crashlog_name.c_str(), "wb");
 		}
 	}
@@ -150,31 +148,22 @@ void bsodFatal(const char *component)
 		strftime(tm_str, sizeof(tm_str), "%a %b %_d %T %Y", &tm);
 
 		fprintf(f,
-			"teamblue Enigma2 crash log\n\n"
-			"crashdate=%s\n"
-			"compiledate=%s\n"
-			"skin=%s\n"
-			"sourcedate=%s\n"
-			"branch=%s\n"
-			"rev=%s\n"
-			"component=%s\n\n",
-			tm_str,
-			__DATE__,
-			getConfigString("config.skin.primary_skin", "Default Skin").c_str(),
-			enigma2_date,
-			enigma2_branch,
-			enigma2_rev,
-			component);
-
-		stringFromFile(f, "stbmodel", "/proc/stb/info/boxtype");
-		stringFromFile(f, "stbmodel", "/proc/stb/info/vumodel");
-		stringFromFile(f, "stbmodel", "/proc/stb/info/model");
-		stringFromFile(f, "stbmodel", "/proc/stb/info/hwmodel");
-		stringFromFile(f, "stbmodel", "/proc/stb/info/gbmodel");
-		stringFromFile(f, "kernelcmdline", "/proc/cmdline");
-		stringFromFile(f, "nimsockets", "/proc/bus/nim_sockets");
-		stringFromFile(f, "imageversion", "/etc/image-version");
-		stringFromFile(f, "imageissue", "/etc/issue.net");
+					"OpenViX Enigma2 Crashlog\n\n"
+					"Crashdate = %s\n\n"
+					"%s\n"
+					"Compiled = %s\n"
+					"Skin = %s\n"
+					"Component = %s\n\n"
+					"Kernel CMDline = %s\n"
+					"Nim Sockets = %s\n",
+					tm_str,
+					stringFromFile("/etc/image-version").c_str(),
+					__DATE__,
+					getConfigString("config.skin.primary_skin", "Default Skin").c_str(),
+					component,
+					stringFromFile("/proc/cmdline").c_str(),
+					stringFromFile("/proc/bus/nim_sockets").c_str()
+				);
 
 		/* dump the log ringbuffer */
 		fprintf(f, "\n\n");
@@ -195,8 +184,9 @@ void bsodFatal(const char *component)
 	gPainter p(my_dc);
 	p.resetOffset();
 	p.resetClip(eRect(ePoint(0, 0), my_dc->size()));
-	p.setBackgroundColor(gRGB(0x27408B));
+	p.setBackgroundColor(gRGB(0x010000));
 	p.setForegroundColor(gRGB(0xFFFFFF));
+
 	int hd =  my_dc->size().width() == 1920;
 	ePtr<gFont> font = new gFont("Regular", hd ? 30 : 20);
 	p.setFont(font);
@@ -206,7 +196,7 @@ void bsodFatal(const char *component)
 
 	os.str("");
 	os.clear();
-	os << "We are really sorry. Your STB encountered "
+	os << "We are really sorry. Your receiver encountered "
 		"a software problem, and needs to be restarted.\n"
 		"Please send the logfile " << crashlog_name << " to " << crash_emailaddr << ".\n"
 		"Your STB restarts in 10 seconds!\n"
@@ -276,7 +266,13 @@ void bsodFatal(const char *component)
 	 * We'd risk destroying things with every additional instruction we're
 	 * executing here.
 	 */
-	if (component) raise(SIGKILL);
+	if (component) {
+		/*
+		 *  We need to use a signal that generate core dump.
+		 */
+		if (eConfigManager::getConfigBoolValue("config.crash.coredump", false)) raise(SIGTRAP);
+		raise(SIGKILL);
+	}
 }
 
 void oops(const mcontext_t &context)
@@ -293,7 +289,7 @@ void oops(const mcontext_t &context)
 #elif defined(__arm__)
 	eLog(lvlFatal, "PC: %08lx", (unsigned long)context.arm_pc);
 	eLog(lvlFatal, "Fault Address: %08lx", (unsigned long)context.fault_address);
-	eLog(lvlFatal, "Error Code:: %lu", (unsigned long)context.error_code);
+	eLog(lvlFatal, "Error Code: %lu", (unsigned long)context.error_code);
 #else
 	eLog(lvlFatal, "FIXME: no oops support!");
 #endif
@@ -304,7 +300,6 @@ void oops(const mcontext_t &context)
  * it's not async-signal-safe and so must not be used in signal
  * handlers.
  */
-#ifdef __GLIBC__
 void print_backtrace()
 {
 	void *array[15];
@@ -320,20 +315,17 @@ void print_backtrace()
 		if (dladdr(array[cnt], &info)
 			&& info.dli_fname != NULL && info.dli_fname[0] != '\0')
 		{
-			eLog(lvlFatal, "%s(%s) [0x%lX]", info.dli_fname, info.dli_sname != NULL ? info.dli_sname : "n/a", (unsigned long int) array[cnt]);
+			eLog(lvlFatal, "%s(%s) [0x%X]", info.dli_fname, info.dli_sname != NULL ? info.dli_sname : "n/a", (unsigned long int) array[cnt]);
 		}
 	}
 }
-#endif
 
 void handleFatalSignal(int signum, siginfo_t *si, void *ctx)
 {
 	ucontext_t *uc = (ucontext_t*)ctx;
 	oops(uc->uc_mcontext);
-#ifdef __GLIBC__
 	print_backtrace();
-#endif
-	eLog(lvlFatal, "-------FATAL SIGNAL");
+	eLog(lvlFatal, "-------FATAL SIGNAL (%d)", signum);
 	bsodFatal("enigma2, signal");
 }
 
