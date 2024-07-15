@@ -37,15 +37,15 @@ enigma2_LDADD = \
 	@BASE_LIBS@ \
 	@LIBGIF_LIBS@ \
 	@LIBJPEG_LIBS@ \
-	@LIBVUGLES2_LIBS@ \
 	@LIBSDL_LIBS@ \
 	@LIBXINE_LIBS@ \
 	@PTHREAD_LIBS@ \
 	@PYTHON_LIBS@ \
 	@LIBDDVD_LIBS@ \
+	@ALSA_LIBS@ \
 	@AVAHI_LIBS@ \
-	@LIBHIACCEL_LIBS@ \
-	-ltuxtxt32bpp -lcrypt -lrt -ldl
+	@LIBDL_LIBS@ \
+	-ltuxtxt32bpp
 
 enigma2_LDFLAGS = -Wl,--export-dynamic
 
@@ -59,7 +59,7 @@ ENIGMA2_BRANCH = `cat $(GIT_DIR)/branch`
 else
 ENIGMA2_COMMIT_DATE = `$(GIT) log --no-color -n 1 --pretty=format:%cd --date=short`
 ENIGMA2_BRANCH = `$(GIT) branch --no-color 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
-ENIGMA2_REV = `$(GIT) describe --abbrev=7 --always --long --tags`
+ENIGMA2_REV = `$(GIT) rev-parse --short HEAD`
 endif
 endif
 
