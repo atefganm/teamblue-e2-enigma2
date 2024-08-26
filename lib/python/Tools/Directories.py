@@ -4,6 +4,7 @@ import os
 
 from enigma import eEnv, getDesktop, eGetEnigmaDebugLvl
 from errno import ENOENT, EXDEV
+from datetime import datetime
 from re import compile, split
 from stat import S_IMODE
 from sys import _getframe as getframe
@@ -445,6 +446,12 @@ def fileWriteLines(filename, lines, source=DEFAULT_MODULE_NAME, debug=False):
 	if debug or forceDebug:
 		print("[%s] Line %d: %s %d lines to file '%s'." % (source, stack()[1][0].f_lineno, msg, len(lines), filename))
 	return result
+
+
+def fileDate(f):
+	if fileExists(f):
+		return datetime.fromtimestamp(os.stat(f).st_mtime).strftime("%Y-%m-%d")
+	return("1970-01-01")
 
 
 def fileReadXML(filename, default=None, *args, **kwargs):
