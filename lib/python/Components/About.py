@@ -156,12 +156,9 @@ def getHardwareTypeString():
 
 
 def getImageTypeString():
-	#try:
-	#       image_type = open("/etc/issue").readlines()[-2].strip()[:-6]
-	#       return image_type.capitalize()
-	#except:
-	#       return _("undefined")
-	return "%s %s" % (getImageVersion(), getImageType())
+	if BoxInfo.getItem("imageversion"):
+		return "%s %s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imageversion"), BoxInfo.getItem("imagetype").title())
+	return "%s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imagetype").title())
 
 
 def getCPUInfoString():
