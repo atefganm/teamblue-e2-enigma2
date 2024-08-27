@@ -8,7 +8,6 @@ from re import findall
 from subprocess import PIPE, Popen
 from enigma import Misc_Options, eDVBCIInterfaces, eDVBResourceManager, eGetEnigmaDebugLvl
 
-from Components.About import getChipSetString
 from Components.RcModel import rc_model
 from Tools.Directories import SCOPE_PLUGINS, SCOPE_LIBDIR, SCOPE_SKIN, fileCheck, fileReadLine, fileReadLines, resolveFilename, isPluginInstalled, fileExists, fileHas, fileReadLine, pathExists
 from Tools.HardwareInfo import HardwareInfo
@@ -170,6 +169,21 @@ def getBootdevice():
 
 
 model = getBoxType()
+
+
+def getChipsetString():
+	if MODEL in ("dm7080", "dm820"):
+		return "7435"
+	elif MODEL in ("dm520", "dm525"):
+		return "73625"
+	elif MODEL in ("dm900", "dm920", "et13000", "sf5008"):
+		return "7252S"
+	elif MODEL in ("hd51", "vs1500", "h7"):
+		return "7251S"
+	elif MODEL == "alien5":
+		return "S905D"
+	chipset = fileReadLine("/proc/stb/info/chipset", default=_("Undefined"), source=MODULE_NAME)
+	return str(chipset.lower().replace("\n", "").replace("bcm", "").replace("brcm", "").replace("sti", ""))
 
 
 def getModuleLayout():

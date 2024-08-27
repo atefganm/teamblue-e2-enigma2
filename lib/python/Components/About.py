@@ -9,6 +9,7 @@ from Tools.HardwareInfo import HardwareInfo
 from builtins import round
 
 from boxbranding import getBoxType, getMachineBuild, getImageType, getImageVersion
+from Components.SystemInfo import BoxInfo
 from sys import maxsize, modules, version_info
 from Tools.Directories import fileReadLine
 
@@ -44,16 +45,22 @@ def getFlashDateString():
 		return _("unknown")
 
 
+def returndate(date):
+	return "%s-%s-%s" % (date[:4], date[4:6], date[6:8])
+
+def getBuildDateString():
+	return returndate(BoxInfo.getItem("compiledate"))
+
+
+def getUpdateDateString():
+	build = BoxInfo.getItem("compiledate")
+	if build and build.isdigit():
+		return "%s-%s-%s" % (build[:4], build[4:6], build[6:])
+	return _("Unknown")
+
+
 def getEnigmaVersionString():
-	# import enigma
-	# enigma_version = enigma.getEnigmaVersionString()
-	# if len(enigma_version) > 11:
-	# 	enigma_version = enigma_version[:10] + " " + enigma_version[11:]
-	from boxbranding import getImageVersion
-	enigma_version = getImageVersion()
-	if '-(no branch)' in enigma_version:
-		enigma_version = enigma_version[:-12]
-	return enigma_version
+	return str(BoxInfo.getItem("imageversion"))
 
 
 def getGStreamerVersionString():
@@ -82,24 +89,7 @@ def getKernelVersionString():
 
 
 def getChipSetString():
-	if getMachineBuild() in ('dm7080', 'dm820'):
-		return "7435"
-	elif getMachineBuild() in ('dm520', 'dm525'):
-		return "73625"
-	elif getMachineBuild() in ('dm900', 'dm920', 'et13000', 'sf5008'):
-		return "7252S"
-	elif getMachineBuild() in ('hd51', 'vs1500', 'h7'):
-		return "7251S"
-	elif getMachineBuild() in ('alien5',):
-		return "S905D"
-	else:
-		try:
-			f = open('/proc/stb/info/chipset', 'r')
-			chipset = f.read()
-			f.close()
-			return str(chipset.lower().replace('\n', '').replace('bcm', '').replace('brcm', '').replace('sti', ''))
-		except IOError:
-			return "unavailable"
+	return str(BoxInfo.getItem("ChipsetString"))
 
 
 def getCPUString():
@@ -159,6 +149,10 @@ def getImageTypeString():
 	if BoxInfo.getItem("imageversion"):
 		return "%s %s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imageversion"), BoxInfo.getItem("imagetype").title())
 	return "%s %s" % (BoxInfo.getItem("displaydistro"), BoxInfo.getItem("imagetype").title())
+
+
+def getOEVersionString():
+	return BoxInfo.getItem("oe").title()
 
 
 def getCPUInfoString():
