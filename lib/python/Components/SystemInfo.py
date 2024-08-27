@@ -173,17 +173,19 @@ model = getBoxType()
 
 def getChipsetString():
 	if MODEL in ("dm7080", "dm820"):
-		return "7435"
+		chipset = "7435"
 	elif MODEL in ("dm520", "dm525"):
-		return "73625"
-	elif MODEL in ("dm900", "dm920", "et13000", "sf5008"):
-		return "7252S"
-	elif MODEL in ("hd51", "vs1500", "h7"):
-		return "7251S"
-	elif MODEL == "alien5":
-		return "S905D"
-	chipset = fileReadLine("/proc/stb/info/chipset", default=_("Undefined"), source=MODULE_NAME)
-	return str(chipset.lower().replace("\n", "").replace("bcm", "").replace("brcm", "").replace("sti", ""))
+		chipset = "73625"
+	elif MODEL in ("dm900", "dm920", "et13000"):
+		chipset = "7252S"
+	elif MODEL in ("hd51", "vs1500", "h7", "h17"):
+		chipset = "7251S"
+	elif MODEL in ("dreamone", "dreamtwo"):
+		chipset = "S922X"
+	else:
+		chipset = fileReadLine("/proc/stb/info/chipset", default=_("Undefined"), source=MODULE_NAME)
+		chipset = chipset.lower().replace("\n", "").replace("bcm", "").replace("brcm", "").replace("sti", "")
+	return chipset
 
 
 def getModuleLayout():
@@ -263,6 +265,7 @@ def setBoxInfoItems():
 	BoxInfo.setItem("LCDsymbol_timeshift", fileCheck("/proc/stb/lcd/symbol_timeshift"))
 	BoxInfo.setItem("LCDshow_symbols", (model.startswith("et9") or model in ("hd51", "vs1500")) and fileCheck("/proc/stb/lcd/show_symbols"))
 	BoxInfo.setItem("LCDsymbol_hdd", model in ("hd51", "vs1500") and fileCheck("/proc/stb/lcd/symbol_hdd"))
+	BoxInfo.setItem("ChipsetString", getChipsetString(), immutable=True)
 	BoxInfo.setItem("FrontpanelDisplayGrayscale", fileExists("/dev/dbox/oled0"))
 	BoxInfo.setItem("DeepstandbySupport", model != "dm800")
 	BoxInfo.setItem("OledDisplay", fileExists(resolveFilename(SCOPE_SKIN, 'display/lcd_skin/skin_lcd_default.xml')))
