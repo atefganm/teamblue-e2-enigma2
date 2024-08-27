@@ -94,10 +94,9 @@
 				<!-- Menu / Settings / System / Frontpanel Menu -->
 				<menu key="frontpanel_menu" weight="15" level="0" text="Frontpanel">
 					<item key="lcd_setup" weight="0" level="0" text="Display setup" requires="Display"><setup id="lcd"/></item>
-					<item key="display_skin_selector" weight="5" level="0" text="Display Skin" requires="OledDisplay"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
-					<item key="clock_skin_selector" weight="10" level="0" text="Clock Skin" requires="OledDisplay"><screen module="SkinSelector" screen="ClockSkinSelector"/></item>
-					<item weight="10" level="0" text="Display Skin" entryID="display_skin_selector"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
+					<item key="display_skin_selector" level="0" requires="FrontpanelDisplay" text="Display Skin"><screen module="SkinSelector" screen="LcdSkinSelector"/></item>
 					<item entryID="led_setup" level="1" text="LED Setup" weight="15"><setup id="ledsetup" /></item>
+					<item key="led_setup" level="1" text="LED Setup" weight="15"><setup id="LedDisplay" /></item>
 				</menu>
 
 				<!-- Menu / Settings / System / Recording Menu -->
