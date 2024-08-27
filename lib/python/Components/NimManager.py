@@ -947,7 +947,9 @@ class NimManager:
 			if "frontend_device" in entry:  # check if internally connectable
 				if path.exists("/proc/stb/frontend/%d/rf_switch" % entry["frontend_device"]) and (not id or entries[id]["name"] == entries[id - 1]["name"]):
 					if '7356' in about.getChipSetString():
-					if id:
+						if not id:
+							entry["internally_connectable"] = 1
+					elif id:
 						entry["internally_connectable"] = entry["frontend_device"] - 1
 			else:
 				entry["frontend_device"] = None
