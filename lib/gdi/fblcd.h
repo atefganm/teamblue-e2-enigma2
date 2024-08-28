@@ -50,6 +50,7 @@ public:
 	int islocked() { return locked; }
 	void setDump(bool);
 	void dumpLCD(bool);
+	void setDump(bool) {};
 };
 
 #endif
