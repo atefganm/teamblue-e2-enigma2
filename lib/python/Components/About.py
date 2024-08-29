@@ -335,5 +335,21 @@ def getBoxUptime():
 		return '-'
 
 
+def getGlibcVersion():
+	try:
+		return libc_ver()[1]
+	except:
+		print("[About] Get glibc version failed.")
+	return _("Unknown")
+
+
+def getGccVersion():
+	try:
+		return pyversion.split("[GCC ")[1].replace("]", "")
+	except:
+		print("[About] Get gcc version failed.")
+	return _("Unknown")
+
+
 # For modules that do "from About import about"
 about = modules[__name__]
