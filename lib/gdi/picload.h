@@ -31,8 +31,13 @@ struct Cfilepara
 		palette_size(0),
 		bits(24),
 		id(mid),
+		max_x(0),
+		max_y(0),
+		ox(0),
+		oy(0),
 		picinfo(mfile),
-		callback(true)
+		callback(true),
+		transparent(true)
 	{
 		picinfo += "\n" + size + "\n";
 	}
@@ -52,8 +57,11 @@ class ePicLoad: public eMainloop, public eThread, public sigc::trackable, public
 {
 	DECLARE_REF(ePicLoad);
 
+	enum{ F_PNG, F_JPEG, F_BMP, F_GIF, F_SVG};
+
 	void decodePic();
 	void decodeThumb();
+	void resizePic();
 
 	Cfilepara *m_filepara;
 	Cexif *m_exif;
@@ -81,6 +89,7 @@ class ePicLoad: public eMainloop, public eThread, public sigc::trackable, public
 			decode_Pic,
 			decode_Thumb,
 			decode_finished,
+			decode_error,
 			quit
 		};
 		Message(int type=0)
