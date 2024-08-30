@@ -128,6 +128,7 @@ int loadPNG(ePtr<gPixmap> &result, const char *filename, int accel, int cached)
 	channels = png_get_channels(png_ptr, info_ptr);
 
 	result = new gPixmap(width, height, bit_depth * channels, cached ? PixmapCache::PixmapDisposed : NULL, accel);
+	result->isPNG = true;
 	gUnmanagedSurface *surface = result->surface;
 
 	png_bytep *rowptr = new png_bytep[height];
@@ -618,7 +619,7 @@ static void loadGIFFile(GifFile* filepara)
 #endif
 	return;
 ERROR_R:
-	eTrace("[loadGIFFile] <Error gif>");
+	eDebug("[loadGIFFile] <Error gif>");
 #if !defined(GIFLIB_MAJOR) || ( GIFLIB_MAJOR < 5) || (GIFLIB_MAJOR == 5 && GIFLIB_MINOR == 0)
 	DGifCloseFile(gft);
 #else
@@ -679,3 +680,4 @@ int loadGIF(ePtr<gPixmap> &result, const char *filename, int accel,int cached)
 	m_filepara = NULL;
 	return 0;
 }
+
