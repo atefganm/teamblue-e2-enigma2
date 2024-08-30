@@ -9,6 +9,7 @@ typedef long long pts_t;
 /* Wrapper around FILE to prevent leaks and to make your code a bit more OO */
 struct CFile
 {
+	FILE *handle;
 	CFile(const char *fileName, const char *mode)
 		: handle(fopen(fileName, mode))
 	{

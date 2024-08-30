@@ -28,9 +28,9 @@ int CFile::parseInt(int *result, const char *fileName)
 	return 0;
 }
 
-int CFile::parsePts_t(pts_t *result, const char *fileName)
+int CFile::parsePts_t(pts_t *result, const char *filename)
 {
-	CFile f(fileName, "r");
+	CFile f(filename, "r");
 	if (!f)
 		return -1;
 	if (fscanf(f, "%lld", result) != 1)
@@ -55,6 +55,14 @@ int CFile::writeInt(const char *fileName, int value)
 }
 
 int CFile::writeStr(const char *fileName, const std::string &value)
+{
+	CFile f(fileName, "w");
+	if (f)
+		fprintf(f, "%s", value.c_str());
+	return 0;
+}
+
+int CFile::write(const char *fileName, const char *value)
 {
 	CFile f(fileName, "w");
 	if (!f)
