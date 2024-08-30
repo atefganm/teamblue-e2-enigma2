@@ -133,6 +133,8 @@ class About(Screen):
 		self["EnigmaSkin"] = StaticText(EnigmaSkin)
 		AboutText += EnigmaSkin + "\n"
 
+		AboutText += _("OpenSSL version: ") + about.getOpenSSLVersion() + "\n"
+
 		AboutText += _("Python version: ") + about.getPythonVersionString() + "\n"
 		AboutText += _("Enigma2 debug level:\t%d") % eGetEnigmaDebugLvl() + "\n"
 
