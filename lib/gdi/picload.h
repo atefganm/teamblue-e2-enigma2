@@ -23,6 +23,7 @@ struct Cfilepara
 	int oy;
 	std::string picinfo;
 	bool callback;
+	bool transparent;
 
 	Cfilepara(const char *mfile, int mid, std::string size):
 		file(strdup(mfile)),
