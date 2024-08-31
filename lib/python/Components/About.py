@@ -12,6 +12,7 @@ from boxbranding import getBoxType, getMachineBuild, getImageType, getImageVersi
 from Components.SystemInfo import BoxInfo
 from sys import maxsize, modules, version_info
 from Tools.Directories import fileReadLine
+from subprocess import PIPE, Popen
 
 MODULE_NAME = __name__.split(".")[-1]
 

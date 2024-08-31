@@ -288,8 +288,6 @@ class AudioSetup(ConfigListScreen, Screen):
 				self.list.append((_("AAC plus downmix"), config.av.downmix_aacplus, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
 			if SystemInfo["CanDownmixAC3Plus"]:
 				self.list.append((_("AC3 plus downmix"), config.av.downmix_ac3plus, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if SystemInfo["CanDownmixDTSHD"]:
-				self.list.append((_("DTS HD downmix"), config.av.downmix_dtshd, _("Configure whether DTS-HD channel sound tracks should be downmixed or transcoded.")))
 			if SystemInfo["HDMIAudioSource"]:
 				self.list.append((_("HDMI audio source"), config.av.hdmi_audio_source, _("Choose whether multi channel sound tracks should be convert to PCM or SPDIF.")))
 			if SystemInfo["CanAACTranscode"]:
