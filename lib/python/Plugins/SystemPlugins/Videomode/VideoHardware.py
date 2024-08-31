@@ -1,5 +1,5 @@
 from Components.config import config, ConfigSelection, ConfigSubDict, ConfigYesNo
-from Components.SystemInfo import SystemInfo
+from Components.SystemInfo import BoxInfo
 from Tools.CList import CList
 from Tools.HardwareInfo import HardwareInfo
 from Components.About import about
@@ -17,7 +17,7 @@ from enigma import getDesktop
 config.av.edid_override = ConfigYesNo(default=True)
 chipsetstring = about.getChipSetString()
 
-Has24hz = SystemInfo["Has24hz"]
+Has24hz = BoxInfo.getItem("Has24hz")
 
 axis = {"480i": "0 0 719 479",
 		"480p": "0 0 719 479",
@@ -95,13 +95,13 @@ class VideoHardware:
 		"640x480": {60: "640x480"}
 	}
 
-	if SystemInfo["HasScart"]:
+	if BoxInfo.getItem("HasScart"):
 		modes["Scart"] = ["PAL", "NTSC", "Multi"]
-	if SystemInfo["HasComposite"] and HardwareInfo().get_device_name() in ("dm7020hd", "dm7020hdv2", "dm8000"):
+	if BoxInfo.getItem("HasComposite") and HardwareInfo().get_device_name() in ("dm7020hd", "dm7020hdv2", "dm8000"):
 		modes["RCA"] = ["576i", "PAL", "NTSC", "Multi"]
-	if SystemInfo["HasYPbPr"]:
+	if BoxInfo.getItem("HasYPbPr"):
 		modes["YPbPr"] = ["720p", "1080i", "576p", "480p", "576i", "480i"]
-	if SystemInfo["Has2160p"]:
+	if BoxInfo.getItem("Has2160p"):
 		modes["HDMI"] = ["720p", "1080p", "2160p", "1080i", "576p", "480p", "576i", "480i"]
 	if HardwareInfo().get_device_name() in ("one", "two"):
 		modes["HDMI"] = ["720p", "1080p", "smpte", "2160p30", "2160p", "1080i", "576p", "576i", "480p", "480i"]
@@ -340,7 +340,7 @@ class VideoHardware:
 		except IOError:
 			print("[VideoHardware] writing initial videomode to /etc/videomode failed.")
 
-		if SystemInfo["Has24hz"]:
+		if BoxInfo.getItem("Has24hz"):
 			try:
 				print("[VideoHardware] Write to /proc/stb/video/videomode_24hz")
 				open("/proc/stb/video/videomode_24hz", "w").write(mode_24)
@@ -418,7 +418,7 @@ class VideoHardware:
 				ratelist = []
 				for rate in rates:
 					if rate in ("auto"):
-						if SystemInfo["Has24hz"]:
+						if BoxInfo.getItem("Has24hz"):
 							ratelist.append((rate, rate))
 					else:
 						ratelist.append((rate, rate))
