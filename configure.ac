@@ -16,10 +16,6 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_OPENMP()
 
 AC_PATH_PROG(MSGFMT, msgfmt, AC_MSG_ERROR(Could not find msgfmt))
-AC_PATH_PROG(MSGINIT, msginit, AC_MSG_ERROR(Could not find msginit))
-AC_PATH_PROG(MSGMERGE, msgmerge, AC_MSG_ERROR(Could not find msgmerge))
-AC_PATH_PROG(MSGUNIQ, msguniq, AC_MSG_ERROR(Could not find msguniq))
-AC_PATH_PROG(XGETTEXT, xgettext, AC_MSG_ERROR(Could not find xgettext))
 
 AM_PATH_PYTHON
 AX_PYTHON_DEVEL
@@ -553,19 +549,22 @@ data/Makefile
 data/fonts/Makefile
 data/countries/Makefile
 data/display/Makefile
-data/display/7segment/Makefile
 data/display/display/Makefile
 data/display/display96/Makefile
 data/display/display128/Makefile
 data/display/display128dm/Makefile
 data/display/display220/Makefile
 data/display/display240/Makefile
-data/display/lcd220/Makefile
-data/display/lcd_skin220/Makefile
 data/display/display390/Makefile
 data/display/display400/Makefile
 data/display/display480/Makefile
-data/display/vfd255/Makefile
+data/display/display720/Makefile
+data/display/display800/Makefile
+data/display/displaytext/Makefile
+data/display/grautec70x0/Makefile
+data/display/grautec70x0/fonts/Makefile
+data/display/grautec8000/Makefile
+data/display/grautec8000/fonts/Makefile
 data/extensions/Makefile
 data/gbipbox/Makefile
 data/hw_info/Makefile
