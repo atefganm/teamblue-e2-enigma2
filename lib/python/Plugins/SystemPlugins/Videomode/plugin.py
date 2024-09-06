@@ -286,8 +286,6 @@ class AudioSetup(ConfigListScreen, Screen):
 				self.list.append((_("AAC transcoding"), config.av.transcodeaac, _("Choose whether AAC sound tracks should be transcoded.")))
 			if BoxInfo.getItem("CanDownmixAC3Plus"):
 				self.list.append((_("AC3 plus downmix"), config.av.downmix_ac3plus, _("Configure whether multi channel sound tracks should be downmixed to stereo.")))
-			if BoxInfo.getItem("CanDownmixDTSHD"):
-				self.list.append((_("DTS HD downmix"), config.av.downmix_dtshd, _("Configure whether DTS-HD channel sound tracks should be downmixed or transcoded.")))
 			if BoxInfo.getItem("HasMultichannelPCM"):
 				self.list.append((_("Multichannel PCM"), config.av.multichannel_pcm, _("Configure whether multi channel PCM sound should be enabled.")))
 			if BoxInfo.getItem("HasAutoVolume") or BoxInfo.getItem("HasAutoVolumeLevel"):
