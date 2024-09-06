@@ -13,7 +13,11 @@ from xml.etree.ElementTree import Element, ParseError, fromstring, parse
 
 from xml.etree.ElementTree import Element, fromstring, parse
 
-pathExists = os.path.exists
+
+from os.path import exists as pathExists, isdir as pathIsdir, isfile as pathIsfile, join as pathJoin
+
+from os import listdir
+
 
 DEFAULT_MODULE_NAME = __name__.split(".")[-1]
 
@@ -677,6 +681,17 @@ def mediafilesInUse(session):
 
 def shellquote(s):
 	return "'%s'" % s.replace("'", "'\\''")
+
+def isPluginInstalled(pluginname, pluginfile="plugin", pluginType=None):
+	path = resolveFilename(SCOPE_PLUGINS)
+	pluginfolders = [name for name in listdir(path) if pathIsdir(pathJoin(path, name)) and name not in ["__pycache__"]]
+	if pluginType is None or pluginType in pluginfolders:
+		plugintypes = pluginType and [pluginType] or pluginfolders
+		for fileext in [".pyc", ".py"]:
+			for plugintype in plugintypes:
+				if pathIsfile(pathJoin(path, plugintype, pluginname, pluginfile + fileext)):
+					return True
+	return False
 
 
 def sanitizeFilename(filename):
