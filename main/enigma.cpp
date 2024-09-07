@@ -37,8 +37,6 @@
 #include "bsod.h"
 #include "version_info.h"
 
-#include <gst/gst.h>
-
 #include <unistd.h>
 #include <lib/components/scan.h>
 #include <lib/dvb/idvb.h>
@@ -287,8 +285,6 @@ int main(int argc, char **argv)
 	atexit(object_dump);
 #endif
 
-	gst_init(&argc, &argv);
-
 	setenv("PYTHONPATH", eEnv::resolve("${libdir}/enigma2/python").c_str(), 0);
 	printf("[enigma2] PYTHONPATH: %s\n", getenv("PYTHONPATH"));
 	printf("[enigma2] DVB_API_VERSION %d DVB_API_VERSION_MINOR %d\n", DVB_API_VERSION, DVB_API_VERSION_MINOR);
@@ -425,7 +421,7 @@ const char *getE2Rev()
 
 const char *getGStreamerVersionString()
 {
-	return gst_version_string();
+	return "unavailable";
 }
 
 const char *getBoxType()
