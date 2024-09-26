@@ -227,7 +227,7 @@ RESULT eDVBService::getName(const eServiceReference &ref, std::string &name)
 
 	if (!res_provider.empty() && m_provider_name.empty()) {
 		m_provider_name = res_provider;
-	} 
+	}
 
 	return 0;
 }
@@ -1513,7 +1513,7 @@ eDVBDB::eDVBDB()
 	: m_numbering_mode(false), m_load_unlinked_userbouquets(1)
 {
 	instance = this;
-	
+
 	iptv_services.clear();
 	std::ifstream iptv_services_store_file;
 	iptv_services_store_file.open("/etc/enigma2/config_av");

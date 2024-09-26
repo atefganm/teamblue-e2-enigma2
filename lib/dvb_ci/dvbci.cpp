@@ -1368,7 +1368,7 @@ eDVBCISlot::eDVBCISlot(eMainloop *context, int nr):
 	if (enabled)
 	{
 		int bootDelay = eConfigManager::getConfigIntValue("config.cimisc.bootDelay");
-		if (bootDelay) 
+		if (bootDelay)
 		{
 			CONNECT(startup_timeout->timeout, eDVBCISlot::openDevice);
 			startup_timeout->start(1000 * bootDelay, true);
@@ -1413,7 +1413,7 @@ eDVBCISlot::~eDVBCISlot()
 	close(fd);
 }
 
-void eDVBCISlot::closeDevice() 
+void eDVBCISlot::closeDevice()
 {
 	close(fd);
 	fd = -1;
