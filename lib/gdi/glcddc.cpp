@@ -1,8 +1,6 @@
 #include <lib/gdi/glcddc.h>
 #include <lib/gdi/lcd.h>
-#ifdef LCD_FRAMEBUFFER_MODE
 #include <lib/gdi/fblcd.h>
-#endif
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
 
@@ -10,12 +8,15 @@ gLCDDC *gLCDDC::instance;
 
 gLCDDC::gLCDDC()
 {
-#ifdef LCD_FRAMEBUFFER_MODE
 	lcd = new eFbLCD();
-#else
-	lcd = new eDBoxLCD();
-#endif
+	if (!lcd->detected())
+	{
+		delete lcd;
+		lcd = new eDBoxLCD();
+	}
 	instance = this;
+
+	update = 1;
 
 	surface.x = lcd->size().width();
 	surface.y = lcd->size().height();
@@ -58,7 +59,7 @@ void gLCDDC::exec(const gOpcode *o)
 		lcd->setPalette(surface);
 		break;
 	}
-#if defined(HAVE_TEXTLCD) || defined(HAVE_7SEGMENT)
+#ifdef HAVE_TEXTLCD
 	case gOpcode::renderText:
 		if (o->parm.renderText->text)
 		{

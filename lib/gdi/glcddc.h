@@ -8,7 +8,7 @@ class gLCDDC: public gDC
 {
 	eLCD *lcd;
 	static gLCDDC *instance;
-	int update = 1;
+	int update;
 	void exec(const gOpcode *opcode);
 	gUnmanagedSurface surface;
 public:
