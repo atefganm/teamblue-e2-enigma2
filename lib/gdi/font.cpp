@@ -32,7 +32,7 @@
 
 fontRenderClass *fontRenderClass::instance;
 
-static pthread_mutex_t ftlock= 
+static pthread_mutex_t ftlock=
 #ifdef __GLIBC__
 	PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP;
 #else
@@ -702,6 +702,17 @@ int eTextPara::renderString(const char *string, int rflags, int border, int mark
 		lineCount = 1;
 		cursor=ePoint(area.x(), area.y()+(ascender>>6));
 		left=cursor.x();
+	}
+
+	if ((FTC_Manager_LookupFace(fontRenderClass::instance->cacheManager,
+				    current_font->scaler.face_id,
+				    &current_face) < 0) ||
+	    (FTC_Manager_LookupSize(fontRenderClass::instance->cacheManager,
+				    &current_font->scaler,
+				    &current_font->size) < 0))
+	{
+		eDebug("[eTextPara] renderString: FTC_Manager_Lookup_Size current_font failed!");
+		return -1;
 	}
 
 	std::vector<unsigned long> uc_string, uc_visual;
