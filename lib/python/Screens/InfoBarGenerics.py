@@ -62,6 +62,10 @@ from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
 from six.moves import cPickle as pickle
 import six
 
+MODEL = BoxInfo.getItem("model")
+
+MODULE_NAME = __name__.split(".")[-1]
+
 # hack alert!
 from Screens.Menu import MainMenu, mdom
 
@@ -250,32 +254,37 @@ def getPossibleSubservicesForCurrentChannel(current_service):
 
 
 def getActiveSubservicesForCurrentChannel(service):
-	subservices = service and service.subServices()
-	info = service and service.info()
-	current_service = info and ':'.join(info.getInfoString(iServiceInformation.sServiceref).split(':')[:11])
 	activeSubservices = []
-	if current_service:
-		possibleSubservices = getPossibleSubservicesForCurrentChannel(current_service)
-		for subservice in possibleSubservices:
-			events = eEPGCache.getInstance().lookupEvent(['BDTS', (subservice, 0, -1)])
-			if events and len(events) == 1:
-				event = events[0]
-				title = event[2]
+	if info := service and service.info():
+		sRef = info.getInfoString(iServiceInformation.sServiceref)
+		url = "http://%s:%s/" % (config.misc.softcam_streamrelay_url.getHTML(), config.misc.softcam_streamrelay_port.value)
+		splittedRef = sRef.split(url.replace(":", "%3a"))
+		if len(splittedRef) > 1:
+			sRef = splittedRef[1].split(":")[0].replace("%3a", ":")
+		current_service = ':'.join(sRef.split(':')[:11])
+		if current_service:
+			possibleSubservices = getPossibleSubservicesForCurrentChannel(current_service)
+			epgCache = eEPGCache.getInstance()
+			for subservice in possibleSubservices:
+				events = epgCache.lookupEvent(['BDTS', (subservice, 0, -1)])
+				if events and len(events) == 1:
+					event = events[0]
+					title = event[2]
 					if title and ("Sendepause" not in title and "Sky Sport Kompakt" not in title):
-					starttime = datetime.datetime.fromtimestamp(event[0]).strftime('%H:%M')
-					endtime = datetime.datetime.fromtimestamp(event[0] + event[1]).strftime('%H:%M')
-					current_show_name = "%s %s-%s" % (title, str(starttime), str(endtime))
-					activeSubservices.append((current_show_name, subservice))
+						starttime = datetime.datetime.fromtimestamp(event[0]).strftime('%H:%M')
+						endtime = datetime.datetime.fromtimestamp(event[0] + event[1]).strftime('%H:%M')
+						current_show_name = "%s [%s-%s]" % (title, str(starttime), str(endtime))
+						activeSubservices.append((current_show_name, subservice))
 	if not activeSubservices:
 		subservices = service and service.subServices()
 		if subservices:
-			for idx in list(range(0, subservices.getNumberOfSubservices())):
+			for idx in range(0, subservices.getNumberOfSubservices()):
 				subservice = subservices.getSubservice(idx)
 				activeSubservices.append((subservice.getName(), subservice.toString()))
 	return activeSubservices
 
-
 def hasActiveSubservicesForCurrentChannel(service):
+	activeSubservices = getActiveSubservicesForCurrentChannel(service)
 	return bool(activeSubservices and len(activeSubservices) > 1)
 
 
