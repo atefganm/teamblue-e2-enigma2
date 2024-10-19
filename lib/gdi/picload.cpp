@@ -3,7 +3,7 @@
 #include <fcntl.h>
 
 #include <lib/base/cfile.h>
-#include <lib/base/wrappers.h>
+#include <lib/base/estring.h>
 #include <lib/base/wrappers.h>
 #include <lib/gdi/picexif.h>
 #include <lib/gdi/picload.h>
@@ -397,8 +397,11 @@ static void png_load(Cfilepara* filepara, int background, bool forceRGB=false)
 	filepara->ox = width;
 	filepara->oy = height;
 	
+	bool forceRGBA = false;
+
 	// This is a hack to support 8bit pngs with transparency since the detection is not really correct for some reason....
 	if (color_type == PNG_COLOR_TYPE_PALETTE && bit_depth == 8) {
+		forceRGBA = true;
 		color_type = PNG_COLOR_TYPE_RGBA;
 	}
 	
@@ -417,7 +420,7 @@ static void png_load(Cfilepara* filepara, int background, bool forceRGB=false)
 		filepara->transparent = (trans_alpha != NULL);
 	}
 
-	if ((bit_depth <= 8) && (color_type == PNG_COLOR_TYPE_GRAY || color_type & PNG_COLOR_MASK_PALETTE || color_type == PNG_COLOR_TYPE_RGBA))
+	if ((bit_depth <= 8) && (color_type == PNG_COLOR_TYPE_GRAY || color_type & PNG_COLOR_MASK_PALETTE || forceRGBA))
 	{
 		if (bit_depth < 8)
 			png_set_packing(png_ptr);
@@ -429,6 +432,7 @@ static void png_load(Cfilepara* filepara, int background, bool forceRGB=false)
 			png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 			return;
 		}
+
 		int number_passes = png_set_interlace_handling(png_ptr);
 		png_read_update_info(png_ptr, info_ptr);
 
@@ -895,8 +899,8 @@ ePicLoad::ePicLoad():
 	m_exif(NULL),
 	threadrunning(false),
 	m_conf(),
-	msg_thread(this,1),
-	msg_main(eApp,1)
+	msg_thread(this,1, "ePicLoad_thread"),
+	msg_main(eApp,1, "ePicLoad_main")
 {
 	CONNECT(msg_thread.recv_msg, ePicLoad::gotMessage);
 	CONNECT(msg_main.recv_msg, ePicLoad::gotMessage);
@@ -1616,7 +1620,8 @@ RESULT ePicLoad::setPara(PyObject *val)
 		ePyObject fast = PySequence_Fast(val, "");
 		int width = PyLong_AsLong(PySequence_Fast_GET_ITEM(fast, 0));
 		int height = PyLong_AsLong(PySequence_Fast_GET_ITEM(fast, 1));
-		double aspectRatio = PyLong_AsLong(PySequence_Fast_GET_ITEM(fast, 2));
+		ePyObject pas = PySequence_Fast_GET_ITEM(fast, 2);
+		double aspectRatio = PyFloat_Check(pas) ? PyFloat_AsDouble(pas) : PyLong_AsDouble(pas);
 		int as = PyLong_AsLong(PySequence_Fast_GET_ITEM(fast, 3));
 		bool useCache = PyLong_AsLong(PySequence_Fast_GET_ITEM(fast, 4));
 		int resizeType = PyLong_AsLong(PySequence_Fast_GET_ITEM(fast, 5));
