@@ -410,6 +410,17 @@ if test x"$with_libhiaccel" != xno ; then
 	AC_DEFINE(HAVE_HISILICON_ACCEL, 1,[define add HISILICON ACCEL])
 fi
 
+AC_ARG_WITH(osdanimation,
+	AC_HELP_STRING([--with-osdanimation], [use osd animation, yes or no]),
+	[[withosdanimation=$withval]],
+	[[withosdanimation=no]]
+)
+if test x"$withosdanimation" != xno ; then
+
+	AC_DEFINE(HAVE_OSDANIMATION, 1,[Define if driver supports animation of osd])
+fi
+AM_CONDITIONAL(HAVE_OSDANIMATION, test x"$withosdanimation" != xno)
+
 AC_ARG_WITH(debug,
 	AS_HELP_STRING([--without-debug],[disable debugging code]),
 	[with_debug="$withval"],[with_debug="yes"])
