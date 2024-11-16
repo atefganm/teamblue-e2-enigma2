@@ -614,8 +614,6 @@ def runScreenTest():
 
 	profile("configfile.save")
 	configfile.save()
-	from Screens import InfoBarGenerics
-	InfoBarGenerics.saveResumePoints()
 
 	return 0
 
