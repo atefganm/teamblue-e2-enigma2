@@ -607,7 +607,7 @@ int eDVBFrontend::openFrontend()
 			if (tmp_fd == 0)
 			{
 				::close(tmp_fd);
-				tmp_fd = -1;	
+				tmp_fd = -1;
 				fd0lock = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
 				/* eDebugNoSimulate("[eDVBFrontend] 0 opening null fd returned: %d", fd0lock); */
 			}

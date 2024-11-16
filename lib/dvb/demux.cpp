@@ -35,7 +35,6 @@ enum dmx_source {
 #define DMX_SET_SOURCE _IOW('o', 49, enum dmx_source)
 #endif
 
-
 //#define SHOW_WRITE_TIME
 static int determineBufferCount()
 {
@@ -87,7 +86,7 @@ int eDVBDemux::openDemux(void)
 	if (tmp_fd == 0)
 	{
 		::close(tmp_fd);
-		tmp_fd = -1;	
+		tmp_fd = -1;
 		fd0lock = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
 		/* eDebug("[eDVBDemux] opening null fd returned: %d", fd0lock); */
 	}
@@ -109,7 +108,7 @@ int eDVBDemux::openDVR(int flags)
 	if (tmp_fd == 0)
 	{
 		::close(tmp_fd);
-		tmp_fd = -1;	
+		tmp_fd = -1;
 		fd0lock = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
 		/* eDebug("[eDVBDemux] opening null fd returned: %d", fd0lock); */
 	}
@@ -833,7 +832,7 @@ RESULT eDVBTSRecorder::start()
 	if (tmp_fd == 0)
 	{
 		::close(tmp_fd);
-		tmp_fd = -1;	
+		tmp_fd = -1;
 		fd0lock = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
 		/* eDebug("[eDVBTSRecorder] opening null fd returned: %d", fd0lock); */
 	}
