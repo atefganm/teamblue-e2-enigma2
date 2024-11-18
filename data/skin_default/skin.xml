@@ -3283,20 +3283,25 @@ self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)//2, orgpos.y() + (o
 		<widget name="key_blue" position="420,0" size="140,40" backgroundColor="#18188b" font="Regular; 18" halign="center" valign="center" zPosition="1" transparent="1"/>
 		<widget name="config" position="10,50" size="640,250" itemHeight="25" font="Regular;18" scrollbarMode="showOnDemand" transparent="1"/>
 	</screen>
-	<!-- ZapHistoryBrowser -->
-	<screen name="ZapHistoryBrowser" position="center,center" size="560,455" title="ZapHistoryBrowser">
-		<ePixmap pixmap="buttons/red.png" position="0,0" size="140,40" alphatest="on"/>
-		<ePixmap pixmap="buttons/green.png" position="140,0" size="140,40" alphatest="on"/>
-		<ePixmap pixmap="buttons/yellow.png" position="280,0" size="140,40" alphatest="on"/>
-		<ePixmap pixmap="buttons/blue.png" position="420,0" size="140,40" alphatest="on"/>
-		<widget source="key_red" render="Label" position="0,0" size="140,40" backgroundColor="#9f1313" font="Regular; 18" halign="center" valign="center" zPosition="1" transparent="1"/>
-		<widget source="key_green" render="Label" position="140,0" size="140,40" backgroundColor="#1f771f" font="Regular; 18" halign="center" valign="center" zPosition="1" transparent="1"/>
-		<widget source="key_yellow" render="Label" position="280,0" size="140,40" backgroundColor="#a08500" font="Regular; 18" halign="center" valign="center" zPosition="1" transparent="1"/>
-		<widget source="key_blue" render="Label" position="420,0" size="140,40" backgroundColor="#18188b" font="Regular; 18" halign="center" valign="center" zPosition="1" transparent="1"/>
-		<widget name="list" position="10,50" size="540,400" itemHeight="50" scrollbarMode="showOnDemand" transparent="1"/>
-	</screen>
-	<screen name="ZapHistoryConfigurator" position="center,center" size="660,160" title="ZapHistoryConfigurator">
-		<widget name="config" position="10,5" size="640,150" itemHeight="25" font="Regular;18" scrollbarMode="showOnDemand" transparent="1"/>
+	<!-- History Zap Selector -->
+	<screen name="HistoryZapSelector" position="25,center" size="550,490" flags="wfNoBorder">
+		<eLabel text="History Zap..." position="center,0" size="550,50" halign="center" font="Regular; 35" backgroundColor="background" foregroundColor="foreground" transparent="1" />
+		<eLabel position="30,50" zPosition="0" size="490,1" backgroundColor="background" />
+		<eLabel position="9,0" zPosition="-2" size="532,490" backgroundColor="transpBlack" />
+		<widget source="menu" render="Listbox" position="0,60" size="550,420" scrollbarMode="showNever" backgroundColor="background" foregroundColor="foreground" foregroundColorSelected="yellow" transparent="1">
+			<convert type="TemplatedMultiContent">
+				{"template": [
+						MultiContentEntryText(pos = (128, 22), size = (10, 22), font = 1, flags = RT_HALIGN_CENTER | RT_VALIGN_CENTER, text = 1), # Current Service
+						MultiContentEntryText(pos = (150, 2), size = (370, 25), font = 1, flags = RT_HALIGN_LEFT | RT_VALIGN_TOP, text = 2), # Servicename
+						MultiContentEntryText(pos = (150, 24), size = (370, 22), font = 2, flags = RT_HALIGN_LEFT | RT_VALIGN_CENTER | RT_WRAP, text = 3), # Eventname
+						MultiContentEntryText(pos = (150, 46), size = (370, 21), font = 3, flags = RT_HALIGN_LEFT, text = 5), # Eventtime
+						MultiContentEntryPixmapAlphaBlend(pos=(30, 9), size=(85, 51), png=6, flags = BT_SCALE) # picon
+					],
+				 "fonts": [gFont("Regular",22), gFont("Regular",22), gFont("Regular",20), gFont("Regular",18)],
+				 "itemHeight": 70
+				}
+			</convert>
+		</widget>
 	</screen>
 	<!-- doFlashImage -->
 	<screen name="doFlashImage" position="center,center" size="560,455" title="doFlashImage">
