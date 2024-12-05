@@ -47,7 +47,7 @@ public:
 			return eServiceReferenceDVB(eDVBNamespace(NS), eTransportStreamID(TSID), eOriginalNetworkID(ONID), eServiceID(SID), 0);
 		else
 			return eServiceReferenceDVB();
-		
+
 	}
 
 	void Update(uint16_t lcn, uint32_t signal)
