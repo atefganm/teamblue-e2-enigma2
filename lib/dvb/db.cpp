@@ -1166,7 +1166,7 @@ void eDVBDB::saveIptvServicelist()
 {
 	std::ofstream outputFile("/etc/enigma2/config_av");
 	for(std::vector<eIPTVDBItem>::iterator it = iptv_services.begin(); it != iptv_services.end(); ++it) {
-		std::string line = it->s_ref + "|" 
+		std::string line = it->s_ref + "|"
 				+ std::to_string(it->v_pid) + "|"
 				+ std::to_string(it->ampeg_pid) + "|"
 				+ std::to_string(it->aac3_pid) + "|"
@@ -2221,7 +2221,7 @@ PyObject *eDVBDB::getLcnDBData()
 			PyList_Append(dest, tuple);
 			Py_DECREF(tuple);
 		}
-	} 
+	}
 	else
 		Py_RETURN_NONE;
 	return dest;
@@ -2548,7 +2548,7 @@ RESULT eDVBDB::addOrUpdateBouquet(const std::string &name, const std::string &fi
 	res->getChannelList(db);
 	std::string bouquetquery = "FROM BOUQUET \"" + filename + "\" ORDER BY bouquet";
 	eServiceReference bouquetref(eServiceReference::idDVB, eServiceReference::flagDirectory, bouquetquery);
-	bouquetref.setData(0, type); 
+	bouquetref.setData(0, type);
 	eBouquet *bouquet = NULL;
 	eServiceReference rootref(eServiceReference::idDVB, eServiceReference::flagDirectory, "FROM BOUQUET \"bouquets" + ext + "\" ORDER BY bouquet");
 	if (!db->getBouquet(bouquetref, bouquet) && bouquet)
@@ -2620,11 +2620,11 @@ RESULT eDVBDB::appendServicesToBouquet(const std::string &filename, ePyObject se
 	res->getChannelList(db);
 	std::string bouquetquery = "FROM BOUQUET \"" + filename + "\" ORDER BY bouquet";
 	eServiceReference bouquetref(eServiceReference::idDVB, eServiceReference::flagDirectory, bouquetquery);
-	bouquetref.setData(0, type); 
+	bouquetref.setData(0, type);
 	eBouquet *bouquet = NULL;
 	if (!db->getBouquet(bouquetref, bouquet) && bouquet)
 	{
-		
+
 		if (!PyList_Check(services)) {
 			const char *errstr = "eDVBDB::appendServicesToBouquet second parameter is not a python list!!!";
 			PyErr_SetString(PyExc_TypeError, errstr);
@@ -2658,7 +2658,7 @@ RESULT eDVBDB::appendServicesToBouquet(const std::string &filename, ePyObject se
 	}
 	else
 		return -1;
-	
+
 	return 0;
 }
 
@@ -2674,21 +2674,6 @@ RESULT eDVBDB::removeBouquet(const std::string &filename_regex)
 	ePtr<eDVBResourceManager> res;
 	eDVBResourceManager::getInstance(res);
 	res->getChannelList(db);
-	std::string bouquetquery = "FROM BOUQUET \"" + filename + "\" ORDER BY bouquet";
-	eServiceReference bouquetref(eServiceReference::idDVB, eServiceReference::flagDirectory, bouquetquery);
-	bouquetref.setData(0, type); 
-	eBouquet *bouquet = NULL;
-	eServiceReference rootref(eServiceReference::idDVB, eServiceReference::flagDirectory, "FROM BOUQUET \"bouquets" + ext + "\" ORDER BY bouquet");
-	if (!db->getBouquet(bouquetref, bouquet) && bouquet)
-	{
-		if (!db->getBouquet(rootref, bouquet) && bouquet)
-		{
-			bouquet->m_services.remove(bouquetref);
-			bouquet->flushChanges();
-			deleteBouquet(filename);
-		}
-	}
-	else
 	std::string p = eEnv::resolve("${sysconfdir}/enigma2/");
 	DIR *dir = opendir(p.c_str());
 	if (!dir)
@@ -2764,7 +2749,7 @@ RESULT eDVBDB::addChannelToDB(const eServiceReference &service, const eDVBFronte
 					int cPid = PyLong_AsLong(cachedPidValObj);
 					s->setCacheEntry((eDVBService::cacheID)cID, cPid);
 				}
-			} 
+			}
 		}
 	}
 	CAID_LIST m_ca;
