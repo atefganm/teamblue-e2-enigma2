@@ -9,9 +9,11 @@ from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_O
 from Components.ServiceList import refreshServiceList, redrawServiceList
 from Components.SystemInfo import SystemInfo, BoxInfo
 from os.path import exists, isfile, join as pathjoin, normpath
-
 import os
 import time
+from boxbranding import getDisplayType
+
+displaytype = getDisplayType()
 
 
 originalAudioTracks = "orj dos ory org esl qaa qaf und qae mis mul ORY ORJ Audio_ORJ oth"
