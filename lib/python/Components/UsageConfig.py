@@ -184,6 +184,12 @@ def InitUsageConfig():
 		("intermediate", _("Intermediate")),
 		("expert", _("Expert"))])
 
+	config.usage.help_sortorder = ConfigSelection(default="headings+alphabetic", choices=[
+		("headings+alphabetic", _("Alphabetical under headings")),
+		("flat+alphabetic", _("Flat alphabetical")),
+		("flat+remotepos", _("Flat by position on remote")),
+		("flat+remotegroups", _("Flat by key group on remote"))])
+
 	config.usage.startup_to_standby = ConfigSelection(default="no", choices=[
 		("no", _("no")),
 		("yes", _("yes")),
@@ -363,6 +369,14 @@ def InitUsageConfig():
 	config.usage.show_channel_numbers_in_servicelist.addNotifier(redrawServiceList, initial_call=False)
 
 	config.usage.blinking_display_clock_during_recording = ConfigYesNo(default=False)
+
+	if displaytype == "textlcd" or "text" in displaytype:
+		config.usage.blinking_rec_symbol_during_recording = ConfigSelection(default="Channel", choices=[
+			("Rec", _("REC symbol")),
+			("RecBlink", _("Blinking REC symbol")),
+			("Channel", _("Channel name"))
+		])
+	config.usage.blinking_rec_symbol_during_recording = ConfigYesNo(default=True)
 
 	config.usage.show_message_when_recording_starts = ConfigYesNo(default=True)
 
