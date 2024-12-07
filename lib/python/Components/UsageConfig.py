@@ -2,16 +2,20 @@ from Components.Harddisk import harddiskmanager
 from Components.config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber, ConfigClock, ConfigSlider, ConfigEnableDisable, ConfigSubDict, ConfigDictionarySet, ConfigInteger, ConfigPassword, ConfigBoolean, ConfigIP
 from Components.Console import Console
 from Tools.Directories import defaultRecordingLocation
+from Tools.HardwareInfo import HardwareInfo
 from enigma import setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff, eEnv, eDVBDB, Misc_Options, eBackgroundFileEraser, eServiceEvent, eDVBLocalTimeHandler, eEPGCache
 from Components.About import GetIPsFromNetworkInterfaces
 from Components.NimManager import nimmanager
 from Components.Renderer.FrontpanelLed import ledPatterns, PATTERN_ON, PATTERN_OFF, PATTERN_BLINK
 from Components.ServiceList import refreshServiceList, redrawServiceList
 from Components.SystemInfo import SystemInfo, BoxInfo
+from Components.AVSwitch import iAVSwitch
+from os import makedirs
 from os.path import exists, isfile, join as pathjoin, normpath
 import os
 import time
-from boxbranding import getDisplayType
+import os, time, locale, skin
+from boxbranding import getBrandOEM, getDisplayType
 
 displaytype = getDisplayType()
 
@@ -483,13 +487,15 @@ def InitUsageConfig():
 
 	if BoxInfo.getItem("PowerOffDisplay"):
 		def powerOffDisplayChanged(configElement):
-			open(BoxInfo.getItem("PowerOffDisplay"), "w").write(configElement.value and "1" or "0")
+			with open(BoxInfo.getItem("PowerOffDisplay"), "w") as fd:
+				fd.write(configElement.value and "1" or "0")
 		config.usage.powerOffDisplay = ConfigYesNo(default=True)
 		config.usage.powerOffDisplay.addNotifier(powerOffDisplayChanged)
 
 	if BoxInfo.getItem("LCDshow_symbols"):
 		def lcdShowSymbols(configElement):
-			open(BoxInfo.getItem("LCDshow_symbols"), "w").write(configElement.value and "1" or "0")
+			with open(BoxInfo.getItem("LCDshow_symbols"), "w") as fd:
+				fd.write(configElement.value and "1" or "0")
 		config.usage.lcd_show_symbols = ConfigYesNo(default=True)
 		config.usage.lcd_show_symbols.addNotifier(lcdShowSymbols)
 
@@ -508,20 +514,22 @@ def InitUsageConfig():
 
 	if BoxInfo.getItem("hasXcoreVFD"):
 		def set12to8characterVFD(configElement):
-			open(BoxInfo.getItem("hasXcoreVFD"), "w").write(not configElement.value and "1" or "0")
+			with open(BoxInfo.getItem("hasXcoreVFD"), "w") as fd:
+				fd.write(not configElement.value and "1" or "0")
 		config.usage.toggle12to8characterVFD = ConfigYesNo(default=False)
 		config.usage.toggle12to8characterVFD.addNotifier(set12to8characterVFD)
 
 	if BoxInfo.getItem("LcdLiveTVMode"):
 		def setLcdLiveTVMode(configElement):
-			open(BoxInfo.getItem("LcdLiveTVMode"), "w").write(configElement.value)
+			with open(BoxInfo.getItem("LcdLiveTVMode"), "w") as fd:
+				fd.write(configElement.value)
 		config.usage.LcdLiveTVMode = ConfigSelection(default="0", choices=[str(x) for x in range(0, 9)])
 		config.usage.LcdLiveTVMode.addNotifier(setLcdLiveTVMode)
 
-	config.usage.multiboot_order = ConfigYesNo(default=True)
 	if BoxInfo.getItem("LcdLiveDecoder"):
 		def setLcdLiveDecoder(configElement):
-			open(BoxInfo.getItem("LcdLiveDecoder"), "w").write(configElement.value)
+			with open(BoxInfo.getItem("LcdLiveDecoder"), "w") as fd:
+				fd.write(configElement.value)
 		config.usage.LcdLiveDecoder = ConfigSelection(default="0", choices=[str(x) for x in range(0, 4)])
 		config.usage.LcdLiveDecoder.addNotifier(setLcdLiveDecoder)
 
@@ -743,100 +751,113 @@ def InitUsageConfig():
 
 	if BoxInfo.getItem("VFD_scroll_repeats"):
 		def scroll_repeats(el):
-			open(BoxInfo.getItem("VFD_scroll_repeats"), "w").write(el.value)
+			with open(BoxInfo.getItem("VFD_scroll_repeats"), "w") as fd:
+				fd.write(el.value)
 		choicelist = []
-		for i in list(range(1, 11, 1)):
+		for i in range(1, 11, 1):
 			choicelist.append((str(i)))
 		config.usage.vfd_scroll_repeats = ConfigSelection(default="3", choices=choicelist)
 		config.usage.vfd_scroll_repeats.addNotifier(scroll_repeats, immediate_feedback=False)
 
 	if BoxInfo.getItem("VFD_scroll_delay"):
 		def scroll_delay(el):
-			open(BoxInfo.getItem("VFD_scroll_delay"), "w").write(el.value)
+			with open(BoxInfo.getItem("VFD_scroll_delay"), "w") as fd:
+				fd.write(el.value)
 		choicelist = []
-		for i in list(range(0, 1001, 50)):
+		for i in range(0, 1001, 50):
 			choicelist.append((str(i)))
 		config.usage.vfd_scroll_delay = ConfigSelection(default="150", choices=choicelist)
 		config.usage.vfd_scroll_delay.addNotifier(scroll_delay, immediate_feedback=False)
 
 	if BoxInfo.getItem("VFD_initial_scroll_delay"):
 		def initial_scroll_delay(el):
-			open(BoxInfo.getItem("VFD_initial_scroll_delay"), "w").write(el.value)
+			with open(BoxInfo.getItem("VFD_initial_scroll_delay"), "w") as fd:
+				fd.write(el.value)
 		choicelist = []
-		for i in list(range(0, 20001, 500)):
+		for i in range(0, 20001, 500):
 			choicelist.append((str(i)))
 		config.usage.vfd_initial_scroll_delay = ConfigSelection(default="1000", choices=choicelist)
 		config.usage.vfd_initial_scroll_delay.addNotifier(initial_scroll_delay, immediate_feedback=False)
 
 	if BoxInfo.getItem("VFD_final_scroll_delay"):
 		def final_scroll_delay(el):
-			open(BoxInfo.getItem("VFD_final_scroll_delay"), "w").write(el.value)
+			with open(BoxInfo.getItem("VFD_final_scroll_delay"), "w") as fd:
+				fd.write(el.value)
 		choicelist = []
-		for i in list(range(0, 20001, 500)):
+		for i in range(0, 20001, 500):
 			choicelist.append((str(i)))
 		config.usage.vfd_final_scroll_delay = ConfigSelection(default="1000", choices=choicelist)
 		config.usage.vfd_final_scroll_delay.addNotifier(final_scroll_delay, immediate_feedback=False)
 
 	if BoxInfo.getItem("HasBypassEdidChecking"):
 		def setHasBypassEdidChecking(configElement):
-			open(BoxInfo.getItem("HasBypassEdidChecking"), "w").write("00000001" if configElement.value else "00000000")
+			with open(BoxInfo.getItem("HasBypassEdidChecking"), "w") as fd:
+				fd.write("00000001" if configElement.value else "00000000")
 		config.av.bypassEdidChecking = ConfigYesNo(default=False)
 		config.av.bypassEdidChecking.addNotifier(setHasBypassEdidChecking)
 
 	if BoxInfo.getItem("HasColorspace"):
 		def setHaveColorspace(configElement):
-			open(BoxInfo.getItem("HasColorspace"), "w").write(configElement.value)
+			with open(BoxInfo.getItem("HasColorspace"), "w") as fd:
+				fd.write(configElement.value)
 		if BoxInfo.getItem("HasColorspaceSimple"):
 			config.av.hdmicolorspace = ConfigSelection(default="Edid(Auto)", choices={"Edid(Auto)": _("auto"), "Hdmi_Rgb": "RGB", "444": "YCbCr 4:4:4", "422": "YCbCr 4:2:2", "420": "YCbCr 4:2:0"})
 		else:
-			# config.av.hdmicolorspace = ConfigSelection(default="auto", choices={"auto": _("auto"), "rgb": "RGB", "420": "4:2:0", "422": "4:2:2", "444": "4:4:4"})
-			config.av.hdmicolorspace = ConfigSelection(default="Edid(Auto)", choices={"Edid(Auto)": _("Auto"), "Hdmi_Rgb": _("RGB"), "Itu_R_BT_709": _("Itu_R_BT_709"), "Unknown": _("Unknown")})
+			config.av.hdmicolorspace = ConfigSelection(default="auto", choices={"auto": _("auto"), "rgb": "RGB", "420": "4:2:0", "422": "4:2:2", "444": "4:4:4"})
 		config.av.hdmicolorspace.addNotifier(setHaveColorspace)
 
 	if BoxInfo.getItem("HasColordepth"):
 		def setHaveColordepth(configElement):
-			open(BoxInfo.getItem("HasColordepth"), "w").write(configElement.value)
+			with open(BoxInfo.getItem("HasColordepth"), "w") as fd:
+				fd.write(configElement.value)
 		config.av.hdmicolordepth = ConfigSelection(default="auto", choices={"auto": _("auto"), "8bit": "8bit", "10bit": "10bit", "12bit": "12bit"})
 		config.av.hdmicolordepth.addNotifier(setHaveColordepth)
 
 	if BoxInfo.getItem("HasHDMIpreemphasis"):
 		def setHDMIpreemphasis(configElement):
-			open(BoxInfo.getItem("HasHDMIpreemphasis"), "w").write("on" if configElement.value else "off")
+			with open(BoxInfo.getItem("HasHDMIpreemphasis"), "w") as fd:
+				fd.write("on" if configElement.value else "off")
 		config.av.hdmipreemphasis = ConfigYesNo(default=False)
 		config.av.hdmipreemphasis.addNotifier(setHDMIpreemphasis)
 
 	if BoxInfo.getItem("HasColorimetry"):
 		def setColorimetry(configElement):
-			open(BoxInfo.getItem("HasColorimetry"), "w").write(configElement.value)
+			with open(BoxInfo.getItem("HasColorimetry"), "w") as fd:
+				fd.write(configElement.value)
 		config.av.hdmicolorimetry = ConfigSelection(default="auto", choices=[("auto", _("auto")), ("bt2020ncl", "BT 2020 NCL"), ("bt2020cl", "BT 2020 CL"), ("bt709", "BT 709")])
 		config.av.hdmicolorimetry.addNotifier(setColorimetry)
 
 	if BoxInfo.getItem("HasHdrType"):
 		def setHdmiHdrType(configElement):
-			open(BoxInfo.getItem("HasHdrType"), "w").write(configElement.value)
+			with open(BoxInfo.getItem("HasHdrType"), "w") as fd:
+				fd.write(configElement.value)
 		config.av.hdmihdrtype = ConfigSelection(default="auto", choices={"auto": _("auto"), "none": "SDR", "hdr10": "HDR10", "hlg": "HLG", "dolby": "Dolby Vision"})
 		config.av.hdmihdrtype.addNotifier(setHdmiHdrType)
 
 	if BoxInfo.getItem("HDRSupport"):
 		def setHlgSupport(configElement):
-			open("/proc/stb/hdmi/hlg_support", "w").write(configElement.value)
+			with open("/proc/stb/hdmi/hlg_support", "w") as fd:
+				fd.write(configElement.value)
 		config.av.hlg_support = ConfigSelection(default="auto(EDID)",
 			choices=[("auto(EDID)", _("controlled by HDMI")), ("yes", _("force enabled")), ("no", _("force disabled"))])
 		config.av.hlg_support.addNotifier(setHlgSupport)
 
 		def setHdr10Support(configElement):
-			open("/proc/stb/hdmi/hdr10_support", "w").write(configElement.value)
+			with open("/proc/stb/hdmi/hdr10_support", "w") as fd:
+				fd.write(configElement.value)
 		config.av.hdr10_support = ConfigSelection(default="auto(EDID)",
 			choices=[("auto(EDID)", _("controlled by HDMI")), ("yes", _("force enabled")), ("no", _("force disabled"))])
 		config.av.hdr10_support.addNotifier(setHdr10Support)
 
 		def setDisable12Bit(configElement):
-			open("/proc/stb/video/disable_12bit", "w").write("on" if configElement.value else "off")
+			with open("/proc/stb/video/disable_12bit", "w") as fd:
+				fd.write("on" if configElement.value else "off")
 		config.av.allow_12bit = ConfigYesNo(default=False)
 		config.av.allow_12bit.addNotifier(setDisable12Bit)
 
 		def setDisable10Bit(configElement):
-			open("/proc/stb/video/disable_10bit", "w").write("on" if configElement.value else "off")
+			with open("/proc/stb/video/disable_10bit", "w") as fd:
+				fd.write("on" if configElement.value else "off")
 		config.av.allow_10bit = ConfigYesNo(default=False)
 		config.av.allow_10bit.addNotifier(setDisable10Bit)
 
