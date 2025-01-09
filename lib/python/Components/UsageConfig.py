@@ -115,7 +115,7 @@ def InitUsageConfig():
 	config.usage.show_infobar_on_zap = ConfigYesNo(default=True)
 	config.usage.show_infobar_on_skip = ConfigYesNo(default=True)
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default=False)
-	config.usage.show_second_infobar = ConfigSelection(default="0", choices=[("", _("None"))] + choicelist + [("EPG", _("EPG"))])
+	config.usage.show_second_infobar = ConfigSelection(default="0", choices=[("no", _("None"))] + choicelist + [("EPG", _("EPG"))])
 	config.usage.show_simple_second_infobar = ConfigYesNo(default=False)
 	config.usage.show_infobar_adds = ConfigYesNo(default=False)
 	config.usage.infobar_frontend_source = ConfigSelection(default="settings", choices=[("settings", _("Settings")), ("tuner", _("Tuner"))])
@@ -540,7 +540,7 @@ def InitUsageConfig():
 	config.usage.multiboot_order = ConfigYesNo(default=True)
 
 	config.usage.setupShowDefault = ConfigSelection(default="spaces", choices=[
-		("", _("Don't show default")),
+		("no", _("Don't show default")),
 		("spaces", _("Show default after description")),
 		("newline", _("Show default on new line"))
 	])
