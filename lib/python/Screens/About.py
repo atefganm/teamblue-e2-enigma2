@@ -326,9 +326,13 @@ class CommitInfo(Screen):
 
 		self["key_red"] = Button(_("Cancel"))
 
-		# get the branch to display from the Enigma version
+		# get the branch to display from the boxinfo image type and version
 		try:
-			branch = "?sha=" + about.getEnigmaVersionString().split("(")[1].split(")")[0].lower()
+			# develop-type images have no version but a revision number
+			if BoxInfo.getItem('imagetype') == "rev":
+				branch = "?sha=" + BoxInfo.getItem('imageversion')
+			else:
+				branch = "?sha=%s-%s" % (BoxInfo.getItem('imagetype'),BoxInfo.getItem('imageversion'))
 		except:
 			branch = ""
 		branch_e2plugins = "?sha=python3"

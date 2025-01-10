@@ -327,7 +327,7 @@ class PluginDownloadBrowser(Screen):
 		self.container.appClosed.append(self.runFinished)
 		self.container.dataAvail.append(self.dataAvail)
 		self.onLayoutFinish.append(self.startRun)
-		self.onShown.append(self.setWindowTitle)
+		self.setTitle(_("Downloadable new plugins") if self.type == self.DOWNLOAD else _("Remove plugins"))
 		self.list = []
 		self["list"] = PluginList(self.list)
 		self.pluginlist = []
@@ -340,7 +340,9 @@ class PluginDownloadBrowser(Screen):
 		self.install_settings_name = ''
 		self.remove_settings_name = ''
 		self["text"] = Label(_("Downloading plugin information. Please wait...") if self.type == self.DOWNLOAD else _("Getting plugin information. Please wait..."))
-		self["key_red" if self.type == self.DOWNLOAD else "key_green"] = Label(_("Remove plugins") if self.type == self.DOWNLOAD else _("Download plugins"))
+		self["key_red"] = Label(_("Cancel"))
+		self["key_green"] = Label(_("Expand"))
+		self["key_blue"] = Label(_("Remove plugins") if self.type == self.DOWNLOAD else _("Download plugins"))
 		self.run = 0
 		self.remainingdata = ""
 		self["actions"] = ActionMap(["WizardActions"],
@@ -348,7 +350,11 @@ class PluginDownloadBrowser(Screen):
 			"ok": self.go,
 			"back": self.requestClose,
 		})
-		self["PluginDownloadActions"] = ActionMap(["ColorActions"],	{"red": self.delete} if self.type == self.DOWNLOAD else {"green": self.download})
+		self["PluginDownloadActions"] = ActionMap(["ColorActions"], {
+			"blue": self.delete if self.type == self.DOWNLOAD else self.download,
+			"red": self.requestClose,
+			"green": self.go}
+		)
 		if os.path.isfile('/usr/bin/opkg'):
 			self.opkg = '/usr/bin/opkg'
 			self.opkg_install = self.opkg + ' install --force-overwrite'
@@ -358,68 +364,32 @@ class PluginDownloadBrowser(Screen):
 			self.opkg = 'opkg'
 			self.opkg_install = 'opkg install --force-overwrite -force-defaults'
 			self.opkg_remove = self.opkg + ' remove'
-			self.opkg_toogle = self.opkg + ' flag hold'
+		self["list"].onSelectionChanged.append(self.selectionChanged)
 
-	def createPluginFilter(self):
-		#Create Plugin Filter
-		self.PLUGIN_PREFIX2 = []
-		if config.pluginfilter.drivers.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'drivers')
-		if config.pluginfilter.extensions.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'extensions')
-		if config.pluginfilter.e2_locales.getValue():
-			self.PLUGIN_PREFIX2.append('enigma2-locale-')
-		if config.pluginfilter.picons.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'picons')
-		if config.pluginfilter.pli.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'pli')
-		if config.pluginfilter.security.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'security')
-		if config.pluginfilter.settings.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'settings')
-		if config.pluginfilter.skins.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'skins')
-		if config.pluginfilter.skincomponents.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'skincomponents')
-		if config.pluginfilter.skinpacks.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'skinpacks')
-		if config.pluginfilter.softcams.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'softcams')
-		if config.pluginfilter.systemplugins.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'systemplugins')
-		if config.pluginfilter.dvb.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'dvb')
-		if config.pluginfilter.codec.getValue():
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'codec')
-		if config.pluginfilter.kernel.getValue():
-			self.PLUGIN_PREFIX2.append('kernel-module-')
+	def selectionChanged(self):
+		selection = self["list"].l.getCurrentSelection()
+		if selection:
+			selection = selection[0]
+			if isinstance(selection, str): # category
+				self["key_green"].text = _("Collapse") if selection in self.expanded else _("Expand")
+			else:
+				self["key_green"].text = _("Install plugin") if self.type == self.DOWNLOAD else _("Remove plugin")
 
 	def go(self):
-		sel = self["list"].l.getCurrentSelection()
-
-		if sel is None:
-			return
-
-		sel = sel[0]
-		if isinstance(sel, str): # category
-			if sel in self.expanded:
-				self.expanded.remove(sel)
-			else:
-				self.expanded.append(sel)
-			self.updateList()
-		else:
-			if self.type == self.DOWNLOAD:
-				mbox = self.session.openWithCallback(self.runInstall, MessageBox, _("Do you really want to download the plugin \"%s\"?") % sel.name)
-				mbox.setTitle(_("Download plugins"))
-			elif self.type == self.REMOVE:
-				mbox = self.session.openWithCallback(self.runInstall, MessageBox, _("Do you really want to remove the plugin \"%s\"?") % sel.name, default=False)
-				mbox.setTitle(_("Remove plugins"))
-			elif self.type == self.TOOGLE:
-				if 'hold' in os.popen("opkg status " + Opkg.opkgExtraDestinations() + " " + self.PLUGIN_PREFIX + sel.name).read():
-					mbox = self.session.openWithCallback(self.runInstall, MessageBox, _("Do you really want to unhold the plugin \"%s\"?") % sel.name, default=False)
+		selection = self["list"].l.getCurrentSelection()
+		if selection:
+			selection = selection[0]
+			if isinstance(selection, str): # category
+				if selection in self.expanded:
+					self.expanded.remove(selection)
 				else:
-					mbox = self.session.openWithCallback(self.runInstall, MessageBox, _("Do you really want to hold the plugin \"%s\"?") % sel.name, default=False)
-				mbox.setTitle(_("Hold plugins"))
+					self.expanded.append(selection)
+				self.updateList()
+			else:
+				if self.type == self.DOWNLOAD:
+					self.session.openWithCallback(self.runInstall, MessageBox, _("Do you really want to download\nthe plugin \"%s\"?") % selection.name)
+				elif self.type == self.REMOVE:
+					self.session.openWithCallback(self.runInstall, MessageBox, _("Do you really want to remove\nthe plugin \"%s\"?") % selection.name)
 
 	def delete(self):
 		self.requestClose(1)
