@@ -257,8 +257,11 @@ ASCIItranslit = {
 
 
 def legacyEncode(string):
+	if isinstance(string, bytes):
+		string = string.decode("utf-8")
 	string2 = ""
 	for z, char in enumerate(string):
+		# print ("[legacyEncode] %d - %d" % (z, ord(char)))
 		i = ord(char)
 		if i < 33:
 			string2 += "_"
@@ -266,8 +269,7 @@ def legacyEncode(string):
 			string2 += ASCIItranslit[i]
 		else:
 			try:
-				string2 += char.encode('ascii', 'strict')
+				string2 += char.encode('ascii', 'strict').decode('utf8')
 			except:
 				string2 += "_"
-	string2 = string2.decode("utf-8")
 	return string2.upper()
