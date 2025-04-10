@@ -140,6 +140,9 @@ class ResumePoints():
 
 resumePointsInstance = ResumePoints()
 
+def setResumePoint(session):
+	resumePointsInstance.setResumePoint(session)
+
 
 class whitelist:
 	FILENAME_VBI = "/etc/enigma2/whitelist_vbi"
