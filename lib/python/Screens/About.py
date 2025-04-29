@@ -870,7 +870,7 @@ class Troubleshoot(Screen):
 
 	def dataAvail(self, data):
 		data = six.ensure_str(data)
-		self["AboutScrollLabel"].appendText(data)
+		self["AboutScrollLabel"].appendText(data.decode())
 
 	def run_console(self):
 		self["AboutScrollLabel"].setText("")
