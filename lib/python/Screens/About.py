@@ -24,7 +24,6 @@ from boxbranding import getBoxType, getMachineBuild, getImageVersion, getImageTy
 boxtype = getBoxType()
 
 from enigma import eTimer, eLabel, eConsoleAppContainer, getDesktop
-import six
 
 from Components.GUIComponent import GUIComponent
 from skin import applySkinFactor, parameters, parseScale
@@ -790,7 +789,6 @@ class SystemNetworkInfo(Screen):
 			iNetwork.getLinkState(self.iface, self.dataAvail)
 
 	def dataAvail(self, data):
-		data = six.ensure_str(data)
 		self.LinkState = None
 		for line in data.splitlines():
 			line = line.strip()
@@ -869,7 +867,6 @@ class Troubleshoot(Screen):
 			self["AboutScrollLabel"].setText(_("Some error occurred - Please try later"))
 
 	def dataAvail(self, data):
-		data = six.ensure_str(data)
 		self["AboutScrollLabel"].appendText(data.decode())
 
 	def run_console(self):
