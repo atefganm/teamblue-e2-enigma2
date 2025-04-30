@@ -496,6 +496,18 @@ if test x"$with_lcddev" != xno ; then
 	AC_DEFINE_UNQUOTED(LCD_DEV, "$withval", [Defines which device to use for lcd (e.g. /dev/fb1)])
 fi
 
+AC_ARG_WITH(alphablendingacceleration,
+	AC_HELP_STRING([--with-alphablendingacceleration=never/always/auto], [alphablending acceleration strategy: never accelerate / always accelerate / automatically decide when to accelerate (default)]),
+	[[with_alphablendingacceleration=$withval]],
+	[[with_alphablendingacceleration=auto]]
+)
+
+if test x"$with_alphablendingacceleration" = xnever ; then
+	AC_DEFINE_UNQUOTED(FORCE_NO_BLENDING_ACCELERATION, 1, [Do not attempt to accelerate alphablending blits])
+elif test x"$with_alphablendingacceleration" = xalways ; then
+	AC_DEFINE_UNQUOTED(FORCE_ALPHABLENDING_ACCELERATION, 1, [Accelerate alphablending blits])
+fi
+
 AC_ARG_WITH(accelerationthreshold,
 	AC_HELP_STRING([--with-accelerationthreshold=n], [use acceleration threshold of n bytes]),
 	[[with_accelerationthreshold=$withval]],
@@ -520,18 +532,6 @@ AC_ARG_WITH(blitaccelerationthreshold,
 
 AC_DEFINE_UNQUOTED(GFX_SURFACE_BLIT_ACCELERATION_THRESHOLD, $with_blitaccelerationthreshold,[Configure threshold for accelerated blit operations (in bytes)])
 
-AC_ARG_WITH(alphablendingacceleration,
-	AC_HELP_STRING([--with-alphablendingacceleration=never/always/auto], [alphablending acceleration strategy: never accelerate / always accelerate / automatically decide when to accelerate (default)]),
-	[[with_alphablendingacceleration=$withval]],
-	[[with_alphablendingacceleration=auto]]
-)
-
-if test x"$with_alphablendingacceleration" = xnever ; then
-	AC_DEFINE_UNQUOTED(FORCE_NO_BLENDING_ACCELERATION, 1, [Do not attempt to accelerate alphablending blits])
-elif test x"$with_alphablendingacceleration" = xalways ; then
-	AC_DEFINE_UNQUOTED(FORCE_ALPHABLENDING_ACCELERATION, 1, [Accelerate alphablending blits])
-fi
-
 AC_ARG_WITH(accelerationaccumulation,
 	AC_HELP_STRING([--with-accelerationaccumulation], [accumulate blit/fill acceleration operations]),
 	[[with_accelerationaccumulation=$withval]],
@@ -552,20 +552,10 @@ AC_CHECK_LIB([rt], [clock_gettime], [BASE_LIBS+=" -lrt"], [AC_MSG_ERROR([Could n
 ENIGMA2_CFLAGS="-fno-rtti -fno-exceptions -rdynamic -funwind-tables"
 AC_SUBST(ENIGMA2_CFLAGS)
 
-AX_CXX_COMPILE_STDCXX([17], [ext], [mandatory])
+AX_CXX_COMPILE_STDCXX_17([ext],[mandatory])
+
 AX_CHECK_COMPILE_FLAG([-Wattribute-alias], [CXXFLAGS="$CXXFLAGS -Wattribute-alias"])
 AX_CHECK_COMPILE_FLAG([-Wattribute-alias=1], [CXXFLAGS="$CXXFLAGS -Wattribute-alias=1"])
-
-if test "$PYTHON_VERSION"; then
-    case $PYTHON_VERSION in
-	2.*)
-	  PY_VERSION_CFLAGS="-Werror -Wno-error=cast-align=strict -Wno-error=cast-function-type -Wno-error=cast-function-type -Wno-error=stringop-truncation"
-	;;
-	3.*)
-	  PY_VERSION_CFLAGS="-Wno-error=unsafe-loop-optimizations"
-	;;
-    esac
-fi
 
 CPPFLAGS="$CPPFLAGS $PYTHON_CPPFLAGS"
 CFLAGS="$CFLAGS -Wall"
@@ -577,9 +567,9 @@ CXXFLAGS="$CXXFLAGS -Wall -Wextra \
 	-Wstringop-overflow=3 -Woverlength-strings \
 	-Wunsafe-loop-optimizations -Wpointer-arith \
 	-Wfloat-equal -Wlogical-op \
-	$PY_VERSION_CFLAGS \
-	-Wno-error=ignored-qualifiers \
-	-Wno-error=shadow -Wno-error=cast-qual \
+	-Wno-error=cast-align=strict -Wno-error=ignored-qualifiers \
+	-Wno-error=cast-function-type -Wno-error=deprecated-declarations \
+	-Wno-error=stringop-truncation -Wno-error=shadow -Wno-error=cast-qual \
 	-Wno-error=aggregate-return -Wno-error=missing-field-initializers \
 	-Wno-error=packed -Wno-error=vla -Wno-error=clobbered -Wno-error=unused-parameter \
 	$BASE_CFLAGS $ENIGMA2_CFLAGS $PTHREAD_CFLAGS $OPENMP_CFLAGS $ALSA_CFLAGS"
