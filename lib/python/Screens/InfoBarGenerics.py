@@ -138,6 +138,7 @@ class ResumePoints():
 			entry[0] = int(time())  # update LRU timestamp
 			return entry[1]
 
+
 resumePointsInstance = ResumePoints()
 
 def setResumePoint(session):
@@ -273,10 +274,11 @@ def getActiveSubservicesForCurrentChannel(service):
 	if not activeSubservices:
 		subservices = service and service.subServices()
 		if subservices:
-			for idx in range(0, subservices.getNumberOfSubservices()):
+			for idx in list(range(0, subservices.getNumberOfSubservices())):
 				subservice = subservices.getSubservice(idx)
 				activeSubservices.append((subservice.getName(), subservice.toString()))
 	return activeSubservices
+
 
 def hasActiveSubservicesForCurrentChannel(service):
 	activeSubservices = getActiveSubservicesForCurrentChannel(service)
