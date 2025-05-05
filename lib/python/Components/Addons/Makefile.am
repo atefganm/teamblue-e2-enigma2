@@ -8,4 +8,4 @@ install_PYTHON = \
 	ColorButtonsSequence.py \
 	ScreenHeader.py \
 	ServiceInfoBar.py \
-	ScreenButtonsBar
+	ScreenButtonsBar.py
