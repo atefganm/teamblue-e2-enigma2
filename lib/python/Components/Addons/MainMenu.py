@@ -78,9 +78,6 @@ class MainMenu(GUIAddon):
 	def selectionChanged(self):
 		if self.instance and hasattr(self, "source"):
 			self.source.setConnectedGuiElement(self)
-	def setFont(self, value):
-		self.font = parseFont(value, ((1, 1), (1, 1)))
-		self.l.setFont(0, self.font)
 
 	def setMinWidth(self, value):
 		self.minWidth = parseScale(value)
