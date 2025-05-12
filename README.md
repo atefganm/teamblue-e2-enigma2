@@ -4,7 +4,7 @@
 
 ## teamBlue 7.5 (based on openPLi) is build using oe-alliance build-environment "7.5" and several git repositories: ##
 
-> [https://github.com/oe-alliance/oe-alliance-core/tree/5.3](https://github.com/oe-alliance/oe-alliance-core/tree/5.4 "OE-Alliance")
+> [https://github.com/oe-alliance/oe-alliance-core/tree/5.4](https://github.com/oe-alliance/oe-alliance-core/tree/5.4 "OE-Alliance")
 >
 > [https://github.com/teamblue-e2/enigma2/tree/7.5](https://github.com/atefganm/teamblue-e2-enigma2/tree/7.5 "teamBlue E2")
 >
