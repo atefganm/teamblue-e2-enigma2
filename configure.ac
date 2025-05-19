@@ -573,11 +573,7 @@ CXXFLAGS="$CXXFLAGS -Wall -Wextra \
 	-Wno-error=aggregate-return -Wno-error=missing-field-initializers \
 	-Wno-error=packed -Wno-error=vla -Wno-error=clobbered -Wno-error=unused-parameter \
 	$BASE_CFLAGS $ENIGMA2_CFLAGS $PTHREAD_CFLAGS $OPENMP_CFLAGS $ALSA_CFLAGS"
-
-ARFLAGS="cr"
-AC_SUBST(ARFLAGS)
-AR_FLAGS="cr"
-AC_SUBST(AR_FLAGS)
+AX_SWIG_PYTHON_OPT="$AX_SWIG_PYTHON_OPT -DSWIG_PYTHON_LEGACY_BOOL"
 
 ARFLAGS="cr"
 AC_SUBST(ARFLAGS)
