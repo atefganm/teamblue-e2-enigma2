@@ -314,7 +314,7 @@ def setBoxInfoItems():
 	BoxInfo.setItem("3DMode", fileCheck("/proc/stb/fb/3dmode") or fileCheck("/proc/stb/fb/primary/3d"))
 	BoxInfo.setItem("3DZNorm", fileCheck("/proc/stb/fb/znorm") or fileCheck("/proc/stb/fb/primary/zoffset"))
 	BoxInfo.setItem("Blindscan_t2_available", fileCheck("/proc/stb/info/vumodel") and model.startswith("vu"))
-	BoxInfo.setItem("RcTypeChangable", not (model.startswith("et8500") or model.startswith("et7")) and pathExists("/proc/stb/ir/rc/type"))
+	BoxInfo.setItem("RcTypeChangable", not (model in ("gbquad4k", "gbue4k") or model.startswith("et7")) and pathExists("/proc/stb/ir/rc/type"))
 	BoxInfo.setItem("HasFullHDSkinSupport", model not in ("et4000", "et5000", "sh1", "hd500c", "hd1100", "xp1000", "lc"))
 	BoxInfo.setItem("HasBypassEdidChecking", fileCheck("/proc/stb/hdmi/bypass_edid_checking"))
 	BoxInfo.setItem("hasKexec", fileHas("/proc/cmdline", "kexec=1"))
