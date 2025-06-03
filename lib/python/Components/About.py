@@ -83,10 +83,7 @@ def getffmpegVersionString():
 
 
 def getKernelVersionString():
-	try:
-		return open("/proc/version", "r").read().split(' ', 4)[2].split('-', 2)[0]
-	except:
-		return _("unknown")
+	return BoxInfo.getItem("kernel")
 
 
 def getChipSetString():
@@ -121,22 +118,18 @@ def getCPUString():
 
 def getCpuCoresString():
 	try:
-		file = open('/proc/cpuinfo', 'r')
-		lines = file.readlines()
+		_file = open('/proc/cpuinfo', 'r')
+		lines = _file.readlines()
 		for x in lines:
 			splitted = x.split(': ')
 			if len(splitted) > 1:
 				splitted[1] = splitted[1].replace('\n', '')
 				if splitted[0].startswith("processor"):
-					if getMachineBuild() in ('dagsmv200', 'gbmv200', 'u51', 'u52', 'u53', 'u532', 'u533', 'u54', 'u55', 'u56', 'u57', 'u571', 'vuultimo4k', 'u5', 'u5pvr', 'h9', 'i55se', 'h9se', 'h9combose', 'h9combo', 'h10', 'h11', 'alien5', 'cc1', 'sf8008', 'sf8008m', 'sf8008opt', 'hd60', 'hd61', 'pulse4k', 'pulse4kmini', 'i55plus', 'ustym4kpro', 'beyonwizv2', 'viper4k', 'vuduo4k', 'vuduo4kse', 'multibox', 'multiboxse'):
-						cores = 4
-					elif getMachineBuild() in ('u41', 'u42', 'u43', 'u45'):
-						cores = 1
-					elif int(splitted[1]) > 0:
+					if int(splitted[1]) > 0:
 						cores = 2
 					else:
 						cores = 1
-		file.close()
+		_file.close()
 		return cores
 	except IOError:
 		return "unavailable"
@@ -271,8 +264,10 @@ def getDriverInstalledDate():
 	try:
 		from glob import glob
 		try:
-			driver = [x.split("-")[-2:-1][0][-8:] for x in open(glob("/var/lib/opkg/info/*-dvb-modules-*.control")[0], "r") if x.startswith("Version:")][0]
-			return "%s-%s-%s" % (driver[:4], driver[4:6], driver[6:])
+			driver = [x.split("-") for x in open(glob("/var/lib/opkg/info/*-dvb-modules-*.control")[0], "r") if x.startswith("Version:")][0]
+			if len(driver) == 2:
+				driver = driver[0].split('+')
+			return "%s-%s-%s" % (driver[1][:4], driver[1][4:6], driver[1][6:])
 		except:
 			driver = [x.split("Version:") for x in open(glob("/var/lib/opkg/info/*-dvb-proxy-*.control")[0], "r") if x.startswith("Version:")][0]
 			return "%s" % driver[1].replace("\n", "")
