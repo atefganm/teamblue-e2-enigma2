@@ -9,18 +9,18 @@ from re import compile
 from stat import S_IMODE
 from sys import _getframe as getframe
 from unicodedata import normalize
+from traceback import print_exc
 from xml.etree.ElementTree import Element, ParseError, fromstring, parse
 
-from traceback import print_exc
 
 from os.path import exists as pathExists, isdir as pathIsdir, isfile as pathIsfile, join as pathJoin
 
 from os import listdir
 
-
 DEFAULT_MODULE_NAME = __name__.split(".")[-1]
 
 forceDebug = eGetEnigmaDebugLvl() > 4
+
 
 SCOPE_HOME = 0  # DEBUG: Not currently used in Enigma2.
 SCOPE_LANGUAGE = 1
@@ -92,9 +92,10 @@ def addInList(*paths):
 	return [path for path in paths if os.path.isdir(path)]
 
 
-skinResolveList = []
-lcdskinResolveList = []
-fontsResolveList = []
+class ResolveList:
+	skin = []
+	lcdskin = []
+	fonts = []
 
 
 def resolveFilename(scope, base="", path_prefix=None):
@@ -130,9 +131,9 @@ def resolveFilename(scope, base="", path_prefix=None):
 			baseList.append("%s%s" % (base[:-3], "png"))
 		for item in resolveList:
 			for base in baseList:
-				_file = os.path.join(item, base)
-				if pathExists(_file):
-					return _file
+				file = os.path.join(item, base)
+				if pathExists(file):
+					return file
 		return base
 
 	if base == "":  # If base is "" then set path to the scope.  Otherwise use the scope to resolve the base filename.
@@ -151,30 +152,31 @@ def resolveFilename(scope, base="", path_prefix=None):
 					relative = "%s%s%s" % (pluginCode[0], os.sep, pluginCode[1])
 					path = os.path.join(plugins, relative)
 	elif scope == SCOPE_GUISKIN:
-		global skinResolveList
-		if not skinResolveList:
+		if not ResolveList.skin:
 			# This import must be here as this module finds the config file as part of the config initialisation.
 			from Components.config import config
-			skin = os.path.dirname(config.skin.primary_skin.value)
-			skinResolveList = addInList(
-				os.path.join(scopeConfig, skin),
+			skin_primary = os.path.dirname(config.skin.primary_skin.value)
+			skin_default = os.path.dirname(config.skin.primary_skin.default)
+			ResolveList.skin = addInList(
+				os.path.join(scopeConfig, skin_primary),
+				os.path.join(scopeConfig, skin_default),
 				os.path.join(scopeConfig, "skin_common"),
 				scopeConfig,
-				os.path.join(scopeGUISkin, skin),
+				os.path.join(scopeGUISkin, skin_primary),
+				os.path.join(scopeGUISkin, skin_default),
 				os.path.join(scopeGUISkin, "skin_default"),
 				scopeGUISkin
 			)
-		path = itemExists(skinResolveList, base)
+		path = itemExists(ResolveList.skin, base)
 	elif scope == SCOPE_LCDSKIN:
-		global lcdskinResolveList
-		if not lcdskinResolveList:
+		if not ResolveList.lcdskin:
 			# This import must be here as this module finds the config file as part of the config initialisation.
 			from Components.config import config
 			if hasattr(config.skin, "display_skin"):
 				skin = os.path.dirname(config.skin.display_skin.value)
 			else:
 				skin = ""
-			lcdskinResolveList = addInList(
+			ResolveList.lcdskin = addInList(
 				os.path.join(scopeConfig, "display", skin),
 				os.path.join(scopeConfig, "display", "skin_common"),
 				scopeConfig,
@@ -182,47 +184,51 @@ def resolveFilename(scope, base="", path_prefix=None):
 				os.path.join(scopeLCDSkin, "skin_default"),
 				scopeLCDSkin
 			)
-		path = itemExists(lcdskinResolveList, base)
+		path = itemExists(ResolveList.lcdskin, base)
 	elif scope == SCOPE_FONTS:
-		global fontsResolveList
-		if not fontsResolveList:
+		if not ResolveList.fonts:
 			# This import must be here as this module finds the config file as part of the config initialisation.
 			from Components.config import config
-			skin = os.path.dirname(config.skin.primary_skin.value)
+			skin_primary = os.path.dirname(config.skin.primary_skin.value)
+			skin_default = os.path.dirname(config.skin.primary_skin.default)
 			display = os.path.dirname(config.skin.display_skin.value) if hasattr(config.skin, "display_skin") else None
-			fontsResolveList = addInList(
+			ResolveList.fonts = addInList(
 				os.path.join(scopeConfig, "fonts"),
-				os.path.join(scopeConfig, skin, "fonts"),
-				os.path.join(scopeConfig, skin)
+				os.path.join(scopeConfig, skin_primary, "fonts"),
+				os.path.join(scopeConfig, skin_primary),
+				os.path.join(scopeConfig, skin_default, "fonts"),
+				os.path.join(scopeConfig, skin_default)
 			)
 			if display:
-				fontsResolveList += addInList(
+				ResolveList.fonts += addInList(
 					os.path.join(scopeConfig, "display", display, "fonts"),
 					os.path.join(scopeConfig, "display", display)
 				)
-			fontsResolveList += addInList(
+			ResolveList.fonts += addInList(
 				os.path.join(scopeConfig, "skin_common"),
 				scopeConfig,
-				os.path.join(scopeGUISkin, skin, "fonts"),
-				os.path.join(scopeGUISkin, skin),
+				os.path.join(scopeGUISkin, skin_primary, "fonts"),
+				os.path.join(scopeGUISkin, skin_primary),
+				os.path.join(scopeGUISkin, skin_default, "fonts"),
+				os.path.join(scopeGUISkin, skin_default),
 				os.path.join(scopeGUISkin, "skin_default", "fonts"),
 				os.path.join(scopeGUISkin, "skin_default")
 			)
 			if display:
-				fontsResolveList += addInList(
+				ResolveList.fonts += addInList(
 					os.path.join(scopeLCDSkin, display, "fonts"),
 					os.path.join(scopeLCDSkin, display)
 				)
-			fontsResolveList += addInList(
+			ResolveList.fonts += addInList(
 				os.path.join(scopeLCDSkin, "skin_default", "fonts"),
 				os.path.join(scopeLCDSkin, "skin_default"),
 				scopeFonts
 			)
-		path = itemExists(fontsResolveList, base)
+		path = itemExists(ResolveList.fonts, base)
 	elif scope == SCOPE_PLUGIN:
-		_file = os.path.join(scopePlugins, base)
-		if pathExists(_file):
-			path = _file
+		file = os.path.join(scopePlugins, base)
+		if pathExists(file):
+			path = file
 	elif scope in (SCOPE_PLUGIN_ABSOLUTE, SCOPE_PLUGIN_RELATIVE):
 		callingCode = os.path.normpath(getframe(1).f_code.co_filename)
 		plugins = os.path.normpath(scopePlugins)
@@ -314,6 +320,7 @@ def fileReadXML(filename, default=None, source=DEFAULT_MODULE_NAME, debug=False)
 		print("[%s] Line %d: %s from XML file '%s'." % (source, stack()[1][0].f_lineno, msg, filename))
 	return dom
 
+
 def defaultRecordingLocation(candidate=None):
 	if candidate and pathExists(candidate):
 		return candidate
@@ -377,9 +384,9 @@ def fileCheck(f, mode="r"):
 def fileHas(f, content, mode="r"):
 	result = False
 	if fileExists(f, mode):
-		_file = open(f, mode)
-		text = _file.read()
-		_file.close()
+		file = open(f, mode)
+		text = file.read()
+		file.close()
 		if content in text:
 			result = True
 	return result
@@ -508,14 +515,14 @@ def InitFallbackFiles():
 
 
 def crawlDirectory(directory, pattern):
-	_list = []
+	list = []
 	if directory:
 		expression = compile(pattern)
 		for root, dirs, files in os.walk(directory):
-			for _file in files:
-				if expression.match(_file) is not None:
-					_list.append((root, _file))
-	return _list
+			for file in files:
+				if expression.match(file) is not None:
+					list.append((root, file))
+	return list
 
 
 def copyfile(src, dst):
@@ -603,6 +610,7 @@ def moveFiles(fileList):
 	except (IOError, OSError) as err:
 		if err.errno == errno.EXDEV:  # Invalid cross-device link
 			print("[Directories] Warning: Cannot rename across devices, trying slower move.")
+			# from Tools.CopyFiles import moveFiles as extMoveFiles  # OpenViX, OpenATV, Beyonwiz
 			from Screens.CopyFiles import moveFiles as extMoveFiles  # OpenPLi
 			extMoveFiles(fileList, item[0])
 			print("[Directories] Moving files in background.")
@@ -623,8 +631,8 @@ def getSize(path, pattern=".*"):
 	path_size = 0
 	if os.path.isdir(path):
 		files = crawlDirectory(path, pattern)
-		for _file in files:
-			filepath = os.path.join(_file[0], _file[1])
+		for file in files:
+			filepath = os.path.join(file[0], file[1])
 			path_size += os.path.getsize(filepath)
 	elif os.path.isfile(path):
 		path_size = os.path.getsize(path)
@@ -637,16 +645,16 @@ def lsof():
 		if pid.isdigit():
 			try:
 				prog = os.readlink(os.path.join("/proc", pid, "exe"))
-				_dir = os.path.join("/proc", pid, "fd")
-				for _file in [os.path.join(_dir, _file) for _file in os.listdir(_dir)]:
-					lsof.append((pid, prog, os.readlink(_file)))
+				dir = os.path.join("/proc", pid, "fd")
+				for file in [os.path.join(dir, file) for file in os.listdir(dir)]:
+					lsof.append((pid, prog, os.readlink(file)))
 			except OSError:
 				pass
 	return lsof
 
 
-def getExtension(_file):
-	filename, extension = os.path.splitext(_file)
+def getExtension(file):
+	filename, extension = os.path.splitext(file)
 	return extension
 
 
@@ -661,7 +669,7 @@ def mediafilesInUse(session):
 			filename = None
 		else:
 			filename = os.path.basename(filename)
-	return set([_file for _file in files if not (filename and _file == filename and files.count(filename) < 2)])
+	return set([file for file in files if not (filename and file == filename and files.count(filename) < 2)])
 
 # Prepare filenames for use in external shell processing. Filenames may
 # contain spaces or other special characters.  This method adjusts the
@@ -689,7 +697,7 @@ def sanitizeFilename(filename, maxlen=255):  # 255 is max length in bytes in ext
 
 	We don't limit ourselves to ascii, because we want to keep municipality
 	names, etc, but we do want to get rid of anything potentially harmful,
-	and make sure we do not exceed filename length limits
+	and make sure we do not exceed filename length limits.
 	Hence a less safe blacklist, rather than a whitelist.
 	"""
 	blacklist = ["\\", "/", ":", "*", "?", "\"", "<", ">", "|", "\0"]
