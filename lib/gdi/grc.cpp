@@ -234,6 +234,7 @@ void *gRC::thread()
 	pthread_exit(0);
 #endif
 	return 0;
+}
 
 void gRC::recv_notify(const int &i)
 {
