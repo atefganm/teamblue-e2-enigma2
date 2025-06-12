@@ -234,7 +234,6 @@ void *gRC::thread()
 	pthread_exit(0);
 #endif
 	return 0;
-}
 
 void gRC::recv_notify(const int &i)
 {
@@ -732,6 +731,7 @@ void gPainter::sendHide(ePoint point, eSize size)
 	o.parm.setShowHideInfo->size = size;
 	m_rc->submit(o);
 }
+
 #ifdef USE_LIBVUGLES2
 void gPainter::sendShowItem(long dir, ePoint point, eSize size)
 {

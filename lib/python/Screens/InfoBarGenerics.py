@@ -318,14 +318,6 @@ class InfoBarUnhandledKey:
 
 	#this function is called on every keypress!
 	def actionA(self, key, flag):
-		####key debug
-		try:
-			print("KEY: %s %s %s" % (key, six.next((key_name for key_name, value in list(KEYIDS.items()) if value == key)), getKeyDescription(key)[0]))
-		except:
-			try:
-				print("KEY: %s %s" % (key, six.next((key_name for key_name, value in list(KEYIDS.items()) if value == key)))) # inverse dictionary lookup in KEYIDS
-			except:
-				print("KEY: %s" % (key))
 		self.unhandledKeyDialog.hide()
 		if flag != 4:
 			if self.flags & (1 << 1):
@@ -2621,7 +2613,8 @@ class InfoBarExtensions:
 		self.extensionKeys = {}
 		for x in self.list:
 			if x[0] == self.EXTENSION_SINGLE:
-				self.updateExtension(x[1], x[2])
+				if x[1][2]():
+					self.updateExtension(x[1], x[2])
 			else:
 				for y in x[1]():
 					self.updateExtension(y[0], y[1])

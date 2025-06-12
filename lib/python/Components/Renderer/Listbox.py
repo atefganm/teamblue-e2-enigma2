@@ -47,11 +47,8 @@ class Listbox(Renderer):
 		self.scrollbarMode = self.scrollbarMode # trigger
 
 	def preWidgetRemove(self, instance):
-		try:
-			instance.setContent(None)
-			instance.selectionChanged.get().remove(self.selectionChanged)
-		except:
-			pass
+		instance.setContent(None)
+		instance.selectionChanged.get().remove(self.selectionChanged)
 
 	def setWrapAround(self, wrap_around):
 		self.__wrap_around = wrap_around
