@@ -159,7 +159,7 @@ def getUUIDtoSD(UUID): # returns None on failure
 	if fileExists(check):
 		lines = subprocess.check_output([check]).decode(encoding="utf8", errors="ignore").split("\n")
 		for line in lines:
-			if UUID in line.replace(""", ""):
+			if UUID in line.replace('"', ''):
 				return line.split(":")[0].strip()
 	else:
 		return None
