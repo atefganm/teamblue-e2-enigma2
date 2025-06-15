@@ -63,9 +63,9 @@ def InitGeolocation():
 				else:
 					print("[Geolocation] Error: Geolocation lookup returned a '%s' status!  Message '%s' returned." % (status, geolocation.get("message", None)))
 			except URLError as err:
-				if hasattr(err, 'code'):
+				if hasattr(err, "code"):
 					print("[Geolocation] Error: Geolocation data not available! (Code: %s)" % err.code)
-				if hasattr(err, 'reason'):
+				if hasattr(err, "reason"):
 					print("[Geolocation] Error: Geolocation data not available! (Reason: %s)" % err.reason)
 			except ValueError:
 				print("[Geolocation] Error: Geolocation data returned can not be processed!")

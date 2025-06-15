@@ -14,7 +14,7 @@ def getFPVersion():
 	try:
 		if getBrandOEM() == "blackbox" and isfile("/proc/stb/info/micomver"):
 			version = fileReadLine("/proc/stb/info/micomver", source=MODULE_NAME)
-		elif getBoxType() in ('dm7080', 'dm820', 'dm520', 'dm525', 'dm900', 'dm920'):
+		elif getBoxType() in ("dm7080", "dm820", "dm520", "dm525", "dm900", "dm920"):
 			version = open("/proc/stb/fp/version", "r").read()
 		else:
 			version = int(open("/proc/stb/fp/version", "r").read())
@@ -33,7 +33,7 @@ def setFPWakeuptime(wutime):
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
-			ioctl(fp.fileno(), 6, pack('L', wutime)) # set wake up
+			ioctl(fp.fileno(), 6, pack("L", wutime)) # set wake up
 		except IOError:
 			print("setFPWakeupTime failed!")
 
@@ -56,7 +56,7 @@ def setRTCtime(wutime):
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
-			ioctl(fp.fileno(), 0x101, pack('L', wutime)) # set wake up
+			ioctl(fp.fileno(), 0x101, pack("L", wutime)) # set wake up
 		except IOError:
 			print("setRTCtime failed!")
 
@@ -68,7 +68,7 @@ def getFPWakeuptime():
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
-			ret = unpack('L', ioctl(fp.fileno(), 5, '    '))[0] # get wakeuptime
+			ret = unpack("L", ioctl(fp.fileno(), 5, "    "))[0] # get wakeuptime
 		except IOError:
 			print("getFPWakeupTime failed!")
 	return ret
@@ -87,7 +87,7 @@ def getFPWasTimerWakeup():
 	except:
 		try:
 			fp = open("/dev/dbox/fp0")
-			wasTimerWakeup = unpack('B', ioctl(fp.fileno(), 9, ' '))[0] and True or False
+			wasTimerWakeup = unpack("B", ioctl(fp.fileno(), 9, " "))[0] and True or False
 		except IOError:
 			print("wasTimerWakeup failed!")
 	if wasTimerWakeup:
@@ -98,7 +98,7 @@ def getFPWasTimerWakeup():
 
 def clearFPWasTimerWakeup():
 	try:
-		open("/proc/stb/fp/was_timer_wakeup", "w").write('0')
+		open("/proc/stb/fp/was_timer_wakeup", "w").write("0")
 	except:
 		try:
 			fp = open("/dev/dbox/fp0")

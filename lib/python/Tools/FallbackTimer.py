@@ -37,7 +37,7 @@ class FallbackTimerList():
 	def getUrl(self, url):
 		print("[FallbackTimer] getURL", url)
 		from twisted.web.client import getPage
-		return getPage(("%s/%s" % (self.url, url)).encode('utf-8'), headers=self.headers)
+		return getPage(("%s/%s" % (self.url, url)).encode("utf-8"), headers=self.headers)
 
 	def getFallbackTimerList(self):
 		self.list = []
@@ -52,8 +52,8 @@ class FallbackTimerList():
 	def gotFallbackTimerList(self, data):
 		self.list = []
 		try:
-			timers = loads(data.decode('utf-8'))
-			if 'result' in timers and timers['result'] == False:
+			timers = loads(data.decode("utf-8"))
+			if "result" in timers and timers["result"] == False:
 				self.fallback(_("Fallback API did not return a valid result."))
 			else:
 				self.list = [
@@ -72,7 +72,7 @@ class FallbackTimerList():
 							afterevent=timer["afterevent"],
 							dirname=timer["dirname"],
 							description=timer["description"])
-					for timer in timers['timers']
+					for timer in timers["timers"]
 				]
 		except Exception as e:
 			self.fallback(e)
@@ -141,7 +141,7 @@ class FallbackTimerList():
 	def getUrlFallback(self, data):
 		try:
 			root = fromstring(data)
-			if root[0].text == 'True':
+			if root[0].text == "True":
 				self.getFallbackTimerList()
 			else:
 				self.fallback(root[1].text)
