@@ -42,7 +42,7 @@ class About(Screen):
 		ImageType = BoxInfo.getItem("imagetype")
 		self["ImageType"] = StaticText(ImageType)
 
-		Boxserial = popen('cat /proc/stb/info/sn').read().strip()
+		Boxserial = popen("cat /proc/stb/info/sn").read().strip()
 		serial = ""
 		if Boxserial != "":
 			serial = Boxserial
@@ -73,10 +73,10 @@ class About(Screen):
 
 		player = None
 
-		if os.path.isfile('/var/lib/opkg/info/enigma2-plugin-systemplugins-servicemp3.list'):
+		if os.path.isfile("/var/lib/opkg/info/enigma2-plugin-systemplugins-servicemp3.list"):
 			if GStreamerVersion:
 				player = _("Media player") + ": Gstreamer, " + _("version") + " " + GStreamerVersion
-		if os.path.isfile('/var/lib/opkg/info/enigma2-plugin-systemplugins-servicehisilicon.list'):
+		if os.path.isfile("/var/lib/opkg/info/enigma2-plugin-systemplugins-servicehisilicon.list"):
 			if os.path.isdir("/usr/lib/hisilicon") and glob.glob("/usr/lib/hisilicon/libavcodec.so.*"):
 				player = _("Media player") + ": ffmpeg, " + _("Hardware Accelerated")
 			elif ffmpegVersion and ffmpegVersion[0].isdigit():
@@ -95,12 +95,12 @@ class About(Screen):
 		self["ChipsetInfo"] = StaticText(ChipsetInfo)
 		AboutText += ChipsetInfo + "\n"
 
-		if boxtype == 'gbquad4k' or boxtype == 'gbue4k' or boxtype == 'gbx34k' or boxtype == "gbquad4kpro":
+		if boxtype == "gbquad4k" or boxtype == "gbue4k" or boxtype == "gbx34k" or boxtype == "gbquad4kpro":
 			def strip_non_ascii(boltversion):
 				''' Returns the string without non ASCII characters'''
 				stripped = (c for c in boltversion if 0 < ord(c) < 127)
-				return ''.join(stripped)
-			boltversion = str(popen('cat /sys/firmware/devicetree/base/bolt/tag').read().strip())
+				return "".join(stripped)
+			boltversion = str(popen("cat /sys/firmware/devicetree/base/bolt/tag").read().strip())
 			boltversion = strip_non_ascii(boltversion)
 			AboutText += _("Bolt") + ":" + boltversion + "\n"
 			self["BoltVersion"] = StaticText(boltversion)
@@ -121,7 +121,7 @@ class About(Screen):
 
 		AboutText += _("DVB drivers: ") + datetime.strptime(BoxInfo.getItem("driversdate"), "%Y%m%d").strftime("%d.%m.%Y") + "\n"
 
-		EnigmaSkin = _('Skin & Resolution: %s (%sx%s)') % (config.skin.primary_skin.value.split('/')[0], getDesktop(0).size().width(), getDesktop(0).size().height())
+		EnigmaSkin = _("Skin & Resolution: %s (%sx%s)") % (config.skin.primary_skin.value.split("/")[0], getDesktop(0).size().width(), getDesktop(0).size().height())
 		self["EnigmaSkin"] = StaticText(EnigmaSkin)
 		AboutText += EnigmaSkin + "\n"
 
@@ -130,7 +130,7 @@ class About(Screen):
 		AboutText += _("Python version: ") + about.getPythonVersionString() + "\n"
 		AboutText += _("Enigma2 debug level:\t%d") % eGetEnigmaDebugLvl() + "\n"
 
-		twisted = popen('opkg list-installed  |grep -i python3-twisted-core').read().strip().split(' - ')[1]
+		twisted = popen("opkg list-installed  |grep -i python3-twisted-core").read().strip().split(" - ")[1]
 		AboutText += "Python-Twisted: " + str(twisted) + "\n"
 
 		self["TunerHeader"] = StaticText(_("Detected NIMs:"))
@@ -151,7 +151,7 @@ class About(Screen):
 
 		storageinfo = ""
 		for partition in harddiskmanager.getMountedPartitions(False, mounts):
-			if partition.mountpoint != '/':
+			if partition.mountpoint != "/":
 				continue
 			free=(("%s MB" % (partition.free()//(1024**2)) if partition.free()//(1024**2) <= 1024 else ("%.2f GB" % (partition.free()/(1024**3)))))
 			total=(("%s MB" % (partition.total()//(1024**2)) if partition.total()//(1024**2) <= 1024 else ("%.2f GB" % (partition.total()/(1024**3)))))
@@ -165,7 +165,7 @@ class About(Screen):
 
 		hddinfo = ""
 		for partition in harddiskmanager.getMountedPartitions(False, mounts):
-			if partition.mountpoint == '/':
+			if partition.mountpoint == "/":
 				continue
 			hddinfo += "%s:\n" % (partition.description)
 			hddinfo += _("Mountpoint: %s (%s)\n") % (partition.mountpoint,partition.device)
@@ -228,7 +228,7 @@ class TranslationInfo(Screen):
 		self.setTitle(_("Translation"))
 		# don't remove the string out of the _(), or it can't be "translated" anymore.
 		# TRANSLATORS: Add here whatever should be shown in the "translator" about screen, up to 6 lines (use \n for newline)
-		# Don't translate TRANSLATOR_INFO to show '(N/A)'
+		# Don't translate TRANSLATOR_INFO to show "(N/A)"
 		info = _("TRANSLATOR_INFO")
 		if info == "TRANSLATOR_INFO":
 			info = "(N/A)"
@@ -236,7 +236,7 @@ class TranslationInfo(Screen):
 		infolines = _("").split("\n")
 		infomap = {}
 		for x in infolines:
-			l = x.split(': ')
+			l = x.split(": ")
 			if len(l) != 2:
 				continue
 			(type, value) = l
@@ -309,10 +309,10 @@ class CommitInfo(Screen):
 		# get the branch to display from the boxinfo image type and version
 		try:
 			# develop-type images have no version but a revision number
-			if BoxInfo.getItem('imagetype') == "rev":
-				branch = "?sha=" + BoxInfo.getItem('imageversion')
+			if BoxInfo.getItem("imagetype") == "rev":
+				branch = "?sha=" + BoxInfo.getItem("imageversion")
 			else:
-				branch = "?sha=%s-%s" % (BoxInfo.getItem('imagetype'),BoxInfo.getItem('imageversion'))
+				branch = "?sha=%s-%s" % (BoxInfo.getItem("imagetype"),BoxInfo.getItem("imageversion"))
 		except:
 			branch = ""
 		branch_e2plugins = "?sha=python3"
@@ -320,9 +320,9 @@ class CommitInfo(Screen):
 		self.project = 0
 		self.projects = [
 			#("organisation",  "repository",           "readable name",                "branch", "github/gitlab"),
-			("teamblue-e2", "enigma2", "teamBlue Enigma2", ("%s-dev" % BoxInfo.getItem('imageversion') if BoxInfo.getItem('imagetype') == "DEV" else BoxInfo.getItem('imageversion')), "github"),
+			("teamblue-e2", "enigma2", "teamBlue Enigma2", ("%s-dev" % BoxInfo.getItem("imageversion") if BoxInfo.getItem("imagetype") == "DEV" else BoxInfo.getItem("imageversion")), "github"),
 			("teamblue-e2", "skin", "teamBlue Skin GigaBlue Pax", "master", "github"),
-			("oe-alliance", "oe-alliance-core", "OE Alliance Core", BoxInfo.getItem('oe').split()[1], "github"),
+			("oe-alliance", "oe-alliance-core", "OE Alliance Core", BoxInfo.getItem("oe").split()[1], "github"),
 			("oe-alliance", "oe-alliance-plugins", "OE Alliance Plugins", "master", "github"),
 			("oe-alliance", "enigma2-plugins", "OE Alliance Enigma2 Plugins", "master", "github")
 		]
@@ -333,11 +333,11 @@ class CommitInfo(Screen):
 
 	def readGithubCommitLogs(self):
 		if self.projects[self.project][4] == "github":
-			url = 'https://api.github.com/repos/%s/%s/commits?sha=%s' % (self.projects[self.project][0], self.projects[self.project][1], self.projects[self.project][3])
+			url = "https://api.github.com/repos/%s/%s/commits?sha=%s" % (self.projects[self.project][0], self.projects[self.project][1], self.projects[self.project][3])
 		if self.projects[self.project][4] == "gitlab":
-			url1 = 'https://gitlab.com/api/v4/projects/%s' % (self.projects[self.project][0])
-			url2 = '%2F'
-			url3 = '%s/repository/commits?ref_name=%s' % (self.projects[self.project][1], self.projects[self.project][3])
+			url1 = "https://gitlab.com/api/v4/projects/%s" % (self.projects[self.project][0])
+			url2 = "%2F"
+			url3 = "%s/repository/commits?ref_name=%s" % (self.projects[self.project][1], self.projects[self.project][3])
 			url = url1 + url2 + url3
 			# print "[About] url: ", url
 		commitlog = ""
@@ -346,35 +346,35 @@ class CommitInfo(Screen):
 		from urllib.request import urlopen
 		if self.projects[self.project][4] == "github":
 			try:
-				commitlog += 80 * '-' + '\n'
-				commitlog += self.projects[self.project][2] + ' - ' + self.projects[self.project][1] + ' - branch ' + self.projects[self.project][3] + '\n'
-				commitlog += 'URL: https://github.com/' + self.projects[self.project][0] + '/' + self.projects[self.project][1] + '/tree/' + self.projects[self.project][3] + '\n'
-				commitlog += 80 * '-' + '\n'
+				commitlog += 80 * "-" + "\n"
+				commitlog += self.projects[self.project][2] + " - " + self.projects[self.project][1] + " - branch " + self.projects[self.project][3] + "\n"
+				commitlog += "URL: https://github.com/" + self.projects[self.project][0] + "/" + self.projects[self.project][1] + "/tree/" + self.projects[self.project][3] + "\n"
+				commitlog += 80 * "-" + "\n"
 				for c in loads(urlopen(url, timeout=5).read()):
-					creator = c['commit']['author']['name']
-					title = c['commit']['message']
-					date = datetime.strptime(c['commit']['committer']['date'], '%Y-%m-%dT%H:%M:%SZ').strftime('%x %X')
+					creator = c["commit"]["author"]["name"]
+					title = c["commit"]["message"]
+					date = datetime.strptime(c["commit"]["committer"]["date"], "%Y-%m-%dT%H:%M:%SZ").strftime("%x %X")
 					if title.startswith("Merge "):
 						pass
 					else:
-						commitlog += date + ' ' + creator + '\n' + title + 2 * '\n'
+						commitlog += date + " " + creator + "\n" + title + 2 * "\n"
 				self.cachedProjects[self.projects[self.project][2]] = commitlog
 			except:
 				commitlog += _("Currently the commit log cannot be retrieved - please try later again")
 		if self.projects[self.project][4] == "gitlab":
 			try:
-				commitlog += 80 * '-' + '\n'
-				commitlog += self.projects[self.project][2] + ' - ' + self.projects[self.project][1] + ' - branch ' + self.projects[self.project][3] + '\n'
-				commitlog += 'URL: https://gitlab.com/' + self.projects[self.project][0] + '/' + self.projects[self.project][1] + '/tree/' + self.projects[self.project][3] + '\n'
-				commitlog += 80 * '-' + '\n'
+				commitlog += 80 * "-" + "\n"
+				commitlog += self.projects[self.project][2] + " - " + self.projects[self.project][1] + " - branch " + self.projects[self.project][3] + "\n"
+				commitlog += "URL: https://gitlab.com/" + self.projects[self.project][0] + "/" + self.projects[self.project][1] + "/tree/" + self.projects[self.project][3] + "\n"
+				commitlog += 80 * "-" + "\n"
 				for c in loads(urlopen(url, timeout=5).read()):
-					creator = c['author_name']
-					title = c['message']
-					date = datetime.strptime(c['committed_date'], '%Y-%m-%dT%H:%M:%S.000+02:00').strftime('%x %X')
+					creator = c["author_name"]
+					title = c["message"]
+					date = datetime.strptime(c["committed_date"], "%Y-%m-%dT%H:%M:%S.000+02:00").strftime("%x %X")
 					if title.startswith("Merge "):
 						pass
 					else:
-						commitlog += date + ' ' + creator + '\n' + title + '\n'
+						commitlog += date + " " + creator + "\n" + title + "\n"
 				self.cachedProjects[self.projects[self.project][2]] = commitlog
 			except:
 				commitlog += _("Currently the commit log cannot be retrieved - please try later again")
@@ -422,17 +422,17 @@ class MemoryInfo(Screen):
 		self["key_red"] = Label(_("Cancel"))
 		self["key_green"] = Label(_("Refresh"))
 		self["key_blue"] = Label(_("Clear"))
-		self['lmemtext'] = Label()
-		self['lmemvalue'] = Label()
-		self['rmemtext'] = Label()
-		self['rmemvalue'] = Label()
-		self['pfree'] = Label()
-		self['pused'] = Label()
+		self["lmemtext"] = Label()
+		self["lmemvalue"] = Label()
+		self["rmemtext"] = Label()
+		self["rmemvalue"] = Label()
+		self["pfree"] = Label()
+		self["pused"] = Label()
 		self["slide"] = ProgressBar()
 		self["slide"].setValue(100)
 		self["params"] = MemoryInfoSkinParams()
 		self.setTitle(_("MemoryInfo - only for Developers"))
-		self['info'] = Label(_("This info is for developers only.\nIt is not important for a normal user.\nPlease - do not panic on any displayed suspicious information!"))
+		self["info"] = Label(_("This info is for developers only.\nIt is not important for a normal user.\nPlease - do not panic on any displayed suspicious information!"))
 		self.onLayoutFinish.append(self.getMemoryInfo)
 
 	def getMemoryInfo(self):
@@ -442,7 +442,7 @@ class MemoryInfo(Screen):
 			mem = 1
 			free = 0
 			rows_in_column = self["params"].rows_in_column
-			for i, line in enumerate(open('/proc/meminfo', 'r')):
+			for i, line in enumerate(open("/proc/meminfo", "r")):
 				s = line.strip().split(None, 2)
 				if len(s) == 3:
 					name, size, units = s
@@ -461,13 +461,13 @@ class MemoryInfo(Screen):
 				else:
 					rtext += "".join((name, "\n"))
 					rvalue += "".join((size, " ", units, "\n"))
-			self['lmemtext'].setText(ltext)
-			self['lmemvalue'].setText(lvalue)
-			self['rmemtext'].setText(rtext)
-			self['rmemvalue'].setText(rvalue)
+			self["lmemtext"].setText(ltext)
+			self["lmemvalue"].setText(lvalue)
+			self["rmemtext"].setText(rtext)
+			self["rmemvalue"].setText(rvalue)
 			self["slide"].setValue(int(100.0 * (mem - free) / mem + 0.25))
-			self['pfree'].setText("%.1f %s" % (100. * free / mem, '%'))
-			self['pused'].setText("%.1f %s" % (100. * (mem - free) / mem, '%'))
+			self["pfree"].setText("%.1f %s" % (100. * free / mem, "%"))
+			self["pused"].setText("%.1f %s" % (100. * (mem - free) / mem, "%"))
 		except Exception as e:
 			print("[About] getMemoryInfo FAIL:", e)
 
@@ -542,18 +542,18 @@ class SystemNetworkInfo(Screen):
 	def createscreen(self):
 		self.AboutText = ""
 		self.iface = "eth0"
-		eth0 = about.getIfConfig('eth0')
-		if 'addr' in eth0:
-			self.iface = 'eth0'
-		eth1 = about.getIfConfig('eth1')
-		if 'addr' in eth1:
-			self.iface = 'eth1'
-		ra0 = about.getIfConfig('ra0')
-		if 'addr' in ra0:
-			self.iface = 'ra0'
-		wlan0 = about.getIfConfig('wlan0')
-		if 'addr' in wlan0:
-			self.iface = 'wlan0'
+		eth0 = about.getIfConfig("eth0")
+		if "addr" in eth0:
+			self.iface = "eth0"
+		eth1 = about.getIfConfig("eth1")
+		if "addr" in eth1:
+			self.iface = "eth1"
+		ra0 = about.getIfConfig("ra0")
+		if "addr" in ra0:
+			self.iface = "ra0"
+		wlan0 = about.getIfConfig("wlan0")
+		if "addr" in wlan0:
+			self.iface = "wlan0"
 		self.AboutText += iNetwork.getFriendlyAdapterName(self.iface) + ":" + iNetwork.getFriendlyAdapterDescription(self.iface) + "\n"
 
 		def nameserver():
@@ -578,7 +578,7 @@ class SystemNetworkInfo(Screen):
 
 		def domain():
 			domain = ""
-			for line in open('/etc/resolv.conf', 'r'):
+			for line in open("/etc/resolv.conf", "r"):
 				line = line.strip()
 				if "domain" in line:
 					domain += line.strip().replace("domain ", "")
@@ -589,10 +589,10 @@ class SystemNetworkInfo(Screen):
 
 		def gateway():
 			gateway = ""
-			for line in popen('ip route show'):
+			for line in popen("ip route show"):
 				line = line.strip()
 				if "default via " in line:
-					line = line.split(' ')
+					line = line.split(" ")
 					line = line[2]
 					return line
 				else:
@@ -601,97 +601,97 @@ class SystemNetworkInfo(Screen):
 
 		def netspeed():
 			netspeed = ""
-			for line in popen('ethtool eth0 |grep Speed', 'r'):
+			for line in popen("ethtool eth0 |grep Speed", "r"):
 				line = line.strip().split(":")
-				line = line[1].replace(' ', '')
+				line = line[1].replace(" ", "")
 				netspeed += line
 				return str(netspeed)
 
 		def netspeed_eth1():
 			netspeed = ""
-			for line in popen('ethtool eth1 |grep Speed', 'r'):
+			for line in popen("ethtool eth1 |grep Speed", "r"):
 				line = line.strip().split(":")
-				line = line[1].replace(' ', '')
+				line = line[1].replace(" ", "")
 				netspeed += line
 				return str(netspeed)
 
-		if 'addr' in eth0:
-			if 'ifname' in eth0:
-				self.AboutText += _('Interface: /dev/' + eth0['ifname'] + "\n")
+		if "addr" in eth0:
+			if "ifname" in eth0:
+				self.AboutText += _("Interface: /dev/" + eth0["ifname"] + "\n")
 			self.AboutText += _("Network Speed:") + netspeed() + "\n"
-			if 'hwaddr' in eth0:
-				self.AboutText += _("MAC:") + eth0['hwaddr'] + "\n"
-			self.AboutText += "\n" + _("IP:") + eth0['addr'] + "\n"
+			if "hwaddr" in eth0:
+				self.AboutText += _("MAC:") + eth0["hwaddr"] + "\n"
+			self.AboutText += "\n" + _("IP:") + eth0["addr"] + "\n"
 			self.AboutText += _("Gateway:") + gateway() + "\n"
 			self.AboutText += nameserver() + "\n"
-			if 'netmask' in eth0:
-				self.AboutText += _("Netmask:") + eth0['netmask'] + "\n"
-			if 'brdaddr' in eth0:
-				if eth0['brdaddr'] == "0.0.0.0":
-					self.AboutText += _('Broadcast:') + _("DHCP is off") + "\n"
+			if "netmask" in eth0:
+				self.AboutText += _("Netmask:") + eth0["netmask"] + "\n"
+			if "brdaddr" in eth0:
+				if eth0["brdaddr"] == "0.0.0.0":
+					self.AboutText += _("Broadcast:") + _("DHCP is off") + "\n"
 				else:
-					self.AboutText += _('Broadcast:' + eth0['brdaddr'] + "\n")
+					self.AboutText += _("Broadcast:" + eth0["brdaddr"] + "\n")
 			self.AboutText += _("Domain:") + domain() + "\n"
-			self.iface = 'eth0'
+			self.iface = "eth0"
 
-		eth1 = about.getIfConfig('eth1')
-		if 'addr' in eth1:
-			if 'ifname' in eth1:
-				self.AboutText += _('Interface:/dev/' + eth1['ifname'] + "\n")
+		eth1 = about.getIfConfig("eth1")
+		if "addr" in eth1:
+			if "ifname" in eth1:
+				self.AboutText += _("Interface:/dev/" + eth1["ifname"] + "\n")
 			self.AboutText += _("NetSpeed:") + netspeed_eth1() + "\n"
-			if 'hwaddr' in eth1:
-				self.AboutText += _("MAC:") + eth1['hwaddr'] + "\n"
-			self.AboutText += "\n" + _("IP:") + eth1['addr'] + "\n"
+			if "hwaddr" in eth1:
+				self.AboutText += _("MAC:") + eth1["hwaddr"] + "\n"
+			self.AboutText += "\n" + _("IP:") + eth1["addr"] + "\n"
 			self.AboutText += _("Gateway:") + gateway() + "\n"
 			self.AboutText += nameserver() + "\n"
-			if 'netmask' in eth1:
-				self.AboutText += _("Netmask:") + eth1['netmask'] + "\n"
-			if 'brdaddr' in eth1:
-				if eth1['brdaddr'] == "0.0.0.0":
-					self.AboutText += _('Broadcast:') + _("DHCP is off") + "\n"
+			if "netmask" in eth1:
+				self.AboutText += _("Netmask:") + eth1["netmask"] + "\n"
+			if "brdaddr" in eth1:
+				if eth1["brdaddr"] == "0.0.0.0":
+					self.AboutText += _("Broadcast:") + _("DHCP is off") + "\n"
 				else:
-					self.AboutText += _('Broadcast:' + eth1['brdaddr'] + "\n")
+					self.AboutText += _("Broadcast:" + eth1["brdaddr"] + "\n")
 			self.AboutText += _("Domain:") + domain() + "\n"
-			self.iface = 'eth1'
+			self.iface = "eth1"
 
-		ra0 = about.getIfConfig('ra0')
-		if 'addr' in ra0:
-			if 'ifname' in ra0:
-				self.AboutText += _('Interface:/dev/') + ra0['ifname'] + "\n"
-			self.AboutText += "\n" + _("IP:") + ra0['addr'] + "\n"
-			if 'netmask' in ra0:
-				self.AboutText += _("Netmask:") + ra0['netmask'] + "\n"
-			if 'brdaddr' in ra0:
-				self.AboutText += _("Broadcast:") + ra0['brdaddr'] + "\n"
-			if 'hwaddr' in ra0:
-				self.AboutText += _("MAC:") + ra0['hwaddr'] + "\n"
-			self.iface = 'ra0'
+		ra0 = about.getIfConfig("ra0")
+		if "addr" in ra0:
+			if "ifname" in ra0:
+				self.AboutText += _("Interface:/dev/") + ra0["ifname"] + "\n"
+			self.AboutText += "\n" + _("IP:") + ra0["addr"] + "\n"
+			if "netmask" in ra0:
+				self.AboutText += _("Netmask:") + ra0["netmask"] + "\n"
+			if "brdaddr" in ra0:
+				self.AboutText += _("Broadcast:") + ra0["brdaddr"] + "\n"
+			if "hwaddr" in ra0:
+				self.AboutText += _("MAC:") + ra0["hwaddr"] + "\n"
+			self.iface = "ra0"
 
-		wlan0 = about.getIfConfig('wlan0')
-		if 'addr' in wlan0:
-			if 'ifname' in wlan0:
-				self.AboutText += _('Interface:/dev/') + wlan0['ifname'] + "\n"
-			if 'hwaddr' in wlan0:
-				self.AboutText += _("MAC:") + wlan0['hwaddr'] + "\n"
-			self.AboutText += "\n" + _("IP:") + wlan0['addr'] + "\n"
+		wlan0 = about.getIfConfig("wlan0")
+		if "addr" in wlan0:
+			if "ifname" in wlan0:
+				self.AboutText += _("Interface:/dev/") + wlan0["ifname"] + "\n"
+			if "hwaddr" in wlan0:
+				self.AboutText += _("MAC:") + wlan0["hwaddr"] + "\n"
+			self.AboutText += "\n" + _("IP:") + wlan0["addr"] + "\n"
 			self.AboutText += _("Gateway:") + gateway() + "\n"
 			self.AboutText += nameserver() + "\n"
-			if 'netmask' in wlan0:
-				self.AboutText += _("Netmask:") + wlan0['netmask'] + "\n"
-			if 'brdaddr' in wlan0:
-				if wlan0['brdaddr'] == "0.0.0.0":
-					self.AboutText += _('Broadcast:') + _("DHCP is off") + "\n"
+			if "netmask" in wlan0:
+				self.AboutText += _("Netmask:") + wlan0["netmask"] + "\n"
+			if "brdaddr" in wlan0:
+				if wlan0["brdaddr"] == "0.0.0.0":
+					self.AboutText += _("Broadcast:") + _("DHCP is off") + "\n"
 				else:
-					self.AboutText += _('Broadcast:') + wlan0['brdaddr'] + "\n"
+					self.AboutText += _("Broadcast:") + wlan0["brdaddr"] + "\n"
 			self.AboutText += _("Domain:") + domain() + "\n"
-			self.iface = 'wlan0'
+			self.iface = "wlan0"
 
 		#not use this , adapter make reset after  4GB (32bit restriction)
 		#rx_bytes, tx_bytes = about.getIfTransferredData(self.iface)
-		#self.AboutText += "\n" + _("Bytes received:") + "\t" + rx_bytes + '  (~'  + str(int(rx_bytes)/1024/1024)  + ' MB)'  + "\n"
-		#self.AboutText += _("Bytes sent:") + "\t" + tx_bytes + '  (~'  + str(int(tx_bytes)/1024/1024)+ ' MB)'  + "\n"
+		#self.AboutText += "\n" + _("Bytes received:") + "\t" + rx_bytes + "  (~"  + str(int(rx_bytes)/1024/1024)  + " MB)"  + "\n"
+		#self.AboutText += _("Bytes sent:") + "\t" + tx_bytes + "  (~"  + str(int(tx_bytes)/1024/1024)+ " MB)"  + "\n"
 
-		hostname = open('/proc/sys/kernel/hostname').read()
+		hostname = open("/proc/sys/kernel/hostname").read()
 		self.AboutText += _("Hostname:") + hostname + "\n"
 		self["AboutScrollLabel"] = ScrollLabel(self.AboutText)
 
@@ -708,7 +708,7 @@ class SystemNetworkInfo(Screen):
 		if data is not None:
 			if data is True:
 				if status is not None:
-					if self.iface == 'wlan0' or self.iface == 'ra0':
+					if self.iface == "wlan0" or self.iface == "ra0":
 						if status[self.iface]["essid"] == "off":
 							essid = _("No Connection")
 						else:
@@ -719,24 +719,24 @@ class SystemNetworkInfo(Screen):
 						else:
 							accesspoint = status[self.iface]["accesspoint"]
 						if "BSSID" in self:
-							self.AboutText += _('Access point:') + accesspoint + '\n'
+							self.AboutText += _("Access point:") + accesspoint + "\n"
 						if "ESSID" in self:
-							self.AboutText += _('SSID:') + essid + '\n'
+							self.AboutText += _("SSID:") + essid + "\n"
 
 						quality = status[self.iface]["quality"]
 						if "quality" in self:
-							self.AboutText += _('Link Quality:') + quality + '\n'
+							self.AboutText += _("Link Quality:") + quality + "\n"
 
-						if status[self.iface]["bitrate"] == '0':
+						if status[self.iface]["bitrate"] == "0":
 							bitrate = _("Unsupported")
 						else:
 							bitrate = str(status[self.iface]["bitrate"]) + " Mb/s"
 						if "bitrate" in self:
-							self.AboutText += _('Bitrate:') + bitrate + '\n'
+							self.AboutText += _("Bitrate:") + bitrate + "\n"
 
 						signal = status[self.iface]["signal"]
 						if "signal" in self:
-							self.AboutText += _('Signal Strength: %d \n' % signal)
+							self.AboutText += _("Signal Strength: %d \n" % signal)
 
 						if status[self.iface]["encryption"] == "off":
 							if accesspoint == "Not-Associated":
@@ -746,7 +746,7 @@ class SystemNetworkInfo(Screen):
 						else:
 							encryption = _("Enabled")
 						if "enc" in self:
-							self.AboutText += _('Encryption:') + encryption + '\n'
+							self.AboutText += _("Encryption:") + encryption + "\n"
 
 						if status[self.iface]["essid"] == "off" or status[self.iface]["accesspoint"] == "Not-Associated" or status[self.iface]["accesspoint"] is False:
 							self.LinkState = False
@@ -773,7 +773,7 @@ class SystemNetworkInfo(Screen):
 		self.LinkState = None
 		for line in data.splitlines():
 			line = line.strip()
-			if 'Link detected:' in line:
+			if "Link detected:" in line:
 				if "yes" in line:
 					self.LinkState = True
 				else:
@@ -857,7 +857,7 @@ class Troubleshoot(Screen):
 		if command == "boxinfo":
 			text = ""
 			for item in BoxInfo.getItemsList():
-				text += '%s = %s %s' % (item, str(BoxInfo.getItem(item)), _(" [immutable]\n") if item in BoxInfo.getEnigmaInfoList() else "\n")
+				text += "%s = %s %s" % (item, str(BoxInfo.getItem(item)), _(" [immutable]\n") if item in BoxInfo.getEnigmaInfoList() else "\n")
 			self["AboutScrollLabel"].setText(text)
 		elif command.startswith("cat "):
 			try:
