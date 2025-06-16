@@ -8,13 +8,13 @@ class CamControl:
 
 	def __init__(self, name):
 		self.name = name
-		self.link = "/etc/init.d/" + name
+		self.link = '/etc/init.d/' + name
 		if not os.path.exists(self.link):
 			print("[CamControl] No softcam link?", self.link)
 
 	def getList(self):
 		result = []
-		prefix = self.name + "."
+		prefix = self.name + '.'
 		for f in os.listdir("/etc/init.d"):
 			if f.startswith(prefix):
 				result.append(f[len(prefix):])
@@ -23,7 +23,7 @@ class CamControl:
 	def current(self):
 		try:
 			l = os.readlink(self.link)
-			prefix = self.name + "."
+			prefix = self.name + '.'
 			return os.path.split(l)[1].split(prefix, 2)[1]
 		except:
 			pass
@@ -31,15 +31,15 @@ class CamControl:
 
 	def command(self, cmd):
 		if os.path.exists(self.link):
-			print("Executing", self.link + " " + cmd)
-			enigma.eConsoleAppContainer().execute(self.link + " " + cmd)
+			print("Executing", self.link + ' ' + cmd)
+			enigma.eConsoleAppContainer().execute(self.link + ' ' + cmd)
 
 	def select(self, which):
 		print("Selecting CAM:", which)
 		if not which:
 			which = "None"
-		dst = self.name + "." + which
-		if not os.path.exists("/etc/init.d/" + dst):
+		dst = self.name + '.' + which
+		if not os.path.exists('/etc/init.d/' + dst):
 			print("[CamControl] init script does not exist:", dst)
 			return
 		try:

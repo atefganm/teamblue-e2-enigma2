@@ -1,6 +1,6 @@
 from pickle import load
 import enigma
-with open(enigma.eEnv.resolve("${datadir}/enigma2/iso-639-3.pck"), "rb") as f:
+with open(enigma.eEnv.resolve("${datadir}/enigma2/iso-639-3.pck"), 'rb') as f:
 	LanguageCodes = load(f)
 
 
@@ -51,7 +51,7 @@ class ISO639Language:
 		syslang = syslanguage.getLanguage()[:2]
 		choices = []
 		for lang, id_list in self.idlist_by_name.items():
-			if syslang not in id_list and "en" not in id_list:
+			if syslang not in id_list and 'en' not in id_list:
 				choices.append((lang, lang))
 		sorted(choices)
 		choices.insert(0, (self.name_by_shortid[syslang], self.name_by_shortid[syslang]))

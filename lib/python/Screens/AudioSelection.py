@@ -118,7 +118,7 @@ class AudioSelection(ConfigListScreen, Screen):
 					conflist.append((_("Multi channel downmix") + extra_text, self.settings.downmix))
 					self["key_red"].setBoolean(True)
 			if not is_downmix:
-				conflist.append(("",))
+				conflist.append(('',))
 				self["key_red"].setBoolean(False)
 
 				if SystemInfo["DreamBoxAudio"]:
@@ -139,13 +139,13 @@ class AudioSelection(ConfigListScreen, Screen):
 					conflist.append((_("Audio channel"), self.settings.channelmode))
 					self["key_green"].setBoolean(True)
 				else:
-					conflist.append(("",))
+					conflist.append(('',))
 					self["key_green"].setBoolean(False)
 				selectedAudio = self.audioTracks.getCurrentTrack()
 				for x in range(track_num):
 					number = str(x + 1)
 					i = audio.getTrackInfo(x)
-					languages = i.getLanguage().split("/")
+					languages = i.getLanguage().split('/')
 					description = StdAudioDesc(i.getDescription())
 					selected = ""
 					language = ""
@@ -157,7 +157,7 @@ class AudioSelection(ConfigListScreen, Screen):
 					cnt = 0
 					for lang in languages:
 						if cnt:
-							language += " / "
+							language += ' / '
 						if lang == "":
 							language += _("Not defined")
 						elif lang in originalAudioTracks:
@@ -174,7 +174,7 @@ class AudioSelection(ConfigListScreen, Screen):
 
 			else:
 				streams = []
-				conflist.append(("",))
+				conflist.append(('',))
 				self["key_green"].setBoolean(False)
 
 			if subtitlelist:
@@ -182,7 +182,7 @@ class AudioSelection(ConfigListScreen, Screen):
 				conflist.append((_("To subtitle selection"), self.settings.menupage))
 			else:
 				self["key_yellow"].setBoolean(False)
-				conflist.append(("",))
+				conflist.append(('',))
 
 			if SystemInfo["Has3DSurround"]:
 				choice_list = [("none", _("off")), ("hdmi", _("HDMI")), ("spdif", _("SPDIF")), ("dac", _("DAC"))]
@@ -228,8 +228,8 @@ class AudioSelection(ConfigListScreen, Screen):
 		elif self.settings.menupage.getValue() == PAGE_SUBTITLES:
 
 			self.setTitle(_("Subtitle selection"))
-			conflist.append(("",))
-			conflist.append(("",))
+			conflist.append(('',))
+			conflist.append(('',))
 			self["key_red"].setBoolean(False)
 			self["key_green"].setBoolean(False)
 

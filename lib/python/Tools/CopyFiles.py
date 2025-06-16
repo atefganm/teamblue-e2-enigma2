@@ -49,14 +49,14 @@ class AddFileProcessTask(Task):
 		self.ProgressTimer.callback.append(self.ProgressUpdate)
 
 	def ProgressUpdate(self):
-		if self.srcsize <= 0 or not fileExists(self.destfile, "r"):
+		if self.srcsize <= 0 or not fileExists(self.destfile, 'r'):
 			return
 
 		self.setProgress(int((os_path.getsize(self.destfile) / float(self.srcsize)) * 100))
 		self.ProgressTimer.start(5000, True)
 
 	def prepare(self):
-		if fileExists(self.srcfile, "r"):
+		if fileExists(self.srcfile, 'r'):
 			self.srcsize = os_path.getsize(self.srcfile)
 			self.ProgressTimer.start(5000, True)
 

@@ -269,7 +269,7 @@ def legacyEncode(string):
 			string2 += ASCIItranslit[i]
 		else:
 			try:
-				string2 += char.encode("ascii", "strict").decode("utf8")
+				string2 += char.encode('ascii', 'strict').decode('utf8')
 			except:
 				string2 += "_"
 	return string2.upper()

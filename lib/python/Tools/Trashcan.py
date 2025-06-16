@@ -10,7 +10,7 @@ from twisted.internet import threads
 def getTrashFolder(path):
 	# Returns trash folder without symlinks. Path may be file or directory or whatever.
 	mountpoint = Harddisk.findMountPoint(os.path.realpath(path))
-	movie = os.path.join(mountpoint, "movie")
+	movie = os.path.join(mountpoint, 'movie')
 	if os.path.isdir(movie):
 		mountpoint = movie
 	return os.path.join(mountpoint, ".Trash")
@@ -29,9 +29,9 @@ def enumTrashFolders():
 	# Walk through all Trash folders. This may access network
 	# drives and similar, so might block for minutes.
 	for mount in Harddisk.getProcMounts():
-		if mount[1].startswith("/media/"):
+		if mount[1].startswith('/media/'):
 			mountpoint = mount[1]
-			movie = os.path.join(mountpoint, "movie")
+			movie = os.path.join(mountpoint, 'movie')
 			if os.path.isdir(movie):
 				mountpoint = movie
 			result = os.path.join(mountpoint, ".Trash")
