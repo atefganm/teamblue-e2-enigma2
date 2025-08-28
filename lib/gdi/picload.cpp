@@ -482,7 +482,7 @@ static void png_load(Cfilepara* filepara, int background, bool forceRGB=false)
 		forceRGBA = true;
 		color_type = PNG_COLOR_TYPE_RGBA;
 	}
-	
+
 
 	if (color_type == PNG_COLOR_TYPE_RGBA || color_type == PNG_COLOR_TYPE_GA) {
 		filepara->transparent = true;
